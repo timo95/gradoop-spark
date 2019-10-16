@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.gradoopnot</groupId>
+    <artifactId>gradoop-spark</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Gradoop Spark</name>
+    <url>http://www.gradoop.org</url>
+
+    <licenses>
+        <license>
+            <name>Apache 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>timo95</id>
+            <name>Timo Adameit</name>
+            <organization>University of Leipzig</organization>
+        </developer>
+    </developers>
+
+    <properties>
+        <top.dir>${project.basedir}</top.dir>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.maven.version>3.0.0</project.maven.version>
+        <project.build.targetJdk>1.8</project.build.targetJdk>
+
+        <scala.version>2.12.10</scala.version>
+        <scala.compat.version>2.12</scala.compat.version>
+
+        <license.licenseName>apache_v2</license.licenseName>
+
+        <dep.gradoop.version>0.5.0</dep.gradoop.version>
+        <dep.spark.version>2.4.4</dep.spark.version>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <version>4.2.0</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>compile</goal>
+                                <goal>testCompile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.gradoop</groupId>
+            <artifactId>gradoop-common</artifactId>
+            <version>${dep.gradoop.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_${scala.compat.version}</artifactId>
+            <version>${dep.spark.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_${scala.compat.version}</artifactId>
+            <version>${dep.spark.version}</version>
+        </dependency>
+
+        <!-- Test dependencies -->
+
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_${scala.compat.version}</artifactId>
+            <version>3.2.0-SNAP10</version>
+        </dependency>
+
+    </dependencies>
+</project>

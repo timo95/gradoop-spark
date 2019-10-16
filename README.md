@@ -1,2 +1,2 @@
 # gradoop-spark
-Grdoop on Spark
+Gradoop on Spark
