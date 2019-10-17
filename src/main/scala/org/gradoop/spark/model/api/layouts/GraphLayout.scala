@@ -1,8 +1,13 @@
 package org.gradoop.spark.model.api.layouts
 
-import org.apache.spark.sql.DataFrame
-import org.gradoop.common.model.api.entities.Element
+import org.apache.spark.sql.Dataset
 
-trait GraphLayout[E <: Element] extends GraphCollectionLayout[E] {
+trait GraphLayout extends GraphCollectionLayout {
 
+  /**
+   * Returns a dataset containing a single graph head associated with that logical graph.
+   *
+   * @return 1-element dataset
+   */
+  def getGraphHead: Dataset[G]
 }

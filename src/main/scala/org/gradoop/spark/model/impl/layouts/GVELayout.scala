@@ -1,33 +1,28 @@
 package org.gradoop.spark.model.impl.layouts
 
-import org.apache.spark.sql.types.DataTypes._
-import org.apache.spark.sql.types._
-import org.gradoop.common.model.impl.pojo.EPGMElement
-import org.gradoop.spark.model.api.layouts.GraphLayout
+import org.apache.spark.sql.Dataset
+import org.gradoop.common.model.impl.pojo.{EPGMEdge, EPGMGraphHead, EPGMVertex}
+import org.gradoop.spark.model.api.EPGM
+import org.gradoop.spark.model.api.layouts.GraphCollectionLayout
 
+class GVELayout(graphHeads: Dataset[EPGMGraphHead], vertices: Dataset[EPGMVertex], edges: Dataset[EPGMEdge])
+  extends GraphCollectionLayout with EPGM {
 
-class GVELayout extends GraphLayout[EPGMElement] {
+  override def getGraphHeads: Dataset[EPGMGraphHead] = graphHeads
 
-  var FIELD_ID = "id"
-  var FIELD_GRAPH_IDS = "graphIds"
-  var FIELD_SOURCE_ID = "sourceId"
-  var FIELD_TARGET_ID = "targetId"
-  var FIELD_LABELS = "labels"
-  var FIELD_PROPERTIES = "properties"
+  override def getGraphHeadsByLabel(label: String): Dataset[EPGMGraphHead] = {
+    graphHeads.filter(graphHead => graphHead.getLabel.equals(label))
+  }
 
-  var elementSchema: StructType = new StructType()
-    .add(FIELD_ID, BinaryType, nullable = false)
-    .add(FIELD_LABELS, createArrayType(StringType, false), nullable = false)
-    .add(FIELD_PROPERTIES, createMapType(StringType, BinaryType, false), nullable = false)
+  override def getVertices: Dataset[EPGMVertex] = vertices
 
-  var graphElementSchema: StructType = new StructType()
-    .add(FIELD_GRAPH_IDS, createArrayType(BinaryType, false), nullable = false)
+  override def getVerticesByLabel(label: String): Dataset[EPGMVertex] = {
+    vertices.filter(vertices => vertices.getLabel.equals(label))
+  }
 
-  var graphHeadSchema: StructType = elementSchema
+  override def getEdges: Dataset[EPGMEdge] = edges
 
-  var vertexSchema: StructType = graphElementSchema
-
-  var edgeSchema: StructType = graphElementSchema
-    .add(FIELD_SOURCE_ID, BinaryType, nullable = false)
-    .add(FIELD_TARGET_ID, BinaryType, nullable = false)
+  override def getEdgesByLabel(label: String): Dataset[EPGMEdge] = {
+    edges.filter(edges => edges.getLabel.equals(label))
+  }
 }
