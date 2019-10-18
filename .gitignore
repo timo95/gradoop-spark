@@ -7,11 +7,9 @@ dependency-reduced-pom.xml
 .classpath
 .project
 .settings/
-dist/*
-lib_managed/
-src_managed/
-project/boot/
-project/plugins/project/
-.history
-.cache
-.lib/
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
