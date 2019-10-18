@@ -1,8 +1,10 @@
 package org.gradoop.spark.model.api.layouts
 
 import org.apache.spark.sql.Dataset
+import org.gradoop.spark.model.api.GraphModel
 
-trait GraphLayout extends GraphCollectionLayout {
+trait GraphLayout extends Layout {
+  this: GraphModel =>
 
   /**
    * Returns a dataset containing a single graph head associated with that logical graph.

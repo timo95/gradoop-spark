@@ -1,10 +1,9 @@
 package org.gradoop.spark.model.api.layouts
 
 import org.apache.spark.sql.Dataset
-import org.gradoop.common.model.api.entities.GraphHead
+import org.gradoop.spark.model.api.GraphModel
 
 trait GraphCollectionLayout extends Layout {
-  type G <: GraphHead
 
   /**
    * Returns the graph heads associated with the logical graphs in that collection.

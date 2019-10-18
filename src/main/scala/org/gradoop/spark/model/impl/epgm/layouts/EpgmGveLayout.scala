@@ -1,12 +1,12 @@
-package org.gradoop.spark.model.impl.layouts
+package org.gradoop.spark.model.impl.epgm.layouts
 
 import org.apache.spark.sql.Dataset
 import org.gradoop.common.model.impl.pojo.{EPGMEdge, EPGMGraphHead, EPGMVertex}
-import org.gradoop.spark.model.api.EPGM
-import org.gradoop.spark.model.api.layouts.GraphCollectionLayout
 
-class GVELayout(graphHeads: Dataset[EPGMGraphHead], vertices: Dataset[EPGMVertex], edges: Dataset[EPGMEdge])
-  extends GraphCollectionLayout with EPGM {
+class EpgmGveLayout(graphHeads: Dataset[EPGMGraphHead], vertices: Dataset[EPGMVertex], edges: Dataset[EPGMEdge])
+  extends EpgmGraphCollectionLayout with EpgmGraphLayout {
+
+  override def getGraphHead: Dataset[EPGMGraphHead] = graphHeads
 
   override def getGraphHeads: Dataset[EPGMGraphHead] = graphHeads
 

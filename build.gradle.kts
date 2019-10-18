@@ -19,12 +19,13 @@ repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
     //jcenter()
+    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
-    var scalaVersion = "2.12.10"
-    var scalaCompatVersion = "2.12"
+    val scalaVersion = "2.12.10"
+    val scalaCompatVersion = "2.12"
 
 
     // Use Scala 2.12 in our library project
@@ -32,7 +33,7 @@ dependencies {
 
     implementation("org.apache.spark:spark-core_" + scalaCompatVersion + ":2.4.4")
     implementation("org.apache.spark:spark-sql_" + scalaCompatVersion + ":2.4.4")
-    implementation("org.gradoop:gradoop-common:0.5.0")
+    implementation("org.gradoop:gradoop-common:0.6.0-SNAPSHOT")
     implementation("org.apache.flink:flink-core:1.7.2")
 
     // Use Scalatest for testing our library

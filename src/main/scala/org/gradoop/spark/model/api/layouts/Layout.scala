@@ -1,11 +1,9 @@
 package org.gradoop.spark.model.api.layouts
 
 import org.apache.spark.sql.Dataset
-import org.gradoop.common.model.api.entities.{Edge, Vertex}
+import org.gradoop.spark.model.api.GraphModel
 
-trait Layout extends Serializable {
-  type V <: Vertex
-  type E <: Edge
+trait Layout extends Serializable with GraphModel {
 
   /**
    * Returns all vertices.
