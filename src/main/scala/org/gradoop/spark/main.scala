@@ -1,29 +1,24 @@
 package org.gradoop.spark
 
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
-import org.gradoop.common.model.api.entities.{Edge, GraphHead, Vertex}
 import org.gradoop.common.model.impl.id.GradoopId
-import org.gradoop.common.model.impl.pojo.{EPGMEdge, EPGMEdgeFactory, EPGMGraphHead, EPGMGraphHeadFactory, EPGMVertex, EPGMVertexFactory}
+import org.gradoop.common.model.impl.pojo._
 import org.gradoop.common.model.impl.properties.{Properties, PropertyValue}
 import org.gradoop.spark.model.impl.layouts.GVELayout
 
-object main extends App {
-  override def main(args: Array[String]): Unit = {
+object main {
+  def main(args: Array[String]): Unit = {
 
-    val path = "C:/Users/timo/Desktop/Projekte/shakespeare.txt" // Should be some file on your system
     val spark = SparkSession.builder
       .appName("Simple Application")
       .master("local[4]")
       .getOrCreate()
 
-
-    val sc = spark.sparkContext
-    val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+    val sqlContext = spark.sqlContext
     //import sqlContext.implicits._
 
-
     val data = Seq(("Person", 13),("Tier", 3),("Person", 42))
-    val dataRDD = sc.parallelize(data)
+    val dataRDD = spark.sparkContext.parallelize(data)
 
 
 

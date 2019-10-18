@@ -9,22 +9,36 @@
 plugins {
     // Apply the scala plugin to add support for Scala
     scala
+
+    // Fix for windows gradle long classpath issue. Fixes JavaExec tasks that error out with message
+    // "CreateProcess error=206, The filename or extension is too long"
+    id("com.github.ManifestClasspath") version "0.1.0-RELEASE"
 }
 
 repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
-    jcenter()
+    //jcenter()
+    mavenCentral()
 }
 
 dependencies {
+    var scalaVersion = "2.12.10"
+    var scalaCompatVersion = "2.12"
+
+
     // Use Scala 2.12 in our library project
-    implementation("org.scala-lang:scala-library:2.12.8")
+    implementation("org.scala-lang:scala-library:" + scalaVersion)
+
+    implementation("org.apache.spark:spark-core_" + scalaCompatVersion + ":2.4.4")
+    implementation("org.apache.spark:spark-sql_" + scalaCompatVersion + ":2.4.4")
+    implementation("org.gradoop:gradoop-common:0.5.0")
+    implementation("org.apache.flink:flink-core:1.7.2")
 
     // Use Scalatest for testing our library
     testImplementation("junit:junit:4.12")
-    testImplementation("org.scalatest:scalatest_2.12:3.0.8")
+    testImplementation("org.scalatest:scalatest_" + scalaCompatVersion + ":3.0.8")
 
     // Need scala-xml at test runtime
-    testRuntimeOnly("org.scala-lang.modules:scala-xml_2.12:1.2.0")
+    testRuntimeOnly("org.scala-lang.modules:scala-xml_" + scalaCompatVersion + ":1.2.0")
 }
