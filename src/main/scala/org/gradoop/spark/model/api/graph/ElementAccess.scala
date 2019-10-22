@@ -1,9 +1,8 @@
-package org.gradoop.spark.model.api.layouts
+package org.gradoop.spark.model.api.graph
 
 import org.apache.spark.sql.Dataset
-import org.gradoop.spark.model.api.elements.{Edge, Vertex}
 
-trait Layout[V <: Vertex, E <: Edge] extends Serializable {
+trait ElementAccess {
 
   /**
    * Returns all vertices.

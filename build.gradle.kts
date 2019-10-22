@@ -29,17 +29,15 @@ dependencies {
 
 
     // Use Scala 2.12 in our library project
-    implementation("org.scala-lang:scala-library:" + scalaVersion)
+    implementation("org.scala-lang:scala-library:$scalaVersion")
 
-    implementation("org.apache.spark:spark-core_" + scalaCompatVersion + ":2.4.4")
-    implementation("org.apache.spark:spark-sql_" + scalaCompatVersion + ":2.4.4")
-    implementation("org.gradoop:gradoop-common:0.6.0-SNAPSHOT")
-    implementation("org.apache.flink:flink-core:1.7.2")
+    implementation("org.apache.spark:spark-core_$scalaCompatVersion:2.4.4")
+    implementation("org.apache.spark:spark-sql_$scalaCompatVersion:2.4.4")
 
     // Use Scalatest for testing our library
     testImplementation("junit:junit:4.12")
-    testImplementation("org.scalatest:scalatest_" + scalaCompatVersion + ":3.0.8")
+    testImplementation("org.scalatest:scalatest_$scalaCompatVersion:3.0.8")
 
     // Need scala-xml at test runtime
-    testRuntimeOnly("org.scala-lang.modules:scala-xml_" + scalaCompatVersion + ":1.2.0")
+    testRuntimeOnly("org.scala-lang.modules:scala-xml_$scalaCompatVersion:1.2.0")
 }
