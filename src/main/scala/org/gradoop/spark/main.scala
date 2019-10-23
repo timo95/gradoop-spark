@@ -2,9 +2,10 @@ package org.gradoop.spark
 
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
+import org.gradoop.spark.model.api.elements.EdgeFactory
 import org.gradoop.spark.model.api.graph.LogicalGraphFactory
 import org.gradoop.spark.model.api.layouts.LogicalGraphLayoutFactory
-import org.gradoop.spark.model.impl.elements.EpgmEdge
+import org.gradoop.spark.model.impl.elements.{EpgmEdge, EpgmGraphHead, EpgmVertex}
 import org.gradoop.spark.model.impl.graph.{EpgmGraphCollection, EpgmLogicalGraph}
 import org.gradoop.spark.model.impl.types.EpgmGraphModel
 import org.gradoop.spark.util.{EpgmGradoopSparkConfig, GradoopId}
