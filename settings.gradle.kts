@@ -8,3 +8,5 @@
  */
 
 rootProject.name = "gradoop-spark"
+
+include("gradoop-spark", "gradoop-spark-common")
