@@ -2,7 +2,7 @@ package org.gradoop.spark
 
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.api.elements.EdgeFactory
+import org.gradoop.spark.model.api.elements.{EdgeFactory, VertexFactory}
 import org.gradoop.spark.model.api.graph.LogicalGraphFactory
 import org.gradoop.spark.model.api.layouts.LogicalGraphLayoutFactory
 import org.gradoop.spark.model.impl.elements.{EpgmEdge, EpgmGraphHead, EpgmVertex}
@@ -33,14 +33,21 @@ object main extends EpgmGraphModel {
 
     val id1: GradoopId = GradoopId.get
 
-    var gh: Seq[G] = Seq(EpgmGraphHead.createGraphHead("Graph"))
+    var gh: Seq[G] = Seq(EpgmGraphHead.create(Array("Graph")))
     val graphHeads: Dataset[G] = spark.createDataset(gh)
 
-    var v: Seq[V] = Seq(EpgmVertex.initVertex(id1, "Person"))
+    var v: Seq[V] = Seq(EpgmVertex(id1, Array("Person")))
     val vertices: Dataset[V] = spark.createDataset(v)
 
     var e: Seq[E] = Seq(EpgmEdge.create(Array("likes") ,id1, id1))
     val edges: Dataset[E] = spark.createDataset(e)
+
+    edges.printSchema()
+    graphHeads.printSchema()
+    edges.printSchema()
+
+    var fac: VertexFactory[V] = EpgmVertex
+
 
 
     implicit val config: GradoopSparkConfig[G, V, E, EpgmLogicalGraph, EpgmGraphCollection] = new EpgmGradoopSparkConfig()

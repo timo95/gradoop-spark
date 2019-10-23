@@ -3,13 +3,9 @@ package org.gradoop.spark.util
 import java.io.{IOException, InputStream}
 import java.util
 
-import org.gradoop.common.model.api.entities.{Edge, GraphHead, Vertex}
-import org.gradoop.common.util.{AsciiGraphLoader, GradoopConstants}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.api.types.GraphModel
-
-import scala.collection.JavaConverters._
 
 
 class SparkAsciiGraphLoader(config: GradoopSparkConfig[G, V, E, LG, GC]) extends GraphModel {
@@ -113,9 +109,9 @@ class SparkAsciiGraphLoader(config: GradoopSparkConfig[G, V, E, LG, GC]) extends
    * @return collection of all logical graphs
    */
   def getGraphCollection: GraphCollection = {
-    val env = config.getExecutionEnvironment
-    val newVertices = env.fromCollection(getVertices).filter((vertex: Vertex) => vertex.getGraphCount > 0)
-    val newEdges = env.fromCollection(getEdges).filter((edge: Edge) => edge.getGraphCount > 0)
+    val session = config.getSparkSession
+    val newVertices = env.fromCollection(getVertices).filter((vertex: V) => vertex.getGraphCount > 0)
+    val newEdges = env.fromCollection(getEdges).filter((edge: E) => edge.getGraphCount > 0)
     config.getGraphCollectionFactory.fromDatasets(env.fromCollection(getGraphHeads), newVertices, newEdges)
   }
 

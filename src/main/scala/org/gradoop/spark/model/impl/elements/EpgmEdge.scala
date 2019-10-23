@@ -3,7 +3,7 @@ package org.gradoop.spark.model.impl.elements
 import org.gradoop.spark.model.api.elements.{Edge, EdgeFactory}
 import org.gradoop.spark.util.GradoopId
 
-class EpgmEdge(id: Id, labels: Labels, sourceId: Id, targetId: Id, properties: Properties, graphIds: IdSet) extends EpgmGraphElement(id, labels, properties, graphIds) with Edge {
+case class EpgmEdge(id: Id, labels: Labels, sourceId: Id, targetId: Id, properties: Properties, graphIds: IdSet) extends EpgmGraphElement(id, labels, properties, graphIds) with Edge {
   override def getSourceId: Id = sourceId
   override def getTargetId: Id = targetId
 }
