@@ -1,4 +1,4 @@
-package org.gradoop.spark.model.api.elements
+package org.gradoop.common.model.api.elements
 
 trait EdgeFactory[E >: Edge] extends ElementFactory[E] {
 

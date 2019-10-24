@@ -1,6 +1,7 @@
 package org.gradoop.spark.model.api.layouts
 
-import org.gradoop.spark.model.api.elements.{Edge, EdgeFactory, GraphHead, GraphHeadFactory, Vertex, VertexFactory}
+import org.gradoop.common.model.api.elements.{Edge, EdgeFactory, GraphHead, GraphHeadFactory, Vertex, VertexFactory}
+import org.gradoop.spark.model.api.elements.{EdgeFactory, GraphHead, GraphHeadFactory, Vertex, VertexFactory}
 import org.gradoop.spark.model.api.graph.{ElementFactoryProvider, GraphCollection, LogicalGraph}
 
 abstract class BaseLayoutFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph, GC <: GraphCollection] extends ElementFactoryProvider[G, V, E] {

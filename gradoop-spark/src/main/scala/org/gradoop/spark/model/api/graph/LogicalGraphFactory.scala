@@ -1,8 +1,9 @@
 package org.gradoop.spark.model.api.graph
 
 import org.apache.spark.sql.Dataset
+import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.api.elements.{Edge, GraphHead, Vertex}
+import org.gradoop.spark.model.api.elements.{GraphHead, Vertex}
 import org.gradoop.spark.model.api.layouts.LogicalGraphLayoutFactory
 
 class LogicalGraphFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph, GC <: GraphCollection]

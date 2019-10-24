@@ -7,4 +7,6 @@ object Versions {
 
     var spark = "2.4.4"
     var scalatest = "3.0.8"
+
+    var gdl = "0.3"
 }

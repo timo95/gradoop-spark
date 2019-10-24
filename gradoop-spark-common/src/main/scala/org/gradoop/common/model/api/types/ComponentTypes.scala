@@ -1,6 +1,6 @@
-package org.gradoop.spark.model.api.types
+package org.gradoop.common.model.api.types
 
-import org.gradoop.spark.util.GradoopId
+import org.gradoop.common.model.impl.id.GradoopId
 
 trait ComponentTypes {
   type Labels = Array[String]

@@ -7,3 +7,7 @@
  */
 
 description = "Gradoop Spark Common"
+
+dependencies {
+    "implementation"("com.github.s1ck:gdl:${Versions.gdl}")
+}

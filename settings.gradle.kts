@@ -9,4 +9,5 @@
 
 rootProject.name = "gradoop-spark"
 
-include("gradoop-spark", "gradoop-spark-common")
+include("gradoop-spark")
+include("gradoop-spark-common")

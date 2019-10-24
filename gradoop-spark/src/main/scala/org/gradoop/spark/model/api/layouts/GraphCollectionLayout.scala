@@ -1,7 +1,8 @@
 package org.gradoop.spark.model.api.layouts
 
 import org.apache.spark.sql.Dataset
-import org.gradoop.spark.model.api.elements.{Edge, GraphHead, Vertex}
+import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
+import org.gradoop.spark.model.api.elements.{GraphHead, Vertex}
 
 trait GraphCollectionLayout[G <: GraphHead, V <: Vertex, E <: Edge] extends Layout[V, E] {
 

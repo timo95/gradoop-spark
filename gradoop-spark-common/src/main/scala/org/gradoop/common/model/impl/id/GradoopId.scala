@@ -1,4 +1,4 @@
-package org.gradoop.spark.util
+package org.gradoop.common.model.impl.id
 
 import java.net.{NetworkInterface, SocketException}
 import java.nio.{BufferUnderflowException, ByteBuffer}

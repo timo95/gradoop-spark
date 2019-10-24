@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.api.config
 
-import org.apache.spark.sql.SparkSession
-import org.gradoop.spark.model.api.elements.{Edge, GraphHead, Vertex}
+import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
+import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.spark.model.api.graph.{GraphCollection, GraphCollectionFactory, LogicalGraph, LogicalGraphFactory}
 
 abstract class GradoopSparkConfig[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph, GC <: GraphCollection](implicit sparkSession: SparkSession) {
@@ -17,4 +17,8 @@ abstract class GradoopSparkConfig[G <: GraphHead, V <: Vertex, E <: Edge, LG <: 
   def getGraphCollectionFactory: GraphCollectionFactory[G, V, E, LG, GC] = graphCollectionFactory
 
   def getSparkSession: SparkSession = sparkSession
+
+  def getGraphHeadEncoder: Encoder[G] = Encoders.kryo[G]
+  def getVertexEncoder: Encoder[V] = Encoders.kryo[V]
+  def getEdgeEncoder: Encoder[E] = Encoders.kryo[E]
 }

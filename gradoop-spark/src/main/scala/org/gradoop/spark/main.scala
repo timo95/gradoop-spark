@@ -1,14 +1,13 @@
 package org.gradoop.spark
 
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
+import org.gradoop.common.model.api.elements.VertexFactory
+import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.api.elements.{EdgeFactory, VertexFactory}
-import org.gradoop.spark.model.api.graph.LogicalGraphFactory
-import org.gradoop.spark.model.api.layouts.LogicalGraphLayoutFactory
 import org.gradoop.spark.model.impl.elements.{EpgmEdge, EpgmGraphHead, EpgmVertex}
 import org.gradoop.spark.model.impl.graph.{EpgmGraphCollection, EpgmLogicalGraph}
 import org.gradoop.spark.model.impl.types.EpgmGraphModel
-import org.gradoop.spark.util.{EpgmGradoopSparkConfig, GradoopId}
+import org.gradoop.spark.util.EpgmGradoopSparkConfig
 
 object main extends EpgmGraphModel {
   def main(args: Array[String]): Unit = {

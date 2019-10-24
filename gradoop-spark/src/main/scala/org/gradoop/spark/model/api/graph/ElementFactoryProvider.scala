@@ -1,6 +1,7 @@
 package org.gradoop.spark.model.api.graph
 
-import org.gradoop.spark.model.api.elements.{EdgeFactory, GraphHeadFactory, VertexFactory}
+import org.gradoop.common.model.api.elements.{EdgeFactory, GraphHeadFactory, VertexFactory}
+import org.gradoop.spark.model.api.elements.{GraphHeadFactory, VertexFactory}
 
 /**
  * Trait that provides getters for the element factories.

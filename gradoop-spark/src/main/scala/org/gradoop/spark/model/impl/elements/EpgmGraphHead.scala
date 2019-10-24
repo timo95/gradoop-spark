@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.impl.elements
 
-import org.gradoop.spark.model.api.elements.{GraphHead, GraphHeadFactory}
-import org.gradoop.spark.util.GradoopId
+import org.gradoop.common.model.api.elements.{GraphHead, GraphHeadFactory}
+import org.gradoop.common.model.impl.id.GradoopId
 
 class EpgmGraphHead(id: Id, labels: Labels, properties: Properties)
   extends EpgmElement(id, labels, properties) with GraphHead

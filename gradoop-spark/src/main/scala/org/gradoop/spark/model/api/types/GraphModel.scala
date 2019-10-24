@@ -1,6 +1,6 @@
 package org.gradoop.spark.model.api.types
 
-import org.gradoop.spark.model.api.elements.{Edge, GraphHead, Vertex}
+import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 
 trait GraphModel {

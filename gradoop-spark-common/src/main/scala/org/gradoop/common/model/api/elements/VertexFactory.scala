@@ -1,4 +1,4 @@
-package org.gradoop.spark.model.api.elements
+package org.gradoop.common.model.api.elements
 
 trait VertexFactory[V >: Vertex] extends ElementFactory[V] {
 
