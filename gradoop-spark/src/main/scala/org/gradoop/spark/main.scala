@@ -1,7 +1,6 @@
 package org.gradoop.spark
 
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
-import org.gradoop.common.model.api.elements.VertexFactory
 import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.impl.elements.{EpgmEdge, EpgmGraphHead, EpgmVertex}
@@ -32,10 +31,10 @@ object main extends EpgmGraphModel {
 
     val id1: GradoopId = GradoopId.get
 
-    var gh: Seq[G] = Seq(EpgmGraphHead.create(Array("Graph")))
+    var gh: Seq[G] = Seq(EpgmGraphHead.create(Array("Facebook")))
     val graphHeads: Dataset[G] = spark.createDataset(gh)
 
-    var v: Seq[V] = Seq(EpgmVertex(id1, Array("Person")))
+    var v: Seq[V] = Seq(EpgmVertex(id1, Array("Person", "Fake Account")))
     val vertices: Dataset[V] = spark.createDataset(v)
 
     var e: Seq[E] = Seq(EpgmEdge.create(Array("likes") ,id1, id1))
@@ -44,9 +43,6 @@ object main extends EpgmGraphModel {
     edges.printSchema()
     graphHeads.printSchema()
     edges.printSchema()
-
-    var fac: VertexFactory[V] = EpgmVertex
-
 
 
     implicit val config: GradoopSparkConfig[G, V, E, EpgmLogicalGraph, EpgmGraphCollection] = new EpgmGradoopSparkConfig()

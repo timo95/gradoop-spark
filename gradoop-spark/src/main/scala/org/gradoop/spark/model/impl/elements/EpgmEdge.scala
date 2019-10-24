@@ -10,8 +10,7 @@ case class EpgmEdge(id: Id, labels: Labels, sourceId: Id, targetId: Id, properti
 
 object EpgmEdge extends EdgeFactory[E] {
 
-  /**
-   * Creates a new edge based on the given parameters.
+  /** Creates a new edge based on the given parameters.
    *
    * @param sourceId source vertex id
    * @param targetId target vertex id
@@ -19,8 +18,7 @@ object EpgmEdge extends EdgeFactory[E] {
    */
   override def create(sourceId: Id, targetId: Id): E = apply(GradoopId.get, sourceId, targetId)
 
-  /**
-   * Initializes an edge based on the given parameters.
+  /** Initializes an edge based on the given parameters.
    *
    * @param id             edge identifier
    * @param sourceId source vertex id
@@ -29,8 +27,7 @@ object EpgmEdge extends EdgeFactory[E] {
    */
   override def apply(id: Id, sourceId: Id, targetId: Id): E = apply(id, new Labels(0), sourceId, targetId)
 
-  /**
-   * Creates a new edge based on the given parameters.
+  /** Creates a new edge based on the given parameters.
    *
    * @param sourceId source vertex id
    * @param targetId target vertex id
@@ -39,8 +36,7 @@ object EpgmEdge extends EdgeFactory[E] {
    */
   override def create(labels: Labels, sourceId: Id, targetId: Id): E = apply(GradoopId.get, labels, sourceId, targetId)
 
-  /**
-   * Initializes an edge based on the given parameters.
+  /** Initializes an edge based on the given parameters.
    *
    * @param id             edge identifier
    * @param sourceId source vertex id
@@ -50,8 +46,7 @@ object EpgmEdge extends EdgeFactory[E] {
    */
   override def apply(id: Id, labels: Labels, sourceId: Id, targetId: Id): E = apply(id, labels, sourceId, targetId, null, null)
 
-  /**
-   * Creates a new edge based on the given parameters.
+  /** Creates a new edge based on the given parameters.
    *
    * @param labels          edge labels
    * @param sourceId source vertex id
@@ -61,8 +56,7 @@ object EpgmEdge extends EdgeFactory[E] {
    */
   override def create(labels: Labels, sourceId: Id, targetId: Id, properties: Properties): E = apply(GradoopId.get, labels, sourceId, targetId, properties)
 
-  /**
-   * Initializes an edge based on the given parameters.
+  /** Initializes an edge based on the given parameters.
    *
    * @param id             edge identifier
    * @param labels          edge labels
@@ -73,8 +67,7 @@ object EpgmEdge extends EdgeFactory[E] {
    */
   override def apply(id: Id, labels: Labels, sourceId: Id, targetId: Id, properties: Properties): E = apply(id, labels, sourceId, targetId, properties, null)
 
-  /**
-   * Creates a new edge based on the given parameters.
+  /** Creates a new edge based on the given parameters.
    *
    * @param labels          edge labels
    * @param sourceId source vertex id
@@ -84,8 +77,7 @@ object EpgmEdge extends EdgeFactory[E] {
    */
   override def create(labels: Labels, sourceId: Id, targetId: Id, graphIds: IdSet): E = apply(GradoopId.get, labels, sourceId, targetId, graphIds)
 
-  /**
-   * Initializes an edge based on the given parameters.
+  /** Initializes an edge based on the given parameters.
    *
    * @param id             edge identifier
    * @param labels          edge labels
@@ -96,8 +88,7 @@ object EpgmEdge extends EdgeFactory[E] {
    */
   override def apply(id: Id, labels: Labels, sourceId: Id, targetId: Id, graphIds: IdSet): E = apply(id, labels, sourceId, targetId, null, graphIds)
 
-  /**
-   * Creates a new edge based on the given parameters.
+  /** Creates a new edge based on the given parameters.
    *
    * @param labels          edge labels
    * @param sourceId source vertex id
@@ -108,8 +99,7 @@ object EpgmEdge extends EdgeFactory[E] {
    */
   override def create(labels: Labels, sourceId: Id, targetId: Id, properties: Properties, graphIds: IdSet): E = apply(GradoopId.get, labels, sourceId, targetId, properties, graphIds)
 
-  /**
-   * Initializes an edge based on the given parameters.
+  /** Initializes an edge based on the given parameters.
    *
    * @param id             edge identifier
    * @param labels          edge labels

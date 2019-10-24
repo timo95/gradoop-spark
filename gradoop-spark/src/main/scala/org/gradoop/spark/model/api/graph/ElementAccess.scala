@@ -1,8 +1,10 @@
 package org.gradoop.spark.model.api.graph
 
 import org.apache.spark.sql.Dataset
+import org.gradoop.spark.model.api.types.GraphModel
 
 trait ElementAccess {
+  this: GraphModel =>
 
   /**
    * Returns all vertices.

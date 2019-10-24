@@ -2,7 +2,6 @@ package org.gradoop.spark.model.api.layouts
 
 import org.apache.spark.sql.Dataset
 import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
-import org.gradoop.spark.model.api.elements.{GraphHead, Vertex}
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 
 abstract class GveLayoutFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph, GC <: GraphCollection]

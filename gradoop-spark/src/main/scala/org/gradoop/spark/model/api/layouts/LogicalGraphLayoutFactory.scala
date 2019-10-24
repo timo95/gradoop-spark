@@ -3,21 +3,19 @@ package org.gradoop.spark.model.api.layouts
 import org.apache.spark.sql.Dataset
 import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.api.elements.{GraphHead, Vertex}
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 
-abstract class LogicalGraphLayoutFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph, GC <: GraphCollection] extends BaseLayoutFactory[G, V, E, LG, GC] {
+abstract class LogicalGraphLayoutFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph, GC <: GraphCollection]
+  extends BaseLayoutFactory[G, V, E, LG, GC] {
 
-  /**
-   * Creates a logical graph from the given vertices.
+  /** Creates a logical graph from the given vertices.
    *
    * @param vertices the vertex Dataset
    * @return Logical graph
    */
   def fromDatasets(vertices: Dataset[V])(implicit config: GradoopSparkConfig[G, V, E, LG, GC]): LG
 
-  /**
-   * Creates a logical graph from the given vertices and edges.
+  /** Creates a logical graph from the given vertices and edges.
    *
    * The method creates a new graph head element and assigns the vertices and
    * edges to that graph.
@@ -28,8 +26,7 @@ abstract class LogicalGraphLayoutFactory[G <: GraphHead, V <: Vertex, E <: Edge,
    */
   def fromDatasets(vertices: Dataset[V], edges: Dataset[E])(implicit config: GradoopSparkConfig[G, V, E, LG, GC]): LG
 
-  /**
-   * Creates a logical graph from the given graph head, vertices and edges.
+  /** Creates a logical graph from the given graph head, vertices and edges.
    *
    * The method assumes that the given vertices and edges are already assigned
    * to the given graph head.
@@ -62,8 +59,7 @@ abstract class LogicalGraphLayoutFactory[G <: GraphHead, V <: Vertex, E <: Edge,
    */
   def fromIndexedDatasets(graphHead: Map[String, Dataset[G]], vertices: Map[String, Dataset[V]], edges: Map[String, Dataset[E]])(implicit config: GradoopSparkConfig[G, V, E, LG, GC]): LG
 
-  /**
-   * Creates a logical graph from the given single graph head, vertex and edge collections.
+  /** Creates a logical graph from the given single graph head, vertex and edge collections.
    *
    * @param graphHead Graph head associated with the logical graph
    * @param vertices  Vertex collection
@@ -82,8 +78,7 @@ abstract class LogicalGraphLayoutFactory[G <: GraphHead, V <: Vertex, E <: Edge,
    */
   def fromCollections(vertices: Seq[V], edges: Seq[E])(implicit config: GradoopSparkConfig[G, V, E, LG, GC]): LG
 
-  /**
-   * Creates an empty graph.
+  /** Creates an empty graph.
    *
    * @return empty graph
    */
