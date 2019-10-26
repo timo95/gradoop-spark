@@ -10,19 +10,13 @@ abstract class GveLayout[G <: GraphHead, V <: Vertex, E <: Edge](graphHeads: Dat
 
   override def getGraphHeads: Dataset[G] = graphHeads
 
-  override def getGraphHeadsByLabel(label: String): Dataset[G] = {
-    graphHeads.filter(graphHead => graphHead.getLabels.contains(label))
-  }
+  override def getGraphHeadsByLabel(label: String): Dataset[G] = graphHeads.filter(graphHead => graphHead.getLabels.contains(label))
 
   override def getVertices: Dataset[V] = vertices
 
-  override def getVerticesByLabel(label: String): Dataset[V] = {
-    vertices.filter(vertices => vertices.getLabels.contains(label))
-  }
+  override def getVerticesByLabel(label: String): Dataset[V] = vertices.filter(vertices => vertices.getLabels.contains(label))
 
   override def getEdges: Dataset[E] = edges
 
-  override def getEdgesByLabel(label: String): Dataset[E] = {
-    edges.filter(edges => edges.getLabels.contains(label))
-  }
+  override def getEdgesByLabel(label: String): Dataset[E] = edges.filter(edges => edges.getLabels.contains(label))
 }

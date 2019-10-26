@@ -1,35 +1,30 @@
 package org.gradoop.spark.model.api.graph
 
 import org.apache.spark.sql.Dataset
-import org.gradoop.spark.model.api.types.GraphModel
+import org.gradoop.common.model.api.elements.{Edge, Vertex}
 
-trait ElementAccess {
-  this: GraphModel =>
+trait ElementAccess[V <: Vertex, E <: Edge] {
 
-  /**
-   * Returns all vertices.
+  /** Returns all vertices.
    *
    * @return vertices
    */
   def getVertices: Dataset[V]
 
-  /**
-   * Returns all vertices having the specified label.
+  /** Returns all vertices having the specified label.
    *
    * @param label vertex label
    * @return filtered vertices
    */
   def getVerticesByLabel(label: String): Dataset[V]
 
-  /**
-   * Returns all edges.
+  /** Returns all edges.
    *
    * @return edges
    */
   def getEdges: Dataset[E]
 
-  /**
-   * Returns all edges having the specified label.
+  /** Returns all edges having the specified label.
    *
    * @param label edge label
    * @return filtered edges

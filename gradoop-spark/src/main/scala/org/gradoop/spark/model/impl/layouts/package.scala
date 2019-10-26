@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.impl
 
-import org.gradoop.spark.model.impl.types.EpgmGraphModel
+import org.gradoop.spark.model.impl.types.EpgmShortcuts
 
-package object layouts extends EpgmGraphModel {
+package object layouts extends EpgmShortcuts {
 
 }

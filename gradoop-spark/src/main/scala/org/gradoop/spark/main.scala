@@ -1,14 +1,12 @@
 package org.gradoop.spark
 
-import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.impl.elements.{EpgmEdge, EpgmGraphHead, EpgmVertex}
-import org.gradoop.spark.model.impl.graph.{EpgmGraphCollection, EpgmLogicalGraph}
-import org.gradoop.spark.model.impl.types.EpgmGraphModel
-import org.gradoop.spark.util.EpgmGradoopSparkConfig
+import org.gradoop.spark.model.impl.types.EpgmShortcuts
 
-object main extends EpgmGraphModel {
+object main extends EpgmShortcuts {
   def main(args: Array[String]): Unit = {
 
     implicit val spark: SparkSession = SparkSession.builder
@@ -16,9 +14,7 @@ object main extends EpgmGraphModel {
       .master("local[4]")
       .getOrCreate()
 
-    implicit var gradoopIdEncoder: Encoder[G] = Encoders.kryo[G]
-    implicit var vertexEncoder: Encoder[V] = Encoders.kryo[V]
-    implicit var edgeEncoder: Encoder[E] = Encoders.kryo[E]
+    val config = GradoopSparkConfig[G, V, E, LG, GC](GVE, GVE)
 
     //var prop1 = PropertyValue.create("value1")
     //var prop2 = PropertyValue.create(3)
@@ -31,24 +27,11 @@ object main extends EpgmGraphModel {
 
     val id1: GradoopId = GradoopId.get
 
-    var gh: Seq[G] = Seq(EpgmGraphHead.create(Array("Facebook")))
-    val graphHeads: Dataset[G] = spark.createDataset(gh)
+    val graphHead: Seq[G] = Seq(EpgmGraphHead.create(Array("Facebook")))
+    val vertices: Seq[V] = Seq(EpgmVertex(id1, Array("Person", "Fake Account")))
+    val edges: Seq[E] = Seq(EpgmEdge.create(Array("likes") ,id1, id1))
 
-    var v: Seq[V] = Seq(EpgmVertex(id1, Array("Person", "Fake Account")))
-    val vertices: Dataset[V] = spark.createDataset(v)
-
-    var e: Seq[E] = Seq(EpgmEdge.create(Array("likes") ,id1, id1))
-    val edges: Dataset[E] = spark.createDataset(e)
-
-    edges.printSchema()
-    graphHeads.printSchema()
-    edges.printSchema()
-
-
-    implicit val config: GradoopSparkConfig[G, V, E, EpgmLogicalGraph, EpgmGraphCollection] = new EpgmGradoopSparkConfig()
-    //implicit def ftolf(f: LogicalGraphFactory[G, V, E, EpgmLogicalGraph, EpgmGraphCollection]): LogicalGraphLayoutFactory[G, V, E, EpgmLogicalGraph, EpgmGraphCollection] = f.getLayoutFactory
-
-    config.getLogicalGraphFactory.createEmptyGraph
+    val graphCollection = config.getGraphCollectionFactory.init(graphHead, vertices, edges)
 
     spark.stop()
   }

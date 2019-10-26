@@ -3,7 +3,7 @@ package org.gradoop.spark.model.impl.elements
 import org.gradoop.common.model.api.elements.{Vertex, VertexFactory}
 import org.gradoop.common.model.impl.id.GradoopId
 
-case class EpgmVertex(id: Id, labels: Labels, properties: Properties, graphIds: IdSet)
+class EpgmVertex(id: Id, labels: Labels, properties: Properties, override var graphIds: IdSet)
   extends EpgmGraphElement(id, labels, properties, graphIds) with Vertex
 
 object EpgmVertex extends VertexFactory[V] {

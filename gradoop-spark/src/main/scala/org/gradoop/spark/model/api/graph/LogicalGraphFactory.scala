@@ -1,25 +1,98 @@
 package org.gradoop.spark.model.api.graph
 
-import org.gradoop.common.model.api.elements.{Edge, ElementFactoryProvider, GraphHead, Vertex}
+import org.apache.spark.sql.Dataset
+import org.gradoop.common.model.api.elements._
+import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.layouts.LogicalGraphLayoutFactory
 
-abstract class LogicalGraphFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph, GC <: GraphCollection]
-  (var layoutFactory: LogicalGraphLayoutFactory[G, V, E, LG, GC]) extends ElementFactoryProvider[G, V, E] {
+/** Creates a logical graph with a specific layout.
+ *
+ * @tparam G
+ * @tparam V
+ * @tparam E
+ * @tparam LG
+ * @tparam GC
+ */
+class LogicalGraphFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph[G, V, E, LG, GC], GC <: GraphCollection[G, V, E, LG, GC]](layoutFactory: LogicalGraphLayoutFactory[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC])
+  extends BaseGraphFactory[G, V, E, LG, GC](config) {
+
+  override def getGraphHeadFactory: GraphHeadFactory[G] = layoutFactory.getGraphHeadFactory
+
+  override def getVertexFactory: VertexFactory[V] = layoutFactory.getVertexFactory
+
+  override def getEdgeFactory: EdgeFactory[E] = layoutFactory.getEdgeFactory
+
+  /** Creates a logical graph from the given vertices and edges.
+   *
+   * The method creates a new graph head element and assigns the vertices and edges to that graph.
+   *
+   * @param vertices Vertex Dataset
+   * @param edges    Edge Dataset
+   * @return Logical graph
+   */
+  def create(vertices: Dataset[V], edges: Dataset[E]): LG = {
+    val id = GradoopId.get
+    val graphHeads = session.createDataset[G](Seq(getGraphHeadFactory(id)))
+
+    // TODO add/set id to each element
+
+   init(graphHeads, vertices, edges)
+  }
+
+  /** Creates a logical graph from the given graph head, vertices and edges.
+   *
+   * The method assumes that the given vertices and edges are already assigned to the given graph head.
+   *
+   * @param graphHead 1-element GraphHead Dataset
+   * @param vertices  Vertex Dataset
+   * @param edges     Edge Dataset
+   * @return Logical graph
+   */
+  def init(graphHead: Dataset[G], vertices: Dataset[V], edges: Dataset[E]): LG = {
+    val layout = layoutFactory(graphHead, vertices, edges)
+    new LG(layout, config) // TODO geht das wirklich?????
+  }
+
+  /** Creates a logical graph from the given single graph head, vertex and edge collections.
+   *
+   * @param graphHead Graph head associated with the logical graph
+   * @param vertices  Vertex collection
+   * @param edges     Edge collection
+   * @return Logical graph
+   */
+  def init(graphHead: G, vertices: Seq[V], edges: Seq[E]): LG = {
+    val graphHeadDS: Dataset[G] = session.createDataset[G](Seq(graphHead))
+    val vertexDS: Dataset[V] = session.createDataset[V](vertices)
+    val edgeDS: Dataset[E] = session.createDataset[E](edges)
+
+    init(graphHeadDS, vertexDS, edgeDS)
+  }
 
   /**
-   * Get the layout factory responsible for creating a graph layout.
+   * Creates a logical graph from the given vertex and edge collections. A new graph head is
+   * created and all vertices and edges are assigned to that graph.
    *
-   * @return The graph layout factory.
+   * @param vertices Vertex collection
+   * @param edges    Edge collection
+   * @return Logical graph
    */
-  implicit def getLayoutFactory(implicit config: GradoopSparkConfig[G, V, E, LG, GC]): LogicalGraphLayoutFactory[G, V, E, LG, GC] = layoutFactory
+  def init(vertices: Seq[V], edges: Seq[E]): LG = {
+    val vertexDS: Dataset[V] = session.createDataset[V](vertices)
+    val edgeDS: Dataset[E] = session.createDataset[E](edges)
 
-  /**
-   * Sets the layout factory that is responsible for creating a graph layout.
+    init(vertices, edges)
+  }
+
+  /** Creates an empty graph.
    *
-   * @param layoutFactory graph layout factory
+   * @return empty graph
    */
-  def setLayoutFactory(layoutFactory: LogicalGraphLayoutFactory[G, V, E, LG, GC]): Unit = {
-    this.layoutFactory = layoutFactory
+  def empty: LG = {
+    var graphHeads: Dataset[G] = session.emptyDataset[G]
+    var vertices: Dataset[V] = session.emptyDataset[V]
+    var edges: Dataset[E] = session.emptyDataset[E]
+
+    init(graphHeads, vertices, edges)
   }
 }
