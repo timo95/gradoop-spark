@@ -1,10 +1,10 @@
 package org.gradoop.common.model.api.elements
 
-trait ElementFactory[EL >: Element] {
-  /**
-   * Returns the type of the instances produced by that factory.
+trait ElementFactory[EL <: Element] {
+
+  /** Returns the type of the instances produced by that factory.
    *
    * @return produced entity type
    */
-  def getType: Class[EL] = classOf[EL]
+  def getType: Class[EL]
 }

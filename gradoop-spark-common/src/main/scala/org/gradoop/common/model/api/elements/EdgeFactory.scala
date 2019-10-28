@@ -1,6 +1,6 @@
 package org.gradoop.common.model.api.elements
 
-trait EdgeFactory[E >: Edge] extends ElementFactory[E] {
+trait EdgeFactory[E <: Edge] extends ElementFactory[E] {
 
   /**
    * Creates a new edge based on the given parameters.

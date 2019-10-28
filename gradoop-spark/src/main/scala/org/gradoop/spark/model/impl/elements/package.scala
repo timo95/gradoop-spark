@@ -1,6 +1,6 @@
 package org.gradoop.spark.model.impl
 
 import org.gradoop.common.model.api.types.ComponentTypes
-import org.gradoop.spark.model.impl.types.EpgmShortcuts
+import org.gradoop.spark.model.impl.types.EpgmTypes
 
-package object elements extends EpgmShortcuts with ComponentTypes
+package object elements extends EpgmTypes with ComponentTypes

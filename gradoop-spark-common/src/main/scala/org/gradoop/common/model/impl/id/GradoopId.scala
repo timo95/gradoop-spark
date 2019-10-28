@@ -9,6 +9,12 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class GradoopId(bytes: Array[Byte]) extends Ordered[GradoopId] with Serializable {
 
+  /** Returns byte representation of a GradoopId
+   *
+   * @return Byte representation
+   */
+  def toByteArray: Array[Byte] = bytes
+
   /** Checks if the specified object is equal to the current id.
    *
    * @param o the object to be compared
@@ -18,7 +24,7 @@ class GradoopId(bytes: Array[Byte]) extends Ordered[GradoopId] with Serializable
     if (super.equals(o)) return true
     if (o == null || (getClass ne o.getClass)) return false
     val firstBytes = this.bytes
-    val secondBytes = o.asInstanceOf[GradoopId].bytes
+    val secondBytes = o.asInstanceOf[GradoopId].toByteArray
     var i = 0
     for (i <- 0 until GradoopId.ID_SIZE) {
       if (firstBytes(i) != secondBytes(i)) return false
@@ -42,7 +48,7 @@ class GradoopId(bytes: Array[Byte]) extends Ordered[GradoopId] with Serializable
 
   override def compare(that: GradoopId): Int = {
     for (i <- 0 until GradoopId.ID_SIZE) {
-      if (this.bytes(i) != that.bytes(i)) return if ((this.bytes(i) & 0xff) < (that.bytes(i) & 0xff)) -1
+      if (this.toByteArray(i) != that.toByteArray(i)) return if ((this.toByteArray(i) & 0xff) < (that.toByteArray(i) & 0xff)) -1
       else 1
     }
     0

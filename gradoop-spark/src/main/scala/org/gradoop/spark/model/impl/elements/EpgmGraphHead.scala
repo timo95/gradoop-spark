@@ -1,5 +1,6 @@
 package org.gradoop.spark.model.impl.elements
 
+import org.apache.spark.sql.{Encoder, Encoders}
 import org.gradoop.common.model.api.elements.{GraphHead, GraphHeadFactory}
 import org.gradoop.common.model.impl.id.GradoopId
 
@@ -7,6 +8,8 @@ class EpgmGraphHead(id: Id, labels: Labels, properties: Properties)
   extends EpgmElement(id, labels, properties) with GraphHead
 
 object EpgmGraphHead extends GraphHeadFactory[G] {
+
+  override def getType: Class[G] = classOf[EpgmGraphHead]
 
   /**
    * Creates a new edge based on the given parameters.
@@ -38,7 +41,7 @@ object EpgmGraphHead extends GraphHeadFactory[G] {
    * @param labels          edge labels
    * @return edge data
    */
-  override def apply(id: Id, labels: Labels): G = apply(id, labels, null, null)
+  override def apply(id: Id, labels: Labels): G = apply(id, labels, null)
 
   /**
    * Creates a new edge based on the given parameters.

@@ -14,9 +14,9 @@ import org.gradoop.spark.model.api.layouts.LogicalGraphLayoutFactory
  * @tparam LG
  * @tparam GC
  */
-class LogicalGraphFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph[G, V, E, LG, GC], GC <: GraphCollection[G, V, E, LG, GC]]
+abstract class LogicalGraphFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph[G, V, E, LG, GC], GC <: GraphCollection[G, V, E, LG, GC]]
 (layoutFactory: LogicalGraphLayoutFactory[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC])
-  extends BaseGraphFactory[G, V, E, LG, GC](config) {
+  extends BaseGraphFactory[G, V, E, LG, GC](layoutFactory, config) {
 
   override def getGraphHeadFactory: GraphHeadFactory[G] = layoutFactory.getGraphHeadFactory
 
@@ -50,10 +50,7 @@ class LogicalGraphFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalG
    * @param edges     Edge Dataset
    * @return Logical graph
    */
-  def init(graphHead: Dataset[G], vertices: Dataset[V], edges: Dataset[E]): LG = {
-    val layout = layoutFactory(graphHead, vertices, edges)
-    new LG(layout, config) // TODO geht das wirklich?????
-  }
+  def init(graphHead: Dataset[G], vertices: Dataset[V], edges: Dataset[E]): LG
 
   /** Creates a logical graph from the given single graph head, vertex and edge collections.
    *

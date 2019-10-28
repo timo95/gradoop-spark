@@ -1,6 +1,6 @@
 package org.gradoop.common.model.api.elements
 
-trait VertexFactory[V >: Vertex] extends ElementFactory[V] {
+trait VertexFactory[V <: Vertex] extends ElementFactory[V] {
 
   /**
    * Initializes a new vertex based on the given parameters.

@@ -13,9 +13,9 @@ import org.gradoop.spark.model.api.layouts.GraphCollectionLayoutFactory
  * @tparam LG
  * @tparam GC
  */
-class GraphCollectionFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph[G, V, E, LG, GC], GC <: GraphCollection[G, V, E, LG, GC]]
+abstract class GraphCollectionFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph[G, V, E, LG, GC], GC <: GraphCollection[G, V, E, LG, GC]]
 (layoutFactory: GraphCollectionLayoutFactory[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC])
-  extends BaseGraphFactory[G, V, E, LG, GC](config) {
+  extends BaseGraphFactory[G, V, E, LG, GC](layoutFactory, config) {
 
   override def getGraphHeadFactory: GraphHeadFactory[G] = layoutFactory.getGraphHeadFactory
 
@@ -30,10 +30,7 @@ class GraphCollectionFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: Logic
    * @param edges      Edge Dataset
    * @return Graph collection
    */
-  def init(graphHeads: Dataset[G], vertices: Dataset[V], edges: Dataset[E]): GC = {
-    val layout = layoutFactory(graphHeads, vertices, edges)
-    new GC(layout, config) // TODO geht das wirklich?????
-  }
+  def init(graphHeads: Dataset[G], vertices: Dataset[V], edges: Dataset[E]): GC
 
   /** Creates a graph collection from the given collections.
    *

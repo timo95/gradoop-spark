@@ -2,11 +2,10 @@ package org.gradoop.spark
 
 import org.apache.spark.sql.SparkSession
 import org.gradoop.common.model.impl.id.GradoopId
-import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.impl.elements.{EpgmEdge, EpgmGraphHead, EpgmVertex}
-import org.gradoop.spark.model.impl.types.EpgmShortcuts
+import org.gradoop.spark.util.{EpgmApp, SparkAsciiGraphLoader}
 
-object main extends EpgmShortcuts {
+object main extends EpgmApp {
   def main(args: Array[String]): Unit = {
 
     implicit val spark: SparkSession = SparkSession.builder
@@ -14,7 +13,7 @@ object main extends EpgmShortcuts {
       .master("local[4]")
       .getOrCreate()
 
-    val config = GradoopSparkConfig[G, V, E, LG, GC](GVE, GVE)
+    val config = getGveConfig
 
     //var prop1 = PropertyValue.create("value1")
     //var prop2 = PropertyValue.create(3)
@@ -32,6 +31,10 @@ object main extends EpgmShortcuts {
     val edges: Seq[E] = Seq(EpgmEdge.create(Array("likes") ,id1, id1))
 
     val graphCollection = config.getGraphCollectionFactory.init(graphHead, vertices, edges)
+
+    val loader = SparkAsciiGraphLoader.fromString(config, getGraphGDLString)
+
+    val graphCollection2 = loader.getGraphCollection
 
     spark.stop()
   }

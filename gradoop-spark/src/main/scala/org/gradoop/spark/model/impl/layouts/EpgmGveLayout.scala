@@ -1,6 +1,6 @@
 package org.gradoop.spark.model.impl.layouts
 
-import org.apache.spark.sql.Dataset
+import org.apache.spark.sql.{Dataset, Encoder, Encoders}
 import org.gradoop.common.model.api.elements.{EdgeFactory, GraphHeadFactory, VertexFactory}
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, GveLayout, LogicalGraphLayoutFactory}
 import org.gradoop.spark.model.impl.elements.{EpgmEdge, EpgmGraphHead, EpgmVertex}
@@ -9,6 +9,12 @@ class EpgmGveLayout(graphHeads: Dataset[G], vertices: Dataset[V], edges: Dataset
   extends GveLayout[G, V, E](graphHeads, vertices, edges)
 
 object EpgmGveLayout extends LogicalGraphLayoutFactory[G, V, E] with GraphCollectionLayoutFactory[G, V, E] {
+
+  override def getGraphHeadEncoder: Encoder[G] = Encoders.kryo[G]
+
+  override def getVertexEncoder: Encoder[V] = Encoders.kryo[V]
+
+  override def getEdgeEncoder: Encoder[E] = Encoders.kryo[E]
 
   override def getGraphHeadFactory: GraphHeadFactory[G] = EpgmGraphHead
 
