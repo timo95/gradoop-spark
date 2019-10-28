@@ -13,7 +13,8 @@ import org.gradoop.spark.model.api.layouts.GraphCollectionLayoutFactory
  * @tparam LG
  * @tparam GC
  */
-class GraphCollectionFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph[G, V, E, LG, GC], GC <: GraphCollection[G, V, E, LG, GC]](layoutFactory: GraphCollectionLayoutFactory[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC])
+class GraphCollectionFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph[G, V, E, LG, GC], GC <: GraphCollection[G, V, E, LG, GC]]
+(layoutFactory: GraphCollectionLayoutFactory[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC])
   extends BaseGraphFactory[G, V, E, LG, GC](config) {
 
   override def getGraphHeadFactory: GraphHeadFactory[G] = layoutFactory.getGraphHeadFactory
@@ -41,10 +42,10 @@ class GraphCollectionFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: Logic
    * @param edges      Edge collection
    * @return Graph collection
    */
-  def init(graphHeads: Seq[G], vertices: Seq[V], edges: Seq[E]): GC = {
-    var graphHeadDS: Dataset[G] = session.createDataset[G](graphHeads)
-    var vertexDS: Dataset[V] = session.createDataset[V](vertices)
-    var edgeDS: Dataset[E] = session.createDataset[E](edges)
+  def init(graphHeads: Iterable[G], vertices: Iterable[V], edges: Iterable[E]): GC = {
+    val graphHeadDS: Dataset[G] = createDataset[G](graphHeads)
+    val vertexDS: Dataset[V] = createDataset[V](vertices)
+    val edgeDS: Dataset[E] = createDataset[E](edges)
 
     init(graphHeadDS, vertexDS, edgeDS)
   }
@@ -54,7 +55,7 @@ class GraphCollectionFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: Logic
    * @param logicalGraphs input graphs
    * @return graph collection
    */
-  def init(logicalGraphs: LogicalGraph[G, V, E, LG, GC]*): GC = {
+  def init(logicalGraphs: LG*): GC = {
     val graphHeads: Dataset[G] = session.emptyDataset[G]
     val vertices: Dataset[V] = session.emptyDataset[V]
     val edges: Dataset[E] = session.emptyDataset[E]

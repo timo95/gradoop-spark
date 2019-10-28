@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.api.graph
 
-import org.apache.spark.sql.{Encoder, SparkSession}
-import org.gradoop.common.model.api.elements.{Edge, ElementFactoryProvider, GraphHead, GraphHeadFactory, Vertex}
+import org.apache.spark.sql.{Dataset, Encoder, SparkSession}
+import org.gradoop.common.model.api.elements.{Edge, ElementFactoryProvider, GraphHead, Vertex}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 
 abstract class BaseGraphFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph[G, V, E, LG, GC], GC <: GraphCollection[G, V, E, LG, GC]](config: GradoopSparkConfig[G, V, E, LG, GC])
@@ -10,4 +10,8 @@ abstract class BaseGraphFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: Lo
   implicit val encoderV: Encoder[V] = config.getVertexEncoder
   implicit val encoderE: Encoder[E] = config.getEdgeEncoder
   implicit val session: SparkSession = config.getSparkSession
+
+  def createDataset[T](iterable: Iterable[T])(implicit encoder: Encoder[T]): Dataset[T] = {
+    session.createDataset(iterable.toSeq)
+  }
 }

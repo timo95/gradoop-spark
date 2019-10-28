@@ -1,6 +1,16 @@
 package org.gradoop.common.util
 
 object GradoopConstants {
+
+  /** Default label for unlabeled graphs. */
+  val DEFAULT_GRAPH_LABEL = ""
+
+  /** Default label for unlabeled vertices. */
+  val DEFAULT_VERTEX_LABEL = ""
+
+  /** Default label for unlabeled edges. */
+  val DEFAULT_EDGE_LABEL = ""
+
   /** String representation of {@code null}. */
   val NULL_STRING = "NULL"
 

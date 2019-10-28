@@ -14,7 +14,8 @@ import org.gradoop.spark.model.api.layouts.LogicalGraphLayoutFactory
  * @tparam LG
  * @tparam GC
  */
-class LogicalGraphFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph[G, V, E, LG, GC], GC <: GraphCollection[G, V, E, LG, GC]](layoutFactory: LogicalGraphLayoutFactory[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC])
+class LogicalGraphFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph[G, V, E, LG, GC], GC <: GraphCollection[G, V, E, LG, GC]]
+(layoutFactory: LogicalGraphLayoutFactory[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC])
   extends BaseGraphFactory[G, V, E, LG, GC](config) {
 
   override def getGraphHeadFactory: GraphHeadFactory[G] = layoutFactory.getGraphHeadFactory
@@ -61,10 +62,10 @@ class LogicalGraphFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalG
    * @param edges     Edge collection
    * @return Logical graph
    */
-  def init(graphHead: G, vertices: Seq[V], edges: Seq[E]): LG = {
+  def init(graphHead: G, vertices: Iterable[V], edges: Iterable[E]): LG = {
     val graphHeadDS: Dataset[G] = session.createDataset[G](Seq(graphHead))
-    val vertexDS: Dataset[V] = session.createDataset[V](vertices)
-    val edgeDS: Dataset[E] = session.createDataset[E](edges)
+    val vertexDS: Dataset[V] = createDataset[V](vertices)
+    val edgeDS: Dataset[E] = createDataset[E](edges)
 
     init(graphHeadDS, vertexDS, edgeDS)
   }
@@ -77,9 +78,9 @@ class LogicalGraphFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalG
    * @param edges    Edge collection
    * @return Logical graph
    */
-  def init(vertices: Seq[V], edges: Seq[E]): LG = {
-    val vertexDS: Dataset[V] = session.createDataset[V](vertices)
-    val edgeDS: Dataset[E] = session.createDataset[E](edges)
+  def init(vertices: Iterable[V], edges: Iterable[E]): LG = {
+    val vertexDS: Dataset[V] = createDataset[V](vertices)
+    val edgeDS: Dataset[E] = createDataset[E](edges)
 
     init(vertices, edges)
   }
@@ -89,9 +90,9 @@ class LogicalGraphFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalG
    * @return empty graph
    */
   def empty: LG = {
-    var graphHeads: Dataset[G] = session.emptyDataset[G]
-    var vertices: Dataset[V] = session.emptyDataset[V]
-    var edges: Dataset[E] = session.emptyDataset[E]
+    val graphHeads: Dataset[G] = session.emptyDataset[G]
+    val vertices: Dataset[V] = session.emptyDataset[V]
+    val edges: Dataset[E] = session.emptyDataset[E]
 
     init(graphHeads, vertices, edges)
   }

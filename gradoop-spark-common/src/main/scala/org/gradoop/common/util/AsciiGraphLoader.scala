@@ -355,8 +355,27 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
 
 object AsciiGraphLoader {
 
-  def apply[G <: GraphHead, V <: Vertex, E <: Edge](gdlHandler: GDLHandler, elementFactoryProvider: ElementFactoryProvider[G, V, E]): AsciiGraphLoader[G, V, E] = {
-    new AsciiGraphLoader[G, V, E](gdlHandler, elementFactoryProvider.getGraphHeadFactory, elementFactoryProvider.getVertexFactory,
-      elementFactoryProvider.getEdgeFactory)
+  def fromString[G <: GraphHead, V <: Vertex, E <: Edge]
+  (elementFactoryProvider: ElementFactoryProvider[G, V, E], asciiGraph: String): AsciiGraphLoader[G, V, E] = {
+    val gdlHandler = new GDLHandler.Builder()
+      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
+      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
+      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
+      .buildFromString(asciiGraph)
+
+    new AsciiGraphLoader[G, V, E](gdlHandler, elementFactoryProvider.getGraphHeadFactory,
+      elementFactoryProvider.getVertexFactory, elementFactoryProvider.getEdgeFactory)
+  }
+
+  def fromFile[G <: GraphHead, V <: Vertex, E <: Edge]
+  (elementFactoryProvider: ElementFactoryProvider[G, V, E], fileName: String): AsciiGraphLoader[G, V, E] = {
+    val gdlHandler = new GDLHandler.Builder()
+      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
+      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
+      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
+      .buildFromFile(fileName)
+
+    new AsciiGraphLoader[G, V, E](gdlHandler, elementFactoryProvider.getGraphHeadFactory,
+      elementFactoryProvider.getVertexFactory, elementFactoryProvider.getEdgeFactory)
   }
 }
