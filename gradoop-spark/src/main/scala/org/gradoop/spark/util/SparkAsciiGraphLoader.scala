@@ -1,7 +1,7 @@
 package org.gradoop.spark.util
 
 import org.gradoop.common.model.api.elements.GraphHead
-import org.gradoop.common.util.AsciiGraphLoader
+import org.gradoop.common.util.{AsciiGraphLoader, GradoopConstants}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 
