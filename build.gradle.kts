@@ -8,6 +8,8 @@
 
 plugins {
     base
+
+    // Fix for gradle + Windows bug
     id("com.github.ManifestClasspath") version "0.1.0-RELEASE"
 }
 

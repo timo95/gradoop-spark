@@ -1,13 +1,13 @@
 package org.gradoop.spark
 
 import org.apache.spark.sql.SparkSession
-import org.gradoop.spark.operators.filter.HasLabel
+import org.gradoop.spark.functions.filter.HasLabel
 import org.gradoop.spark.util.{EpgmApp, SparkAsciiGraphLoader}
 
 object main extends EpgmApp {
   def main(args: Array[String]): Unit = {
 
-    implicit val spark: SparkSession = SparkSession.builder
+    implicit val session: SparkSession = SparkSession.builder
       .appName("Simple Application")
       .master("local[4]")
       .getOrCreate()
@@ -24,6 +24,6 @@ object main extends EpgmApp {
 
     println("Vertices Subgraph: " + graph.getVertices.count())
 
-    spark.stop()
+    session.stop()
   }
 }

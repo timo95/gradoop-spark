@@ -1,4 +1,4 @@
-package org.gradoop.spark.operators.filter
+package org.gradoop.spark.functions.filter
 
 import org.apache.spark.api.java.function.FilterFunction
 import org.gradoop.common.model.api.elements.Labeled

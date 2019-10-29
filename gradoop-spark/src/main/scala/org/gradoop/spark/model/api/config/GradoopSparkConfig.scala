@@ -3,8 +3,10 @@ package org.gradoop.spark.model.api.config
 import org.apache.spark.sql.SparkSession
 import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.spark.model.api.graph.{GraphCollection, GraphCollectionFactory, LogicalGraph, LogicalGraphFactory}
+import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, LogicalGraphLayoutFactory}
+import org.gradoop.spark.model.impl.layouts.{E, EpgmGveLayout, G, GC, LG, V}
 
-class GradoopSparkConfig [
+class GradoopSparkConfig[
   G <: GraphHead,
   V <: Vertex,
   E <: Edge,
@@ -34,5 +36,23 @@ class GradoopSparkConfig [
    */
   def setGraphCollectionFactory(graphCollectionFactory: GraphCollectionFactory[G, V, E, LG, GC]): Unit = {
     this.graphCollectionFactory = graphCollectionFactory
+  }
+}
+
+object GradoopSparkConfig {
+
+  def create[
+    G <: GraphHead,
+    V <: Vertex,
+    E <: Edge,
+    LG <: LogicalGraph[G, V, E, LG, GC],
+    GC <: GraphCollection[G, V, E, LG, GC]]
+  (logicalGraphLayoutFactory: LogicalGraphLayoutFactory[G, V, E, LG, GC],
+   graphCollectionLayoutFactory: GraphCollectionLayoutFactory[G, V, E, LG, GC])
+  (implicit sparkSession: SparkSession): GradoopSparkConfig[G, V, E, LG, GC] = {
+    val config = new GradoopSparkConfig[G, V, E, LG, GC](null, null)
+    config.setLogicalGraphFactory(new LogicalGraphFactory[G, V, E, LG, GC](logicalGraphLayoutFactory, config))
+    config.setGraphCollectionFactory(new GraphCollectionFactory[G, V, E, LG, GC](graphCollectionLayoutFactory, config))
+    config
   }
 }

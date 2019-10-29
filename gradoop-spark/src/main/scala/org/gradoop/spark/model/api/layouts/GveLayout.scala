@@ -2,7 +2,7 @@ package org.gradoop.spark.model.api.layouts
 
 import org.apache.spark.sql.Dataset
 import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
-import org.gradoop.spark.operators.filter.HasLabel
+import org.gradoop.spark.functions.filter.HasLabel
 
 abstract class GveLayout[G <: GraphHead, V <: Vertex, E <: Edge](graphHeads: Dataset[G], vertices: Dataset[V], edges: Dataset[E])
   extends GraphCollectionLayout[G, V, E] with LogicalGraphLayout[G, V, E] {
