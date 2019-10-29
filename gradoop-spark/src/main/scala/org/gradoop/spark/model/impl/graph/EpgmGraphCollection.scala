@@ -5,7 +5,8 @@ import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.GraphCollection
 import org.gradoop.spark.model.api.layouts.GraphCollectionLayout
 
-class EpgmGraphCollection(layout: GraphCollectionLayout[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC]) extends GraphCollection[G, V, E, LG, GC](layout, config) {
+class EpgmGraphCollection(layout: GraphCollectionLayout[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC])
+  extends GraphCollection[G, V, E, LG, GC](layout, config) {
 
   override def getGraphHeads: Dataset[G] = layout.getGraphHeads
   override def getGraphHeadsByLabel(label: String): Dataset[G] = layout.getGraphHeadsByLabel(label)

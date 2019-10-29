@@ -2,7 +2,7 @@ package org.gradoop.spark.util
 
 import org.apache.spark.sql.SparkSession
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.impl.graph.{EpgmGraphCollectionFactory, EpgmLogicalGraphFactory}
+import org.gradoop.spark.model.api.graph.{GraphCollectionFactory, LogicalGraphFactory}
 import org.gradoop.spark.model.impl.layouts.EpgmGveLayout
 import org.gradoop.spark.model.impl.types.EpgmTypes
 
@@ -14,13 +14,9 @@ trait EpgmApp extends EpgmTypes {
     if (config == null) {
       config = new GradoopSparkConfig[G, V, E, LG, GC](null, null)
 
-      val logicalGraphFactory = new EpgmLogicalGraphFactory(EpgmGveLayout, config)
-      val graphCollectionFactory = new EpgmGraphCollectionFactory(EpgmGveLayout, config)
-
-      config.setLogicalGraphFactory(logicalGraphFactory)
-      config.setGraphCollectionFactory(graphCollectionFactory)
+      config.setLogicalGraphFactory(new LogicalGraphFactory[G, V, E, LG, GC](EpgmGveLayout, config))
+      config.setGraphCollectionFactory(new GraphCollectionFactory[G, V, E, LG, GC](EpgmGveLayout, config))
     }
-
     config
   }
 

@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.api.graph
 
-import org.apache.spark.sql.{Dataset, Encoder, SparkSession}
-import org.gradoop.common.model.api.elements.{Edge, EdgeFactory, GraphHead, GraphHeadFactory, Vertex, VertexFactory}
+import org.apache.spark.sql.Dataset
+import org.gradoop.common.model.api.elements._
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.layouts.GraphCollectionLayoutFactory
 
@@ -13,8 +13,14 @@ import org.gradoop.spark.model.api.layouts.GraphCollectionLayoutFactory
  * @tparam LG
  * @tparam GC
  */
-abstract class GraphCollectionFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph[G, V, E, LG, GC], GC <: GraphCollection[G, V, E, LG, GC]]
-(layoutFactory: GraphCollectionLayoutFactory[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC])
+class GraphCollectionFactory[
+  G <: GraphHead,
+  V <: Vertex,
+  E <: Edge,
+  LG <: LogicalGraph[G, V, E, LG, GC],
+  GC <: GraphCollection[G, V, E, LG, GC]]
+(layoutFactory: GraphCollectionLayoutFactory[G, V, E, LG, GC],
+ config: GradoopSparkConfig[G, V, E, LG, GC])
   extends BaseGraphFactory[G, V, E, LG, GC](layoutFactory, config) {
 
   override def getGraphHeadFactory: GraphHeadFactory[G] = layoutFactory.getGraphHeadFactory
@@ -30,7 +36,9 @@ abstract class GraphCollectionFactory[G <: GraphHead, V <: Vertex, E <: Edge, LG
    * @param edges      Edge Dataset
    * @return Graph collection
    */
-  def init(graphHeads: Dataset[G], vertices: Dataset[V], edges: Dataset[E]): GC
+  def init(graphHeads: Dataset[G], vertices: Dataset[V], edges: Dataset[E]): GC = {
+    layoutFactory.createGraphCollection(layoutFactory(graphHeads, vertices, edges), config)
+  }
 
   /** Creates a graph collection from the given collections.
    *

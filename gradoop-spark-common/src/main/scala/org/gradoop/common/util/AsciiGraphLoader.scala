@@ -6,7 +6,8 @@ import org.s1ck.gdl.GDLHandler
 import scala.collection.mutable
 
 class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
-(gdlHandler: GDLHandler, graphHeadFactory: GraphHeadFactory[G], vertexFactory: VertexFactory[V], edgeFactory: EdgeFactory[E]) {
+(gdlHandler: GDLHandler, graphHeadFactory: GraphHeadFactory[G],
+ vertexFactory: VertexFactory[V], edgeFactory: EdgeFactory[E]) {
 
   /** Stores all graphs contained in the GDL script. */
   private val graphHeads: mutable.Map[Id, G] = mutable.HashMap.empty
@@ -33,6 +34,7 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
   /** Stores edges that are assigned to a variable. */
   private val edgeCache: mutable.Map[String, E] = mutable.HashMap.empty
 
+  init()
 
   /** Appends the given ASCII GDL to the graph handled by that loader.
    *
@@ -225,37 +227,36 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
 
   /** Initializes GraphHeads and their cache. */
   private def initGraphHeads(): Unit = {
-    import scala.collection.JavaConversions._
-    for (g <- gdlHandler.getGraphs) {
-      if (!graphHeadIds.containsKey(g.getId)) initGraphHead(g)
+    import scala.collection.JavaConverters._
+
+    for (graph <- gdlHandler.getGraphs.asScala) {
+      if (!graphHeadIds.contains(graph.getId)) initGraphHead(graph)
     }
-    import scala.collection.JavaConversions._
-    for (e <- gdlHandler.getGraphCache.entrySet) {
-      updateGraphCache(e.getKey, e.getValue)
+
+    for ((key, value) <- gdlHandler.getGraphCache().asScala) {
+      updateGraphCache(key, value)
     }
   }
 
   /** Initializes vertices and their cache. */
   private def initVertices(): Unit = {
-    import scala.collection.JavaConversions._
-    for (v <- gdlHandler.getVertices) {
-      initVertex(v)
-    }
-    import scala.collection.JavaConversions._
-    for (e <- gdlHandler.getVertexCache.entrySet) {
-      updateVertexCache(e.getKey, e.getValue)
+    import scala.collection.JavaConverters._
+
+    gdlHandler.getVertices.asScala.foreach(initVertex)
+
+    for ((key, value) <- gdlHandler.getVertexCache.asScala) {
+      updateVertexCache(key, value)
     }
   }
 
   /** Initializes edges and their cache. */
   private def initEdges(): Unit = {
-    import scala.collection.JavaConversions._
-    for (e <- gdlHandler.getEdges) {
-      initEdge(e)
-    }
-    import scala.collection.JavaConversions._
-    for (e <- gdlHandler.getEdgeCache.entrySet) {
-      updateEdgeCache(e.getKey, e.getValue)
+    import scala.collection.JavaConverters._
+
+    gdlHandler.getEdges.asScala.foreach(initEdge)
+
+    for ((key, value) <- gdlHandler.getEdgeCache.asScala) {
+      updateEdgeCache(key, value)
     }
   }
 

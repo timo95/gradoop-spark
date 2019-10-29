@@ -19,4 +19,6 @@ abstract class BaseGraph[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGr
   override def getEdgesByLabel(label: String): Dataset[E] = layout.getEdgesByLabel(label)
 
   def getConfig: GradoopSparkConfig[G, V, E, LG, GC] = config
+
+  def getFactory: BaseGraphFactory[G, V, E, LG, GC]
 }

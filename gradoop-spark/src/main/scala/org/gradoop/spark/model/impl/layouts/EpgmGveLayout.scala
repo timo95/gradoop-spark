@@ -2,13 +2,15 @@ package org.gradoop.spark.model.impl.layouts
 
 import org.apache.spark.sql.{Dataset, Encoder, Encoders}
 import org.gradoop.common.model.api.elements.{EdgeFactory, GraphHeadFactory, VertexFactory}
-import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, GveLayout, LogicalGraphLayoutFactory}
+import org.gradoop.spark.model.api.config.GradoopSparkConfig
+import org.gradoop.spark.model.api.layouts.{GraphCollectionLayout, GraphCollectionLayoutFactory, GveLayout, LogicalGraphLayout, LogicalGraphLayoutFactory}
 import org.gradoop.spark.model.impl.elements.{EpgmEdge, EpgmGraphHead, EpgmVertex}
+import org.gradoop.spark.model.impl.graph.{EpgmGraphCollection, EpgmLogicalGraph}
 
 class EpgmGveLayout(graphHeads: Dataset[G], vertices: Dataset[V], edges: Dataset[E])
   extends GveLayout[G, V, E](graphHeads, vertices, edges)
 
-object EpgmGveLayout extends LogicalGraphLayoutFactory[G, V, E] with GraphCollectionLayoutFactory[G, V, E] {
+object EpgmGveLayout extends LogicalGraphLayoutFactory[G, V, E, LG, GC] with GraphCollectionLayoutFactory[G, V, E, LG, GC] {
 
   override def getGraphHeadEncoder: Encoder[G] = Encoders.kryo[G]
 
@@ -21,6 +23,14 @@ object EpgmGveLayout extends LogicalGraphLayoutFactory[G, V, E] with GraphCollec
   override def getVertexFactory: VertexFactory[V] = EpgmVertex
 
   override def getEdgeFactory: EdgeFactory[E] = EpgmEdge
+
+  override def createLogicalGraph(layout: LogicalGraphLayout[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC]): LG = {
+    new EpgmLogicalGraph(layout, config)
+  }
+
+  override def createGraphCollection(layout: GraphCollectionLayout[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC]): GC = {
+    new EpgmGraphCollection(layout, config)
+  }
 
   /** Creates a Epgm Gve layout from the given Datasets.
    *

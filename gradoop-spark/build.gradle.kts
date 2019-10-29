@@ -9,8 +9,8 @@
 description = "Gradoop Spark"
 
 dependencies {
-    "implementation"(project(":gradoop-spark-common"))
+    implementation(project(":gradoop-spark-common"))
 
-    "implementation"("org.apache.spark:spark-core_${Versions.scalaMajor}:${Versions.spark}")
-    "implementation"("org.apache.spark:spark-sql_${Versions.scalaMajor}:${Versions.spark}")
+    implementation("org.apache.spark:spark-core_${Versions.scalaMajor}:${Versions.spark}")
+    implementation("org.apache.spark:spark-sql_${Versions.scalaMajor}:${Versions.spark}")
 }
