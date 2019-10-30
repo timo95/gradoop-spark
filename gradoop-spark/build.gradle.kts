@@ -10,6 +10,7 @@ description = "Gradoop Spark"
 
 dependencies {
     implementation(project(":gradoop-spark-common"))
+    testImplementation(project(path = ":gradoop-spark-common", configuration = "testArtifact"))
 
     implementation("org.apache.spark:spark-core_${Versions.scalaMajor}:${Versions.spark}")
     implementation("org.apache.spark:spark-sql_${Versions.scalaMajor}:${Versions.spark}")

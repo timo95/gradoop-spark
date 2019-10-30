@@ -31,6 +31,17 @@ subprojects {
 
         "testImplementation"("org.scalatest:scalatest_${Versions.scalaMajor}:${Versions.scalatest}")
     }
+
+    // make tests available in a test jar
+    val testJar by tasks.registering(Jar::class) {
+        archiveClassifier.set("tests")
+        from(project.the<SourceSetContainer>()["test"].output)
+    }
+    val testArtifact by configurations.creating
+
+    artifacts {
+        add(testArtifact.name, testJar)
+    }
 }
 
 dependencies {
