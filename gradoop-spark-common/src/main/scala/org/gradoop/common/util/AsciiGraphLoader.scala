@@ -1,5 +1,7 @@
 package org.gradoop.common.util
 
+import java.io.InputStream
+
 import org.gradoop.common.model.api.elements._
 import org.s1ck.gdl.GDLHandler
 
@@ -358,25 +360,37 @@ object AsciiGraphLoader {
 
   def fromString[G <: GraphHead, V <: Vertex, E <: Edge]
   (elementFactoryProvider: ElementFactoryProvider[G, V, E], asciiGraph: String): AsciiGraphLoader[G, V, E] = {
-    val gdlHandler = new GDLHandler.Builder()
+    new AsciiGraphLoader[G, V, E](new GDLHandler.Builder()
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
-      .buildFromString(asciiGraph)
-
-    new AsciiGraphLoader[G, V, E](gdlHandler, elementFactoryProvider.getGraphHeadFactory,
-      elementFactoryProvider.getVertexFactory, elementFactoryProvider.getEdgeFactory)
+      .buildFromString(asciiGraph),
+      elementFactoryProvider.getGraphHeadFactory,
+      elementFactoryProvider.getVertexFactory,
+      elementFactoryProvider.getEdgeFactory)
   }
 
   def fromFile[G <: GraphHead, V <: Vertex, E <: Edge]
   (elementFactoryProvider: ElementFactoryProvider[G, V, E], fileName: String): AsciiGraphLoader[G, V, E] = {
-    val gdlHandler = new GDLHandler.Builder()
+    new AsciiGraphLoader[G, V, E](new GDLHandler.Builder()
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
-      .buildFromFile(fileName)
+      .buildFromFile(fileName),
+      elementFactoryProvider.getGraphHeadFactory,
+      elementFactoryProvider.getVertexFactory,
+      elementFactoryProvider.getEdgeFactory)
+  }
 
-    new AsciiGraphLoader[G, V, E](gdlHandler, elementFactoryProvider.getGraphHeadFactory,
-      elementFactoryProvider.getVertexFactory, elementFactoryProvider.getEdgeFactory)
+  def fromStream[G <: GraphHead, V <: Vertex, E <: Edge]
+  (elementFactoryProvider: ElementFactoryProvider[G, V, E], inputStream: InputStream): AsciiGraphLoader[G, V, E] = {
+    new AsciiGraphLoader[G, V, E](new GDLHandler.Builder()
+      .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
+      .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
+      .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
+      .buildFromStream(inputStream),
+      elementFactoryProvider.getGraphHeadFactory,
+      elementFactoryProvider.getVertexFactory,
+      elementFactoryProvider.getEdgeFactory)
   }
 }

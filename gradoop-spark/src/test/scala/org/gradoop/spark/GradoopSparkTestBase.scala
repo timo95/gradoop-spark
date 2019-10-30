@@ -5,17 +5,19 @@ import org.gradoop.common.GradoopTestUtils
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.impl.types.GraphModel
 import org.gradoop.spark.util.SparkAsciiGraphLoader
-import org.scalatest.FlatSpec
 
 
-abstract class GradoopSparkTestBase extends FlatSpec {
+trait GradoopSparkTestBase {
   this: GraphModel =>
 
-  implicit val session: SparkSession
+  implicit val session: SparkSession = SparkSession.builder
+    .appName("Simple Application")
+    .master("local[4]")
+    .getOrCreate()
 
   def getConfig: GradoopSparkConfig[G, V, E, LG, GC]
 
   def getSocialNetworkLoader: SparkAsciiGraphLoader[G, V, E, LG, GC] = {
-    SparkAsciiGraphLoader.fromFile(getConfig, GradoopTestUtils.SOCIAL_NETWORK_GDL_FILE)
+    SparkAsciiGraphLoader.fromStream(getConfig, getClass.getResourceAsStream(GradoopTestUtils.SOCIAL_NETWORK_GDL_FILE))
   }
 }
