@@ -1,6 +1,5 @@
 package org.gradoop.spark.model.impl.elements
 
-import org.apache.spark.sql.{Encoder, Encoders}
 import org.gradoop.common.model.api.elements.{GraphHead, GraphHeadFactory}
 import org.gradoop.common.model.impl.id.GradoopId
 

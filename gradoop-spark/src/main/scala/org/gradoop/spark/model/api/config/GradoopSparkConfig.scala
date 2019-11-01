@@ -1,10 +1,9 @@
 package org.gradoop.spark.model.api.config
 
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{Encoder, SparkSession}
 import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.spark.model.api.graph.{GraphCollection, GraphCollectionFactory, LogicalGraph, LogicalGraphFactory}
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, LogicalGraphLayoutFactory}
-import org.gradoop.spark.model.impl.layouts.{E, EpgmGveLayout, G, GC, LG, V}
 
 class GradoopSparkConfig[
   G <: GraphHead,
@@ -21,6 +20,12 @@ class GradoopSparkConfig[
   def getGraphCollectionFactory: GraphCollectionFactory[G, V, E, LG, GC] = graphCollectionFactory
 
   def getSparkSession: SparkSession = sparkSession
+
+  def getGraphHeadEncoder: Encoder[G] = logicalGraphFactory.encoderG
+
+  def getVertexEncoder: Encoder[V] = logicalGraphFactory.encoderV
+
+  def getEdgeEncoder: Encoder[E] = logicalGraphFactory.encoderE
 
   /** Sets the layout factory that is responsible for creating a logical graph layout.
    *

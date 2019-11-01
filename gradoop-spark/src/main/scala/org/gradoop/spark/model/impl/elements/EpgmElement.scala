@@ -2,8 +2,16 @@ package org.gradoop.spark.model.impl.elements
 
 import org.gradoop.common.model.api.elements.Element
 
-abstract class EpgmElement(id: Id, labels: Labels, properties: Properties) extends Element {
+abstract class EpgmElement(var id: Id, var labels: Labels, properties: Properties) extends Element {
   override def getId: Id = id
   override def getLabels: Labels = labels
   override def getProperties: Properties = properties
+
+  override def setId(id: Id): Unit = {
+    this.id = id
+  }
+
+  override def setLabels(labels: Labels): Unit = {
+    this.labels = labels
+  }
 }

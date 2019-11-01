@@ -10,14 +10,14 @@ import org.gradoop.spark.util.SparkAsciiGraphLoader
 trait GradoopSparkTestBase {
   this: GraphModel =>
 
-  implicit val session: SparkSession = SparkSession.builder
+  protected implicit val session: SparkSession = SparkSession.builder
     .appName("Simple Application")
     .master("local[4]")
     .getOrCreate()
 
-  def getConfig: GradoopSparkConfig[G, V, E, LG, GC]
+  protected def getConfig: GradoopSparkConfig[G, V, E, LG, GC]
 
-  def getSocialNetworkLoader: SparkAsciiGraphLoader[G, V, E, LG, GC] = {
+  protected def getSocialNetworkLoader: SparkAsciiGraphLoader[G, V, E, LG, GC] = {
     SparkAsciiGraphLoader.fromStream(getConfig, getClass.getResourceAsStream(GradoopTestUtils.SOCIAL_NETWORK_GDL_FILE))
   }
 }

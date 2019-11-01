@@ -58,6 +58,7 @@ class LogicalGraphFactory[
    */
   def init(graphHead: Dataset[G], vertices: Dataset[V], edges: Dataset[E]): LG = {
     layoutFactory.createLogicalGraph(layoutFactory(graphHead, vertices, edges), config)
+    // TODO limit to graphHead.first?
   }
 
   /** Creates a logical graph from the given single graph head, vertex and edge collections.

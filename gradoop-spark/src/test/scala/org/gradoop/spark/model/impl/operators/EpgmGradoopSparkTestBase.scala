@@ -7,11 +7,11 @@ import org.gradoop.spark.model.impl.types.EpgmTypes
 
 trait EpgmGradoopSparkTestBase extends GradoopSparkTestBase with EpgmTypes {
 
-  private var gveConfig: GradoopSparkConfig[G, V, E, LG, GC] = _
+  private var gveConfig: Option[GradoopSparkConfig[G, V, E, LG, GC]] = None
 
-  def getGveConfig: GradoopSparkConfig[G, V, E, LG, GC] = {
-    if (gveConfig == null) gveConfig = GradoopSparkConfig.create(EpgmGveLayout, EpgmGveLayout)
-    gveConfig
+  protected def getGveConfig: GradoopSparkConfig[G, V, E, LG, GC] = {
+    if (gveConfig.isEmpty) gveConfig = Some(GradoopSparkConfig.create(EpgmGveLayout, EpgmGveLayout))
+    gveConfig.get
   }
 
   override def getConfig: GradoopSparkConfig[G, V, E, LG, GC] = getGveConfig
