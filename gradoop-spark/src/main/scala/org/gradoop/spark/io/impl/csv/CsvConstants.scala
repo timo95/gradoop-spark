@@ -1,5 +1,7 @@
 package org.gradoop.spark.io.impl.csv
 
+import com.google.common.collect.ImmutableSet
+
 object CsvConstants {
 
   /** A function that parses a string and adds the parsed value to the object.
@@ -80,5 +82,5 @@ object CsvConstants {
   /**
    * Characters to be escaped in csv strings.
    */
-  //val ESCAPED_CHARACTERS: Set[Character] = ImmutableSet.of('\\', ';', ',', '|', ':', '\n', '=')
+  val ESCAPED_CHARACTERS: Set[Character] = ImmutableSet.of('\\', ';', ',', '|', ':', '\n', '=')
 }

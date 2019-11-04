@@ -24,7 +24,7 @@ object StringEscaper {
    * @param escapedCharacters characters to be escaped
    * @return escaped string
    */
-  def escape(string: String, escapedCharacters: util.Set[Character]): String = {
+  def escape(string: String, escapedCharacters: Set[Character]): String = {
     val sb = new StringBuilder
     for (c <- string.toCharArray) {
       if (escapedCharacters.contains(c)) sb.append(escapeCharacter(c))
