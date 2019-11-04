@@ -15,17 +15,11 @@ abstract protected class CsvParser[G <: GraphHead, V <: Vertex, E <: Edge]
 
   def getEdgeParseFunctions: Array[ParseFunction[E]]
 
-  protected def getMetaData: MetaData = {
-    // TODO create metadata when needed
-
-    new MetaData
-  }
-
   // Parse functions
 
   protected def parseNothing[EL <: Element](element: Option[EL], string: String): Option[EL] = element
 
-  protected def parseGraphHeadId(graphHead: Option[G], idString: String): Option[G] = {
+  protected def createGraphHead(graphHead: Option[G], idString: String): Option[G] = {
     val id = GradoopId.fromString(idString)
     graphHead match {
       case None => Some(elementFactoryProvider.getGraphHeadFactory(id))
@@ -35,7 +29,7 @@ abstract protected class CsvParser[G <: GraphHead, V <: Vertex, E <: Edge]
     }
   }
 
-  protected def parseVertexId(vertex: Option[V], idString: String): Option[V] = {
+  protected def createVertex(vertex: Option[V], idString: String): Option[V] = {
     val id = GradoopId.fromString(idString)
     vertex match {
       case None => Some(elementFactoryProvider.getVertexFactory(id))
@@ -45,7 +39,7 @@ abstract protected class CsvParser[G <: GraphHead, V <: Vertex, E <: Edge]
     }
   }
 
-  protected def parseEdgeId(edge: Option[E], idString: String): Option[E] = {
+  protected def createEdge(edge: Option[E], idString: String): Option[E] = {
     val id = GradoopId.fromString(idString)
     edge match {
       case None => Some(elementFactoryProvider.getEdgeFactory(id))

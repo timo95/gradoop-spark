@@ -110,12 +110,12 @@ object StringEscaper {
             tokens.add(sb.toString)
             sb.setLength(0)
           }
-          else sb.append(delimiter, 0, delimiterIndex)
+          else sb.append(delimiter.substring(0, delimiterIndex))
           delimiterIndex = 0
         }
       }
       else { // reset delimiter parsing
-        sb.append(delimiter, 0, delimiterIndex)
+        sb.append(delimiter.substring(0, delimiterIndex))
         delimiterIndex = 0
         // escape
         if (escaped) escaped = false
@@ -123,7 +123,7 @@ object StringEscaper {
         sb.append(c)
       }
     }
-    sb.append(delimiter, 0, delimiterIndex)
+    sb.append(delimiter.substring(0, delimiterIndex))
     tokens.add(sb.toString)
     tokens.toArray(new Array[String](0))
   }

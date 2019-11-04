@@ -1,6 +1,5 @@
-package org.gradoop.spark.model.impl.operators
+package org.gradoop.spark
 
-import org.gradoop.spark.GradoopSparkTestBase
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.impl.layouts.EpgmGveLayout
 import org.gradoop.spark.model.impl.types.EpgmTypes

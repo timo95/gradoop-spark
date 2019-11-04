@@ -5,9 +5,10 @@ import org.gradoop.common.GradoopTestUtils
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.impl.types.GraphModel
 import org.gradoop.spark.util.SparkAsciiGraphLoader
+import org.scalatest.FunSpec
 
 
-trait GradoopSparkTestBase {
+trait GradoopSparkTestBase extends FunSpec {
   this: GraphModel =>
 
   protected implicit val session: SparkSession = SparkSession.builder

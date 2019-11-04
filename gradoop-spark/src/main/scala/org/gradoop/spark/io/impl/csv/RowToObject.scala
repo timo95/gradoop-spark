@@ -15,7 +15,7 @@ protected class RowToObject[T](parseFunctions: Array[ParseFunction[T]]) extends 
    */
   def call(row: Row): Traversable[T] = {
     var element: Option[T] = None
-    for (i <- 0 until row.size) {
+    for (i <- parseFunctions.indices) {
       element = if (row.isNullAt(i)) parseFunctions(i)(element, "") else parseFunctions(i)(element, row.getAs[String](i))
     }
     element.fold[Traversable[T]](Traversable.empty)(e => Traversable(e))

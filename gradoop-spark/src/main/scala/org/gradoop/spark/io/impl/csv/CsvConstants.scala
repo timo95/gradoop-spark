@@ -8,6 +8,11 @@ object CsvConstants {
    */
   type ParseFunction[T] = (Option[T], String) => Option[T]
 
+  /** A function that composes a string from a given object.
+   *
+   * @tparam T type
+   */
+  type ComposeFunction[T] = (T) => String
 
   // CSV Base constants
 

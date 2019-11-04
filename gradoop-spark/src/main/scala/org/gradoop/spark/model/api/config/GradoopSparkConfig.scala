@@ -13,7 +13,7 @@ class GradoopSparkConfig[
   GC <: GraphCollection[G, V, E, LG, GC]]
 (var logicalGraphFactory: LogicalGraphFactory[G, V, E, LG, GC],
  var graphCollectionFactory: GraphCollectionFactory[G, V, E, LG, GC])
-(implicit sparkSession: SparkSession) {
+(implicit sparkSession: SparkSession) extends Serializable {
 
   def getLogicalGraphFactory: LogicalGraphFactory[G, V, E, LG, GC] = logicalGraphFactory
 

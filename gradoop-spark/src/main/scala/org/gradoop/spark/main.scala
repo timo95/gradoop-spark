@@ -1,9 +1,9 @@
 package org.gradoop.spark
 
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.gradoop.spark.functions.filter.HasLabel
 import org.gradoop.spark.io.impl.csv.CsvDataSource
-import org.gradoop.spark.io.impl.csv.epgm.EpgmCsvParser
+import org.gradoop.spark.io.impl.csv.epgm.{EpgmCsvDataSink, EpgmCsvDataSource}
 import org.gradoop.spark.util.{EpgmApp, SparkAsciiGraphLoader}
 
 object main extends EpgmApp {
@@ -20,14 +20,20 @@ object main extends EpgmApp {
 
     //var graph = loader.getLogicalGraph
 
-    val csvDataSource = new CsvDataSource[G, V, E, LG, GC]("/home/timo/Projekte/graphs/ldbc_1", config,
-      new EpgmCsvParser(None))
+    val csvDataSource = EpgmCsvDataSource("/home/timo/Projekte/graphs/ldbc_1", config)
+    val csvDataSink = EpgmCsvDataSink("/home/timo/Projekte/graphs/ldbc_1_out", config)
 
     val graph = csvDataSource.getLogicalGraph
+
+    graph.getGraphHead.foreach(g => println(g.getLabels.length))
+    graph.getGraphHead.foreach(g => println(g.getLabels))
+    graph.getGraphHead.foreach(g => println(g.getLabels(0)))
 
     println("Graphs: " + graph.getGraphHead.count())
     println("Vertices: " + graph.getVertices.count())
     println("Edges: " + graph.getEdges.count())
+
+    csvDataSink.write(graph, SaveMode.Overwrite)
 
     //graph = graph.subgraph(new HasLabel("Person"), e => true)
 

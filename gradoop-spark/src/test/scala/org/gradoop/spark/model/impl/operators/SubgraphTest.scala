@@ -1,9 +1,9 @@
 package org.gradoop.spark.model.impl.operators
 
+import org.gradoop.spark.EpgmGradoopSparkTestBase
 import org.gradoop.spark.functions.filter.HasLabel
-import org.scalatest.FunSpec
 
-class SubgraphTest extends FunSpec with EpgmGradoopSparkTestBase {
+class SubgraphTest extends EpgmGradoopSparkTestBase {
 
 
   describe("SocialNetworkGraph") {
