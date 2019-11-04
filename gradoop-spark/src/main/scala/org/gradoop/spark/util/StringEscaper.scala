@@ -2,6 +2,8 @@ package org.gradoop.spark.util
 
 import java.util
 
+import com.google.common.collect.ImmutableBiMap
+
 object StringEscaper {
 
   /** Escape character. */
@@ -9,11 +11,11 @@ object StringEscaper {
 
   /** Custom escape sequences to avoid disruptive behavior of the file reader (e.g. newline). */
   private val CUSTOM_ESCAPE_SEQUENCES = new ImmutableBiMap.Builder[Character, CharSequence]()
-    .put('\t', String.format("%c%c", ESCAPE_CHARACTER, 't'))
-    .put('\b', String.format("%c%c", ESCAPE_CHARACTER, 'b'))
-    .put('\n', String.format("%c%c", ESCAPE_CHARACTER, 'n'))
-    .put('\r', String.format("%c%c", ESCAPE_CHARACTER, 'r'))
-    .put('\f', String.format("%c%c", ESCAPE_CHARACTER, 'f'))
+    .put('\t', s"${ESCAPE_CHARACTER}t")
+    .put('\b', s"${ESCAPE_CHARACTER}b")
+    .put('\n', s"${ESCAPE_CHARACTER}n")
+    .put('\r', s"${ESCAPE_CHARACTER}r")
+    .put('\f', s"${ESCAPE_CHARACTER}f")
     .build
 
   /** Escapes the {@code escapedCharacters} in a string.
@@ -57,8 +59,21 @@ object StringEscaper {
     sb.toString
   }
 
+  /** Splits an escaped string while ignoring escaped delimiters. Does not unescape the tokens.
+   *
+   * @param escapedString escaped string to be split
+   * @param delimiter     delimiter char
+   * @return string array with still escaped strings split by the delimiter
+   */
   def split(escapedString: String, delimiter: Char): Array[String] = split(escapedString, delimiter.toString, 0)
 
+  /** Splits an escaped string while ignoring escaped delimiters. Does not unescape the tokens.
+   *
+   * @param escapedString escaped string to be split
+   * @param delimiter     delimiter char
+   * @param limit         limits the size of the output array
+   * @return string array with still escaped strings split by the delimiter
+   */
   def split(escapedString: String, delimiter: Char, limit: Int): Array[String] = split(escapedString, delimiter.toString, limit)
 
   /** Splits an escaped string while ignoring escaped delimiters. Does not unescape the tokens.
@@ -75,14 +90,14 @@ object StringEscaper {
    *
    * @param escapedString escaped string to be split
    * @param delimiter     delimiter string
-   * @param limit         limits the size of the output
+   * @param limit         limits the size of the output array
    * @return string array with still escaped strings split by the delimiter
    * @throws IllegalArgumentException if the delimiter contains the escape character
    */
   @throws[IllegalArgumentException]
   def split(escapedString: String, delimiter: String, limit: Int): Array[String] = {
-    if (delimiter.contains(Character.toString(ESCAPE_CHARACTER))) throw new IllegalArgumentException(String.format("Delimiter must not contain the escape character: '%c'", ESCAPE_CHARACTER))
-    if (limit <= 0) limit = escapedString.length + 1
+    if (delimiter.contains(Character.toString(ESCAPE_CHARACTER))) throw new IllegalArgumentException(s"Delimiter must not contain the escape character: '${ESCAPE_CHARACTER}'")
+    val realLimit = if (limit <= 0) escapedString.length + 1 else limit
     val tokens = new util.ArrayList[String]
     val sb = new StringBuilder
     var escaped = false
@@ -91,7 +106,7 @@ object StringEscaper {
       if (!escaped && c == delimiter.charAt(delimiterIndex)) {
         delimiterIndex += 1
         if (delimiterIndex == delimiter.length) {
-          if (tokens.size < limit - 1) {
+          if (tokens.size < realLimit - 1) {
             tokens.add(sb.toString)
             sb.setLength(0)
           }
@@ -119,8 +134,8 @@ object StringEscaper {
    * @return escape sequence
    */
   private def escapeCharacter(character: Char): CharSequence = {
-    if (CUSTOM_ESCAPE_SEQUENCES.contains(character)) return CUSTOM_ESCAPE_SEQUENCES.get(character)
-    String.format("%c%c", ESCAPE_CHARACTER, character)
+    if (CUSTOM_ESCAPE_SEQUENCES.containsKey(character)) return CUSTOM_ESCAPE_SEQUENCES.get(character)
+    s"${ESCAPE_CHARACTER}$character"
   }
 
   /** Returns the character of a given escape sequence.

@@ -3,7 +3,7 @@ package org.gradoop.spark.io.impl.csv
 import org.apache.spark.sql.Row
 import org.gradoop.spark.io.impl.csv.CsvConstants.ParseFunction
 
-protected class RowToObject[T](parseFunctions: Array[ParseFunction[T]]) {
+protected class RowToObject[T](parseFunctions: Array[ParseFunction[T]]) extends Serializable {
 
   /** Create a object by applying each parse function on the row field at the same position.
    *
@@ -16,8 +16,8 @@ protected class RowToObject[T](parseFunctions: Array[ParseFunction[T]]) {
   def call(row: Row): Traversable[T] = {
     var element: Option[T] = None
     for (i <- 0 until row.size) {
-      element = parseFunctions(i)(element, row.getAs[String](i))
+      element = if (row.isNullAt(i)) parseFunctions(i)(element, "") else parseFunctions(i)(element, row.getAs[String](i))
     }
-    element.fold(Traversable.empty)(e => Traversable(e))
+    element.fold[Traversable[T]](Traversable.empty)(e => Traversable(e))
   }
 }

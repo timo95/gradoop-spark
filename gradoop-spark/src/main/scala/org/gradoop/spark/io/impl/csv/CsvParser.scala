@@ -7,7 +7,7 @@ import org.gradoop.spark.io.impl.csv.CsvConstants.ParseFunction
 import org.gradoop.spark.util.StringEscaper
 
 abstract protected class CsvParser[G <: GraphHead, V <: Vertex, E <: Edge]
-(var metadata: Option[MetaData], elementFactoryProvider: ElementFactoryProvider[G, V, E]) {
+(var metadata: Option[MetaData], elementFactoryProvider: ElementFactoryProvider[G, V, E]) extends Serializable {
 
   def getGraphHeadParseFunctions: Array[ParseFunction[G]]
 
@@ -29,7 +29,7 @@ abstract protected class CsvParser[G <: GraphHead, V <: Vertex, E <: Edge]
     val id = GradoopId.fromString(idString)
     graphHead match {
       case None => Some(elementFactoryProvider.getGraphHeadFactory(id))
-      case Some(g: G) =>
+      case Some(g) =>
         g.setId(id)
         Some(g)
     }
@@ -90,5 +90,10 @@ abstract protected class CsvParser[G <: GraphHead, V <: Vertex, E <: Edge]
     })
   }
 
-  protected def parseProperties[EL <: Element](element: Option[EL], string: String): Option[EL] = element // TODO
+  protected def parseProperties[EL <: Element](element: Option[EL], propertiesString: String): Option[EL] = {
+    element.map(e => {
+      e.setProperties(propertiesString)
+      e
+    })
+  } // TODO
 }

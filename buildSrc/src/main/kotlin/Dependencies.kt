@@ -9,4 +9,6 @@ object Versions {
     var scalatest = "3.0.8"
 
     var gdl = "0.3"
+
+    var guava = "23.0"
 }

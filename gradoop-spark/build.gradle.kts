@@ -14,4 +14,6 @@ dependencies {
 
     implementation("org.apache.spark:spark-core_${Versions.scalaMajor}:${Versions.spark}")
     implementation("org.apache.spark:spark-sql_${Versions.scalaMajor}:${Versions.spark}")
+
+    implementation("com.google.guava:guava:${Versions.guava}")
 }

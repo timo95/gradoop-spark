@@ -20,25 +20,22 @@ class CsvDataSource[
 
   def getGraphHeads: Dataset[G] = {
     config.getSparkSession.read
-      .option("mode", "FAILFAST")
       .option("delimiter", CsvConstants.TOKEN_DELIMITER)
-      .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.GRAPH_HEAD_PATH)
+      .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.GRAPH_HEAD_FILE)
       .flatMap(new RowToObject[G](csvParser.getGraphHeadParseFunctions).call)(config.getGraphHeadEncoder)
   }
 
   def getVertices: Dataset[V] = {
     config.getSparkSession.read
-      .option("mode", "FAILFAST")
       .option("delimiter", CsvConstants.TOKEN_DELIMITER)
-      .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.VERTEX_PATH)
+      .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.VERTEX_FILE)
       .flatMap(new RowToObject[V](csvParser.getVertexParseFunctions).call)(config.getVertexEncoder)
   }
 
   def getEdges: Dataset[E] = {
     config.getSparkSession.read
-      .option("mode", "FAILFAST")
       .option("delimiter", CsvConstants.TOKEN_DELIMITER)
-      .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.EDGE_PATH)
+      .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.EDGE_FILE)
       .flatMap(new RowToObject[E](csvParser.getEdgeParseFunctions).call)(config.getEdgeEncoder)
   }
 }

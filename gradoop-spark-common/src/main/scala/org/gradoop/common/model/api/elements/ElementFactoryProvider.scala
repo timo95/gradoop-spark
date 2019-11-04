@@ -3,7 +3,7 @@ package org.gradoop.common.model.api.elements
 /**
  * Trait that provides getters for the element factories.
  */
-trait ElementFactoryProvider[G <: GraphHead, V <: Vertex, E <: Edge] {
+trait ElementFactoryProvider[G <: GraphHead, V <: Vertex, E <: Edge] extends Serializable {
 
   /** Get the factory that is responsible for creating graph head instances.
    *
