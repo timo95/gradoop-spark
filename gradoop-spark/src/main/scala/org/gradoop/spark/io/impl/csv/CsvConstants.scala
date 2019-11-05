@@ -1,7 +1,5 @@
 package org.gradoop.spark.io.impl.csv
 
-import com.google.common.collect.ImmutableSet
-
 object CsvConstants {
 
   /** A function that parses a string and adds the parsed value to the object.
@@ -16,7 +14,10 @@ object CsvConstants {
    */
   type ComposeFunction[T] = (T) => String
 
-  // CSV Base constants
+  // CSV file structure
+
+  /** System constant file separator. */
+  val DIRECTORY_SEPARATOR: String = System.getProperty("file.separator")
 
   /** Broadcast set identifier for meta data. */
   val BC_METADATA = "metadata"
@@ -39,48 +40,37 @@ object CsvConstants {
   /** Path for indexed edges */
   val EDGE_PATH = "edges"
 
-  /** CSV file for edges. */
+  /** CSV file for edgesCSV Base constants. */
   val EDGE_FILE: String = "edges" + CSV_FILE_SUFFIX
 
   /** CSV file for meta data. */
   val METADATA_FILE: String = "metadata" + CSV_FILE_SUFFIX
 
-  // real constants
+  // Indexed CSV file structure
 
-  /**
-   * Used to separate the tokens (id, label, values) in the CSV files.
-   */
-  val TOKEN_DELIMITER = ";"
-  /**
-   * Used to separate the property values in the CSV files.
-   */
-  val VALUE_DELIMITER = "|"
-  /**
-   * Used to separate lines in the output CSV files.
-   */
-  val ROW_DELIMITER: String = System.getProperty("line.separator")
-  /**
-   * Used to separate entries of list types in the CSV files
-   */
-  val LIST_DELIMITER = ","
-  /**
-   * Used to separate key and value of maps in the CSV files.
-   */
-  val MAP_SEPARATOR = "="
-  /**
-   * System constant file separator.
-   */
-  val DIRECTORY_SEPARATOR: String = System.getProperty("file.separator")
-  /**
-   * File name for indexed data.
-   */
+  /** File name for indexed data. */
   val SIMPLE_FILE = "data.csv"
-  /**
-   * Directory to store empty labels with indexed CSV.
-   */
-  val DEFAULT_DIRECTORY = "_"
-  /**
-   * Characters to be escaped in csv strings.
-   */
-  val ESCAPED_CHARACTERS: Set[Character] = ImmutableSet.of('\\', ';', ',', '|', ':', '\n', '=')
+
+  /** Directory to store empty labels with indexed CSV. */
+  val DEFAULT_DIRECTORY = '_'
+
+  // CSV string format
+
+  /** Used to separate the tokens (id, label, values) in the CSV files. */
+  val TOKEN_DELIMITER = ";"
+
+  /** Used to separate the property values in the CSV files. */
+  val VALUE_DELIMITER = "|"
+
+  /** Used to separate lines in the output CSV files. */
+  val ROW_DELIMITER: String = System.getProperty("line.separator")
+
+  /** Used to separate entries of list types in the CSV files. */
+  val LIST_DELIMITER = ","
+
+  /** Used to separate key and value of maps in the CSV files. */
+  val MAP_SEPARATOR = '='
+
+  /** Characters to be escaped in csv strings. */
+  val ESCAPED_CHARS: Set[Char] = Set[Char]('\\', ';', ',', '|', ':', '\n', '=')
 }

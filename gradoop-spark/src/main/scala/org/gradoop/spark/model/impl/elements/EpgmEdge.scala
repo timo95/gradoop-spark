@@ -1,5 +1,6 @@
 package org.gradoop.spark.model.impl.elements
 
+import org.apache.spark.sql.{Encoder, Encoders}
 import org.gradoop.common.model.api.elements.{Edge, EdgeFactory}
 import org.gradoop.common.model.impl.id.GradoopId
 
@@ -20,6 +21,8 @@ class EpgmEdge(id: Id, labels: Labels, var sourceId: Id, var targetId: Id, prope
 }
 
 object EpgmEdge extends EdgeFactory[E] {
+
+  def getEncoder: Encoder[EpgmEdge] = Encoders.kryo(classOf[EpgmEdge])
 
   override def getType: Class[E] = classOf[EpgmEdge]
 

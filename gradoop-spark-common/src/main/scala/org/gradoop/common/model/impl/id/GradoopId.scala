@@ -7,7 +7,7 @@ import java.util
 import java.util.Date
 import java.util.concurrent.atomic.AtomicInteger
 
-class GradoopId(bytes: Array[Byte]) extends Ordered[GradoopId] with Serializable {
+case class GradoopId(bytes: Array[Byte]) extends Ordered[GradoopId] with Serializable {
 
   /** Returns byte representation of a GradoopId
    *

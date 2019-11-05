@@ -3,7 +3,7 @@ package org.gradoop.spark.model.api.config
 import org.apache.spark.sql.{Encoder, SparkSession}
 import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.spark.model.api.graph.{GraphCollection, GraphCollectionFactory, LogicalGraph, LogicalGraphFactory}
-import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, LogicalGraphLayoutFactory}
+import org.gradoop.spark.model.api.layouts.{ElementEncoderProvider, GraphCollectionLayoutFactory, LogicalGraphLayoutFactory}
 
 class GradoopSparkConfig[
   G <: GraphHead,
@@ -14,6 +14,14 @@ class GradoopSparkConfig[
 (var logicalGraphFactory: LogicalGraphFactory[G, V, E, LG, GC],
  var graphCollectionFactory: GraphCollectionFactory[G, V, E, LG, GC])
 (implicit sparkSession: SparkSession) extends Serializable {
+
+  object implicits extends Serializable {
+    implicit def implicitGraphHeadEncoder: Encoder[G] = getGraphHeadEncoder
+    implicit def impliticVertexEncoder: Encoder[V] = getVertexEncoder
+    implicit def implicitEdgeEncoder: Encoder[E] = getEdgeEncoder
+
+    implicit def implicitSparkSession: SparkSession = sparkSession
+  }
 
   def getLogicalGraphFactory: LogicalGraphFactory[G, V, E, LG, GC] = logicalGraphFactory
 

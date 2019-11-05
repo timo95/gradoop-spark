@@ -7,15 +7,9 @@ abstract class EpgmElement(var id: Id, var labels: Labels, var properties: Prope
   override def getLabels: Labels = labels
   override def getProperties: Properties = properties
 
-  override def setId(id: Id): Unit = {
-    this.id = id
-  }
+  override def setId(id: Id): Unit = this.id = id
 
-  override def setLabels(labels: Labels): Unit = {
-    this.labels = labels
-  }
+  override def setLabels(labels: Labels): Unit = this.labels = labels
 
-  override def setProperties(properties: Properties): Unit = {
-    this.properties = properties
-  }
+  override def setProperties(properties: Properties): Unit = this.properties = properties
 }

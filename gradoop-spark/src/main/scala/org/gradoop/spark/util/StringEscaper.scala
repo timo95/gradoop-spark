@@ -10,7 +10,7 @@ object StringEscaper {
   private val ESCAPE_CHARACTER = '\\'
 
   /** Custom escape sequences to avoid disruptive behavior of the file reader (e.g. newline). */
-  private val CUSTOM_ESCAPE_SEQUENCES = new ImmutableBiMap.Builder[Character, CharSequence]()
+  private val CUSTOM_ESCAPE_SEQUENCES = new ImmutableBiMap.Builder[Char, CharSequence]()
     .put('\t', s"${ESCAPE_CHARACTER}t")
     .put('\b', s"${ESCAPE_CHARACTER}b")
     .put('\n', s"${ESCAPE_CHARACTER}n")
@@ -24,7 +24,7 @@ object StringEscaper {
    * @param escapedCharacters characters to be escaped
    * @return escaped string
    */
-  def escape(string: String, escapedCharacters: Set[Character]): String = {
+  def escape(string: String, escapedCharacters: Set[Char]): String = {
     val sb = new StringBuilder
     for (c <- string.toCharArray) {
       if (escapedCharacters.contains(c)) sb.append(escapeCharacter(c))
