@@ -2,7 +2,7 @@ package org.gradoop.common.model.api.elements
 
 import org.gradoop.common.model.impl.id.GradoopId
 
-trait Identifiable {
+trait Identifiable extends Serializable {
 
   /** Returns the identifier of that entity.
    *

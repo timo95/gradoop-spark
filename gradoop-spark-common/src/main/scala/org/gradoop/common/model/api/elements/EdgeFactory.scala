@@ -9,7 +9,7 @@ trait EdgeFactory[E <: Edge] extends ElementFactory[E] {
    * @param id             edge identifier
    * @return edge data
    */
-  def apply(id: Id): E = apply(id, new Labels(0), GradoopId.NULL_VALUE, GradoopId.NULL_VALUE)
+  def apply(id: Id): E = apply(id, new Labels(""), GradoopId.NULL_VALUE, GradoopId.NULL_VALUE)
 
   /** Creates a new edge based on the given parameters.
    *

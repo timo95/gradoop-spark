@@ -2,6 +2,7 @@ package org.gradoop.spark.io.impl.csv
 
 import org.gradoop.common.model.api.elements._
 import org.gradoop.common.model.impl.id.GradoopId
+import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.GradoopConstants
 import org.gradoop.spark.io.impl.csv.CsvConstants.ParseFunction
 import org.gradoop.spark.util.StringEscaper
@@ -76,8 +77,8 @@ abstract protected class CsvParser[G <: GraphHead, V <: Vertex, E <: Edge]
   }
 
   protected def parseLabels[EL <: Element](element: Option[EL], labelsString: String): Option[EL] = {
-    val labels: Labels = StringEscaper.split(labelsString, GradoopConstants.LABEL_DELIMITER)
-      .map(StringEscaper.unescape)
+    val labels: Labels = StringEscaper.unescape(labelsString)//StringEscaper.split(labelsString, GradoopConstants.LABEL_DELIMITER)
+      //.map(StringEscaper.unescape)
     element.map(e => {
       e.setLabels(labels)
       e
@@ -86,7 +87,7 @@ abstract protected class CsvParser[G <: GraphHead, V <: Vertex, E <: Edge]
 
   protected def parseProperties[EL <: Element](element: Option[EL], propertiesString: String): Option[EL] = {
     element.map(e => {
-      e.setProperties(propertiesString)
+      e.setProperties(Map[String, PV]("all" -> PropertyValue(propertiesString)))
       e
     })
   } // TODO

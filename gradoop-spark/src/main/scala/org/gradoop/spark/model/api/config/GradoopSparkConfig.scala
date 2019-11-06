@@ -1,9 +1,11 @@
 package org.gradoop.spark.model.api.config
 
-import org.apache.spark.sql.{Encoder, SparkSession}
+import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
 import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
+import org.gradoop.common.model.api.types.ComponentTypes
+import org.gradoop.common.properties.PropertyValue
 import org.gradoop.spark.model.api.graph.{GraphCollection, GraphCollectionFactory, LogicalGraph, LogicalGraphFactory}
-import org.gradoop.spark.model.api.layouts.{ElementEncoderProvider, GraphCollectionLayoutFactory, LogicalGraphLayoutFactory}
+import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, LogicalGraphLayoutFactory}
 
 class GradoopSparkConfig[
   G <: GraphHead,
@@ -15,10 +17,13 @@ class GradoopSparkConfig[
  var graphCollectionFactory: GraphCollectionFactory[G, V, E, LG, GC])
 (implicit sparkSession: SparkSession) extends Serializable {
 
-  object implicits extends Serializable {
+  object implicits extends Serializable with ComponentTypes {
     implicit def implicitGraphHeadEncoder: Encoder[G] = getGraphHeadEncoder
-    implicit def impliticVertexEncoder: Encoder[V] = getVertexEncoder
-    implicit def implicitEdgeEncoder: Encoder[E] = getEdgeEncoder
+    //implicit def impliticVertexEncoder: Encoder[V] = getVertexEncoder
+    //implicit def implicitEdgeEncoder: Encoder[E] = getEdgeEncoder
+
+    //implicit def implicitPropertyValueEncoder: Encoder[PropertyValue] = Encoders.kryo[PropertyValue]
+    //implicit def implicitPropertiesEncoder: Encoder[Properties] = Encoders.kryo[Properties]
 
     implicit def implicitSparkSession: SparkSession = sparkSession
   }

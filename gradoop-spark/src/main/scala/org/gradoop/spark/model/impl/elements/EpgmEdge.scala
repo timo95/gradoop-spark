@@ -26,11 +26,11 @@ object EpgmEdge extends EdgeFactory[E] {
 
   override def getType: Class[E] = classOf[EpgmEdge]
 
-  override def apply(id: Id): E = apply(id, new Labels(0), GradoopId.NULL_VALUE, GradoopId.NULL_VALUE)
+  override def apply(id: Id): E = apply(id, new Labels(""), GradoopId.NULL_VALUE, GradoopId.NULL_VALUE)
 
   override def create(sourceId: Id, targetId: Id): E = apply(GradoopId.get, sourceId, targetId)
 
-  override def apply(id: Id, sourceId: Id, targetId: Id): E = apply(id, new Labels(0), sourceId, targetId)
+  override def apply(id: Id, sourceId: Id, targetId: Id): E = apply(id, new Labels(""), sourceId, targetId)
 
   override def create(labels: Labels, sourceId: Id, targetId: Id): E = apply(GradoopId.get, labels, sourceId, targetId)
 

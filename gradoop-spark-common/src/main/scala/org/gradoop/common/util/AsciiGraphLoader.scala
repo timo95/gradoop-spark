@@ -3,6 +3,7 @@ package org.gradoop.common.util
 import java.io.InputStream
 
 import org.gradoop.common.model.api.elements._
+import org.gradoop.common.properties.PropertyValue
 import org.s1ck.gdl.GDLHandler
 
 import scala.collection.mutable
@@ -268,8 +269,8 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
    * @return graph head
    */
   private def initGraphHead(g: org.s1ck.gdl.model.Graph): G = {
-    val properties: Properties = "" //Properties.createFromMap(g.getProperties)
-    val graphHead: G = graphHeadFactory.create(g.getLabel.split(GradoopConstants.LABEL_DELIMITER), properties)
+    val properties: Properties = Map("all" -> PropertyValue("")) //Properties.createFromMap(g.getProperties)
+    val graphHead: G = graphHeadFactory.create(g.getLabel/*.split(GradoopConstants.LABEL_DELIMITER)*/, properties)
     graphHeadIds.put(g.getId, graphHead.getId)
     graphHeads.put(graphHead.getId, graphHead)
     graphHead
@@ -282,8 +283,8 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
    */
   private def initVertex(v: org.s1ck.gdl.model.Vertex): V = {
     if (!vertexIds.contains(v.getId)) {
-      val properties: Properties = "" //Properties.createFromMap(v.getProperties)
-      val vertex: V = vertexFactory.create(v.getLabel.split(GradoopConstants.LABEL_DELIMITER), properties, createGradoopIdSet(v))
+      val properties: Properties = Map("all" -> PropertyValue("")) //Properties.createFromMap(v.getProperties)
+      val vertex: V = vertexFactory.create(v.getLabel/*.split(GradoopConstants.LABEL_DELIMITER)*/, properties, createGradoopIdSet(v))
       vertexIds.put(v.getId, vertex.getId)
       vertices.put(vertex.getId, vertex)
       vertex
@@ -302,8 +303,8 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
    */
   private def initEdge(e: org.s1ck.gdl.model.Edge): E = {
     if (!edgeIds.contains(e.getId)) {
-      val properties: Properties = "" //Properties.createFromMap(e.getProperties)
-      val edge: E = edgeFactory.create(e.getLabel.split(GradoopConstants.LABEL_DELIMITER), vertexIds(e.getSourceVertexId),
+      val properties: Properties = Map("all" -> PropertyValue("")) //Properties.createFromMap(e.getProperties)
+      val edge: E = edgeFactory.create(e.getLabel/*.split(GradoopConstants.LABEL_DELIMITER)*/, vertexIds(e.getSourceVertexId),
         vertexIds(e.getTargetVertexId), properties, createGradoopIdSet(e))
       edgeIds.put(e.getId, edge.getId)
       edges.put(edge.getId, edge)

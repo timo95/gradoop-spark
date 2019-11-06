@@ -1,10 +1,12 @@
 package org.gradoop.spark
 
-import org.apache.spark.sql.{SaveMode, SparkSession}
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
+import org.gradoop.common.properties.PropertyValue
 import org.gradoop.spark.functions.filter.HasLabel
 import org.gradoop.spark.io.impl.csv.CsvDataSource
 import org.gradoop.spark.io.impl.csv.epgm.{EpgmCsvDataSink, EpgmCsvDataSource}
-import org.gradoop.spark.model.impl.elements.EpgmGraphHead
+import org.gradoop.spark.model.impl.elements.{EpgmGraphHead, PV}
 import org.gradoop.spark.util.{EpgmApp, SparkAsciiGraphLoader}
 
 object main extends EpgmApp {
@@ -28,11 +30,18 @@ object main extends EpgmApp {
 
     graph.getGraphHead.foreach(g => println(g.getLabels.length))
     graph.getGraphHead.foreach(g => println(g.getLabels))
-    graph.getGraphHead.foreach(g => println(g.getLabels(0)))
+    //graph.getGraphHead.foreach(g => println(g.getLabels(0)))
+    implicit val implicitPropertyValueEncoder: Encoder[PV] = Encoders.kryo[PV]
 
     import config.implicits._
+
     import session.implicits._
-    graph.getGraphHead.map(g => g.getId).map(EpgmGraphHead.apply).map(g => g.getLabels).foreach(l => l.foreach(println))
+
+    graph.getGraphHead
+      .map(g => g.getId)
+      .map(i => EpgmGraphHead.apply(i))
+      .map(g => g.getProperties)
+      .foreach(l => l.foreach( k => println(k._2.getString)))
 
     //println("Graphs: " + graph.getGraphHead.count())
     //println("Vertices: " + graph.getVertices.count())

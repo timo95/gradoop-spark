@@ -3,6 +3,7 @@ package org.gradoop.spark.model.impl.elements
 import org.gradoop.common.model.api.elements.Element
 
 abstract class EpgmElement(var id: Id, var labels: Labels, var properties: Properties) extends Element {
+
   override def getId: Id = id
   override def getLabels: Labels = labels
   override def getProperties: Properties = properties

@@ -43,7 +43,7 @@ class SparkAsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge, LG <: Logica
     if (withGraphContainment) factory.init(getVertices, getEdges)
       // TODO .transformGraphHead(new RenameLabel[G](GradoopConstants.DEFAULT_GRAPH_LABEL, GradoopConstants.DB_GRAPH_LABEL))
     else {
-      val graphHead = factory.getGraphHeadFactory.create(Array(GradoopConstants.DB_GRAPH_LABEL))
+      val graphHead = factory.getGraphHeadFactory.create(GradoopConstants.DB_GRAPH_LABEL)
       factory.init(graphHead, getVertices, getEdges)
     }
   }

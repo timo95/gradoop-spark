@@ -32,11 +32,11 @@ abstract class CsvComposer[G <: GraphHead, V <: Vertex, E <: Edge](var metadata:
   }
 
   def composeLabels[T <: Labeled](obj: T): String = {
-    obj.getLabels.map(label => StringEscaper.escape(label, CsvConstants.ESCAPED_CHARS))
-      .mkString(CsvConstants.LIST_DELIMITER)
+    StringEscaper.escape(obj.getLabels, CsvConstants.ESCAPED_CHARS)//obj.getLabels.map(label => StringEscaper.escape(label, CsvConstants.ESCAPED_CHARS))
+      //.mkString(CsvConstants.LIST_DELIMITER)
   }
 
   def composeProperties[T <: Attributed](obj: T): String = {
-    obj.getProperties // TODO
+    obj.getProperties("all").getString //obj.getProperties // TODO
   }
 }
