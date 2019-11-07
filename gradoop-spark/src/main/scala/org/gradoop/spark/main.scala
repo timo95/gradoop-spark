@@ -7,7 +7,10 @@ import org.gradoop.spark.functions.filter.HasLabel
 import org.gradoop.spark.io.impl.csv.CsvDataSource
 import org.gradoop.spark.io.impl.csv.epgm.{EpgmCsvDataSink, EpgmCsvDataSource}
 import org.gradoop.spark.model.impl.elements.{EpgmGraphHead, PV}
+import org.gradoop.spark.model.impl.operators.transform.GraphHeadToRow
 import org.gradoop.spark.util.{EpgmApp, SparkAsciiGraphLoader}
+
+import scala.reflect.internal.util.TableDef.Column
 
 object main extends EpgmApp {
   def main(args: Array[String]): Unit = {
@@ -31,11 +34,15 @@ object main extends EpgmApp {
     graph.getGraphHead.foreach(g => println(g.getLabels.length))
     graph.getGraphHead.foreach(g => println(g.getLabels))
     //graph.getGraphHead.foreach(g => println(g.getLabels(0)))
-    implicit val implicitPropertyValueEncoder: Encoder[PV] = Encoders.kryo[PV]
+    //implicit val implicitPropertyValueEncoder: Encoder[PV] = Encoders.kryo[PV]
 
     import config.implicits._
 
     import session.implicits._
+
+    val f = new GraphHeadToRow[G]
+    graph.getGraphHead.map(f.call)(f.getEncoder).toDF()
+      .select("properties").show()
 
     graph.getGraphHead
       .map(g => g.getId)

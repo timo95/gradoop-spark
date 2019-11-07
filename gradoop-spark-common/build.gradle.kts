@@ -9,5 +9,7 @@
 description = "Gradoop Spark Common"
 
 dependencies {
+    implementation("org.scala-lang:scala-reflect:${Versions.scalaFull}")
+
     implementation("com.github.s1ck:gdl:${Versions.gdl}")
 }
