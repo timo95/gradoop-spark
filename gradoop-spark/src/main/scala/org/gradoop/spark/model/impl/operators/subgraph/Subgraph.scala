@@ -15,8 +15,8 @@ class Subgraph[
   extends LogicalGraphToLogicalGraphOperator[LG] {
 
   override def execute(graph: LG): LG = {
-    graph.getFactory.init(graph.getGraphHead,
-      graph.getVertices.filter(vertexFilterFunction),
-      graph.getEdges.filter(edgeFilterFunction))
+    graph.factory.init(graph.graphHead,
+      graph.vertices.filter(vertexFilterFunction),
+      graph.edges.filter(edgeFilterFunction))
   }
 }

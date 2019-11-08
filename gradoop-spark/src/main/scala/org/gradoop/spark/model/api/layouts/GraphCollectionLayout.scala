@@ -10,7 +10,7 @@ trait GraphCollectionLayout[G <: GraphHead, V <: Vertex, E <: Edge] extends Layo
    *
    * @return graph heads
    */
-  def getGraphHeads: Dataset[G]
+  def graphHeads: Dataset[G]
 
   /**
    * Returns the graph heads associated with the logical graphs in that collection filtered by label.
@@ -18,6 +18,6 @@ trait GraphCollectionLayout[G <: GraphHead, V <: Vertex, E <: Edge] extends Layo
    * @param label graph head label
    * @return graph heads
    */
-  def getGraphHeadsByLabel(label: String): Dataset[G]
+  def graphHeadsByLabel(label: String): Dataset[G]
 
 }

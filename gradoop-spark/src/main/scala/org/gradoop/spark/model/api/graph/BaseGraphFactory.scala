@@ -14,13 +14,12 @@ abstract class BaseGraphFactory[
 (layoutFactory: BaseLayoutFactory[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC])
   extends ElementFactoryProvider[G, V, E] {
 
-  implicit val encoderG: Encoder[G] = layoutFactory.getGraphHeadEncoder
-  implicit val encoderV: Encoder[V] = layoutFactory.getVertexEncoder
-  implicit val encoderE: Encoder[E] = layoutFactory.getEdgeEncoder
+  implicit val graphHeadEncoder: Encoder[G] = layoutFactory.graphHeadEncoder
+  implicit val vertexEncoder: Encoder[V] = layoutFactory.vertexEncoder
+  implicit val edgeEncoder: Encoder[E] = layoutFactory.edgeEncoder
 
   implicit val session: SparkSession = config.getSparkSession
 
-  def createDataset[T](iterable: Iterable[T])(implicit encoder: Encoder[T]): Dataset[T] = {
+  def createDataset[T](iterable: Iterable[T])(implicit encoder: Encoder[T]): Dataset[T] =
     session.createDataset(iterable.toSeq)
-  }
 }

@@ -20,7 +20,7 @@ abstract class LogicalGraph[
    *
    * @return 1-element Dataset
    */
-  def getGraphHead: Dataset[G]
+  def graphHead: Dataset[G]
 
-  override def getFactory: LogicalGraphFactory[G, V, E, LG, GC] = config.getLogicalGraphFactory
+  override def factory: LogicalGraphFactory[G, V, E, LG, GC] = config.logicalGraphFactory
 }

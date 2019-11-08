@@ -1,7 +1,7 @@
 package org.gradoop.common.model.api.elements
 
 trait Labeled extends Serializable {
-  def getLabels: Labels
+  def labels: Labels
 
-  def setLabels(labels: Labels): Unit
+  def labels_=(labels: Labels): Unit
 }

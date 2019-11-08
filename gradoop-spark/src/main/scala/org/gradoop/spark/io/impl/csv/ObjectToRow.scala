@@ -14,7 +14,7 @@ class ObjectToRow[T](composeFunctions: Array[ComposeFunction[T]]) extends Serial
    */
   def call(obj: T): Row = Row.fromSeq(composeFunctions.map(f => f(obj)))
 
-  def getEncoder: ExpressionEncoder[Row] = {
+  def encoder: ExpressionEncoder[Row] = {
     val fields: Seq[StructField] = composeFunctions.indices
       .map(i => StructField(i.toString, DataTypes.StringType, nullable = false))
     RowEncoder(StructType(fields))

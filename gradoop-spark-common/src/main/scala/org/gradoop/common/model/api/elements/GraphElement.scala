@@ -1,8 +1,8 @@
 package org.gradoop.common.model.api.elements
 
 trait GraphElement extends Element {
-  def getGraphIds: IdSet
-  def getGraphCount: Int = getGraphIds.size
+  def graphIds: IdSet
+  def graphCount: Int = graphIds.size
 
-  def setGraphIds(graphIds: IdSet): Unit
+  def graphIds_=(graphIds: IdSet): Unit
 }

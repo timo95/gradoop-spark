@@ -8,15 +8,15 @@ import org.gradoop.spark.model.impl.elements.{EpgmEdge, EpgmGraphHead, EpgmVerte
 class EpgmCsvDataSink(csvPath: String, config: GradoopSparkConfig[G, V, E, LG, GC], metadata: Option[MetaData])
   extends CsvDataSink[G, V, E, LG, GC](csvPath, config, metadata) {
 
-  override def getGraphHeadComposeFunctions: Array[ComposeFunction[EpgmGraphHead]] = {
+  override def graphHeadComposeFunctions: Array[ComposeFunction[EpgmGraphHead]] = {
     Array[ComposeFunction[G]](composeId, composeLabels, composeProperties)
   }
 
-  override def getVertexComposeFunctions: Array[ComposeFunction[EpgmVertex]] = {
+  override def vertexComposeFunctions: Array[ComposeFunction[EpgmVertex]] = {
     Array[ComposeFunction[V]](composeId, composeGraphIds, composeLabels, composeProperties)
   }
 
-  override def getEdgeComposeFunctions: Array[ComposeFunction[EpgmEdge]] = {
+  override def edgeComposeFunctions: Array[ComposeFunction[EpgmEdge]] = {
     Array[ComposeFunction[E]](composeId, composeGraphIds, composeSourceId, composeTargetId, composeLabels, composeProperties)
   }
 }

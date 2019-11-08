@@ -23,11 +23,11 @@ class GraphCollectionFactory[
  config: GradoopSparkConfig[G, V, E, LG, GC])
   extends BaseGraphFactory[G, V, E, LG, GC](layoutFactory, config) {
 
-  override def getGraphHeadFactory: GraphHeadFactory[G] = layoutFactory.getGraphHeadFactory
+  override def graphHeadFactory: GraphHeadFactory[G] = layoutFactory.graphHeadFactory
 
-  override def getVertexFactory: VertexFactory[V] = layoutFactory.getVertexFactory
+  override def vertexFactory: VertexFactory[V] = layoutFactory.vertexFactory
 
-  override def getEdgeFactory: EdgeFactory[E] = layoutFactory.getEdgeFactory
+  override def edgeFactory: EdgeFactory[E] = layoutFactory.edgeFactory
 
   /** Creates a graph collection layout from the given datasets.
    *
@@ -66,9 +66,9 @@ class GraphCollectionFactory[
     val edges: Dataset[E] = session.emptyDataset[E]
 
     for (logicalGraph <- logicalGraphs) {
-      graphHeads.union(logicalGraph.getGraphHead)
-      vertices.union(logicalGraph.getVertices)
-      edges.union(logicalGraph.getEdges)
+      graphHeads.union(logicalGraph.graphHead)
+      vertices.union(logicalGraph.vertices)
+      edges.union(logicalGraph.edges)
     }
 
     init(graphHeads, vertices, edges)

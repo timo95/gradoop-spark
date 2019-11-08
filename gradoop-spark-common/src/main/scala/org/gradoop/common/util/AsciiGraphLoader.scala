@@ -13,20 +13,18 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
  vertexFactory: VertexFactory[V], edgeFactory: EdgeFactory[E]) {
 
   /** Stores all graphs contained in the GDL script. */
-  private val graphHeads: mutable.Map[Id, G] = mutable.HashMap.empty
-
-  /** Mapping between GDL ids and Gradoop IDs. */
-  private val graphHeadIds: mutable.Map[Long, Id] = mutable.HashMap.empty
+  private val idToGraphHead: mutable.Map[Id, G] = mutable.HashMap.empty
 
   /** Stores all vertices contained in the GDL script. */
-  private val vertices: mutable.Map[Id, V] = mutable.HashMap.empty
-
-  private val vertexIds: mutable.Map[Long, Id] = mutable.HashMap.empty
+  private val idToVertex: mutable.Map[Id, V] = mutable.HashMap.empty
 
   /** Stores all edges contained in the GDL script. */
-  private val edges: mutable.Map[Id, E] = mutable.HashMap.empty
+  private val idToEdge: mutable.Map[Id, E] = mutable.HashMap.empty
 
-  private val edgeIds: mutable.Map[Long, Id] = mutable.HashMap.empty
+  /** Mapping between GDL ids and Gradoop IDs. */
+  private val graphHeadIdMapping: mutable.Map[Long, Id] = mutable.HashMap.empty
+  private val vertexIdMapping: mutable.Map[Long, Id] = mutable.HashMap.empty
+  private val edgeIdMapping: mutable.Map[Long, Id] = mutable.HashMap.empty
 
   /** Stores graphs that are assigned to a variable. */
   private val graphHeadCache: mutable.Map[String, G] = mutable.HashMap.empty
@@ -51,15 +49,13 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
     init()
   }
 
-  // ---------------------------------------------------------------------------
   //  Graph methods
-
 
   /** Returns all GraphHeads contained in the ASCII graph.
    *
    * @return graphHeads
    */
-  def getGraphHeads: Iterable[G] = graphHeads.values
+  def graphHeads: Iterable[G] = idToGraphHead.values
 
   /**
    * Returns GraphHead by given variable.
@@ -67,47 +63,44 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
    * @param variable variable used in GDL script
    * @return graphHead or { @code null} if graph is not cached
    */
-  def getGraphHeadByVariable(variable: String): Option[G] = getGraphHeadCache.get(variable)
+  def graphHeadsByVariable(variable: String): Option[G] = getGraphHeadCache.get(variable)
 
   /** Returns GraphHeads by their given variables.
    *
    * @param variables variables used in GDL script
    * @return graphHeads that are assigned to the given variables
    */
-  def getGraphHeadsByVariables(variables: String*): Set[G] = {
+  def graphHeadsByVariables(variables: String*): Set[G] = {
     val result: mutable.Set[G] = mutable.Set[G]()
-    
-    variables.map(getGraphHeadByVariable).filter(g => g.isDefined).map(g => g.get).foreach(result.add)
+
+    variables.map(graphHeadsByVariable).filter(g => g.isDefined).map(g => g.get).foreach(result.add)
 
     result.toSet
   }
 
-
   //  Vertex methods
-
 
   /** Returns all vertices contained in the ASCII graph.
    *
    * @return vertices
    */
-  def getVertices: Iterable[V] = vertices.values
+  def vertices: Iterable[V] = idToVertex.values
 
   /** Returns vertex by its given variable.
    *
    * @param variable variable used in GDL script
    * @return vertex or { @code null} if not present
    */
-  def getVertexByVariable(variable: String): Option[V] = vertexCache.get(variable)
+  def verticesByVariable(variable: String): Option[V] = vertexCache.get(variable)
 
   /** Returns vertices by their given variables.
    *
    * @param variables variables used in GDL script
    * @return vertices
    */
-  def getVerticesByVariables(variables: String*): Set[V] = {
+  def verticesByVariables(variables: String*): Set[V] = {
     val result: mutable.Set[V] = mutable.Set[V]()
-
-    variables.map(getVertexByVariable).filter(v => v.isDefined).map(v => v.get).foreach(result.add)
+    variables.map(verticesByVariable).filter(v => v.isDefined).map(v => v.get).foreach(result.add)
 
     result.toSet
   }
@@ -117,11 +110,11 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
    * @param graphIds graph identifiers
    * @return vertices that are contained in the graphs
    */
-  def getVerticesByGraphIds(graphIds: IdSet): Set[V] = {
+  def verticesByGraphIds(graphIds: IdSet): Set[V] = {
     val result: mutable.Set[V] = mutable.Set[V]()
 
-    for (vertex <- vertices.values) {
-      if (graphIds.exists(vertex.getGraphIds)) result.add(vertex)
+    for (vertex <- idToVertex.values) {
+      if (graphIds.exists(vertex.graphIds)) result.add(vertex)
     }
 
     result.toSet
@@ -132,12 +125,12 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
    * @param graphVariables graph variables used in the GDL script
    * @return vertices that are contained in the graphs
    */
-  def getVerticesByGraphVariables(graphVariables: String*): Set[V] = {
+  def verticesByGraphVariables(graphVariables: String*): Set[V] = {
     val graphIds: mutable.Set[Id] = mutable.Set[Id]()
-    for (graphHead <- getGraphHeadsByVariables(graphVariables:_*)) {
-      graphIds.add(graphHead.getId)
+    for (graphHead <- graphHeadsByVariables(graphVariables:_*)) {
+      graphIds.add(graphHead.id)
     }
-    getVerticesByGraphIds(graphIds.toSet)
+    verticesByGraphIds(graphIds.toSet)
   }
 
 
@@ -148,22 +141,21 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
    *
    * @return edges
    */
-  def getEdges: Iterable[E] = edges.values
+  def edges: Iterable[E] = idToEdge.values
 
-  /**
-   * Returns edge by its given variable.
+  /** Returns edge by its given variable.
    *
    * @param variable variable used in GDL script
    * @return edge or { @code null} if not present
    */
-  def getEdgeByVariable(variable: String): Option[E] = edgeCache.get(variable)
+  def edgeByVariable(variable: String): Option[E] = edgeCache.get(variable)
 
   /** Returns edges by their given variables.
    *
    * @param variables variables used in GDL script
    * @return edges
    */
-  def getEdgesByVariables(variables: String*): Iterable[E] = {
+  def edgesByVariables(variables: String*): Iterable[E] = {
     val result: mutable.Set[E] = mutable.Set[E]()//Sets.newHashSetWithExpectedSize(variables.length)
     for (variable <- variables) {
       val edge: Option[E] = edgeCache.get(variable)
@@ -177,10 +169,10 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
    * @param graphIds Graph identifiers
    * @return edges
    */
-  def getEdgesByGraphIds(graphIds: IdSet): Iterable[E] = {
+  def edgesByGraphIds(graphIds: IdSet): Iterable[E] = {
     val result: mutable.Set[E] = mutable.Set[E]()//Sets.newHashSetWithExpectedSize(graphIds.size)
-    for (edge <- edges.values) {
-      if (graphIds.exists(edge.getGraphIds.contains)) result.add(edge)
+    for (edge <- idToEdge.values) {
+      if (graphIds.exists(edge.graphIds.contains)) result.add(edge)
     }
     result
   }
@@ -190,17 +182,15 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
    * @param variables graph variables used in the GDL script
    * @return edges
    */
-  def getEdgesByGraphVariables(variables: String*): Iterable[E] = {
+  def edgesByGraphVariables(variables: String*): Iterable[E] = {
     val graphIds: mutable.Set[Id] = mutable.Set[Id]()
-    for (graphHead <- getGraphHeadsByVariables(variables:_*)) {
-      graphIds.add(graphHead.getId)
+    for (graphHead <- graphHeadsByVariables(variables:_*)) {
+      graphIds.add(graphHead.id)
     }
-    getEdgesByGraphIds(graphIds.toSet)
+    edgesByGraphIds(graphIds.toSet)
   }
 
-
   //  Caches
-
 
   /** Returns all graph heads that are bound to a variable in the GDL script.
    *
@@ -233,7 +223,7 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
     import scala.collection.JavaConverters._
 
     for (graph <- gdlHandler.getGraphs.asScala) {
-      if (!graphHeadIds.contains(graph.getId)) initGraphHead(graph)
+      if (!graphHeadIdMapping.contains(graph.getId)) initGraphHead(graph)
     }
 
     for ((key, value) <- gdlHandler.getGraphCache().asScala) {
@@ -271,8 +261,8 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
   private def initGraphHead(g: org.s1ck.gdl.model.Graph): G = {
     val properties: Properties = Map("all" -> PropertyValue("")) //Properties.createFromMap(g.getProperties)
     val graphHead: G = graphHeadFactory.create(g.getLabel/*.split(GradoopConstants.LABEL_DELIMITER)*/, properties)
-    graphHeadIds.put(g.getId, graphHead.getId)
-    graphHeads.put(graphHead.getId, graphHead)
+    graphHeadIdMapping.put(g.getId, graphHead.id)
+    idToGraphHead.put(graphHead.id, graphHead)
     graphHead
   }
 
@@ -282,16 +272,16 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
    * @return vertex
    */
   private def initVertex(v: org.s1ck.gdl.model.Vertex): V = {
-    if (!vertexIds.contains(v.getId)) {
+    if (!vertexIdMapping.contains(v.getId)) {
       val properties: Properties = Map("all" -> PropertyValue("")) //Properties.createFromMap(v.getProperties)
       val vertex: V = vertexFactory.create(v.getLabel/*.split(GradoopConstants.LABEL_DELIMITER)*/, properties, createGradoopIdSet(v))
-      vertexIds.put(v.getId, vertex.getId)
-      vertices.put(vertex.getId, vertex)
+      vertexIdMapping.put(v.getId, vertex.id)
+      idToVertex.put(vertex.id, vertex)
       vertex
     }
     else {
-      val vertex: V = vertices(vertexIds(v.getId))
-      vertex.setGraphIds(createGradoopIdSet(v))
+      val vertex: V = idToVertex(vertexIdMapping(v.getId))
+      vertex.graphIds = createGradoopIdSet(v)
       vertex
     }
   }
@@ -302,17 +292,17 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
    * @return edge
    */
   private def initEdge(e: org.s1ck.gdl.model.Edge): E = {
-    if (!edgeIds.contains(e.getId)) {
+    if (!edgeIdMapping.contains(e.getId)) {
       val properties: Properties = Map("all" -> PropertyValue("")) //Properties.createFromMap(e.getProperties)
-      val edge: E = edgeFactory.create(e.getLabel/*.split(GradoopConstants.LABEL_DELIMITER)*/, vertexIds(e.getSourceVertexId),
-        vertexIds(e.getTargetVertexId), properties, createGradoopIdSet(e))
-      edgeIds.put(e.getId, edge.getId)
-      edges.put(edge.getId, edge)
+      val edge: E = edgeFactory.create(e.getLabel/*.split(GradoopConstants.LABEL_DELIMITER)*/, vertexIdMapping(e.getSourceVertexId),
+        vertexIdMapping(e.getTargetVertexId), properties, createGradoopIdSet(e))
+      edgeIdMapping.put(e.getId, edge.id)
+      idToEdge.put(edge.id, edge)
       edge
     }
     else {
-      val edge: E = edges(edgeIds(e.getId))
-      edge.setGraphIds(createGradoopIdSet(e))
+      val edge: E = idToEdge(edgeIdMapping(e.getId))
+      edge.graphIds = createGradoopIdSet(e)
       edge
     }
   }
@@ -323,7 +313,7 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
    * @param g        graph from GDL loader
    */
   private def updateGraphCache(variable: String, g: org.s1ck.gdl.model.Graph): Unit = {
-    graphHeadCache + (variable -> graphHeads(graphHeadIds(g.getId)))
+    graphHeadCache + (variable -> idToGraphHead(graphHeadIdMapping(g.getId)))
   }
 
   /** Updates the vertex cache.
@@ -332,7 +322,7 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
    * @param v        vertex from GDL loader
    */
   private def updateVertexCache(variable: String, v: org.s1ck.gdl.model.Vertex): Unit = {
-    vertexCache + (variable -> vertices(vertexIds(v.getId)))
+    vertexCache + (variable -> idToVertex(vertexIdMapping(v.getId)))
   }
 
   /** Updates the edge cache.
@@ -341,7 +331,7 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
    * @param e        edge from GDL loader
    */
   private def updateEdgeCache(variable: String, e: org.s1ck.gdl.model.Edge): Unit = {
-    edgeCache + (variable -> edges(edgeIds(e.getId)))
+    edgeCache + (variable -> idToEdge(edgeIdMapping(e.getId)))
   }
 
   /** Creates a {@code GradoopIDSet} from the long identifiers stored at the given graph element.
@@ -351,11 +341,10 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
    */
   private def createGradoopIdSet(e: org.s1ck.gdl.model.GraphElement): IdSet = {
     import collection.JavaConverters._
-    e.getGraphs.asScala.map(id => graphHeadIds(id)).toSet
+    e.getGraphs.asScala.map(id => graphHeadIdMapping(id)).toSet
   }
 
 }
-
 
 object AsciiGraphLoader {
 
@@ -366,9 +355,9 @@ object AsciiGraphLoader {
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
       .buildFromString(asciiGraph),
-      elementFactoryProvider.getGraphHeadFactory,
-      elementFactoryProvider.getVertexFactory,
-      elementFactoryProvider.getEdgeFactory)
+      elementFactoryProvider.graphHeadFactory,
+      elementFactoryProvider.vertexFactory,
+      elementFactoryProvider.edgeFactory)
   }
 
   def fromFile[G <: GraphHead, V <: Vertex, E <: Edge]
@@ -378,9 +367,9 @@ object AsciiGraphLoader {
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
       .buildFromFile(fileName),
-      elementFactoryProvider.getGraphHeadFactory,
-      elementFactoryProvider.getVertexFactory,
-      elementFactoryProvider.getEdgeFactory)
+      elementFactoryProvider.graphHeadFactory,
+      elementFactoryProvider.vertexFactory,
+      elementFactoryProvider.edgeFactory)
   }
 
   def fromStream[G <: GraphHead, V <: Vertex, E <: Edge]
@@ -390,8 +379,8 @@ object AsciiGraphLoader {
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
       .buildFromStream(inputStream),
-      elementFactoryProvider.getGraphHeadFactory,
-      elementFactoryProvider.getVertexFactory,
-      elementFactoryProvider.getEdgeFactory)
+      elementFactoryProvider.graphHeadFactory,
+      elementFactoryProvider.vertexFactory,
+      elementFactoryProvider.edgeFactory)
   }
 }

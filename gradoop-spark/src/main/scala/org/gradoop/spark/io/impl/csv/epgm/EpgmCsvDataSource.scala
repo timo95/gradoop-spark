@@ -7,15 +7,15 @@ import org.gradoop.spark.model.api.config.GradoopSparkConfig
 class EpgmCsvDataSource(csvPath: String, config: GradoopSparkConfig[G, V, E, LG, GC], metadata: Option[MetaData])
   extends CsvDataSource[G, V, E, LG, GC](csvPath, config, metadata) {
 
-  override def getGraphHeadParseFunctions: Array[ParseFunction[G]] = {
+  override def graphHeadParseFunctions: Array[ParseFunction[G]] = {
     Array[ParseFunction[G]](createGraphHead, parseLabels, parseProperties)
   }
 
-  override def getVertexParseFunctions: Array[ParseFunction[V]] = {
+  override def vertexParseFunctions: Array[ParseFunction[V]] = {
     Array[ParseFunction[V]](createVertex, parseGraphIds, parseLabels, parseProperties)
   }
 
-  override def getEdgeParseFunctions: Array[ParseFunction[E]] = {
+  override def edgeParseFunctions: Array[ParseFunction[E]] = {
     Array[ParseFunction[E]](createEdge, parseGraphIds, parseSourceId, parseTargetId, parseLabels, parseProperties)
   }
 }

@@ -3,7 +3,6 @@ package org.gradoop.spark.model.impl.layouts
 import org.apache.spark.sql.Dataset
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.layouts._
-import org.gradoop.spark.model.impl.elements.EpgmBaseLayoutFactory
 import org.gradoop.spark.model.impl.graph.{EpgmGraphCollection, EpgmLogicalGraph}
 
 class EpgmGveLayout(graphHeads: Dataset[G], vertices: Dataset[V], edges: Dataset[E])

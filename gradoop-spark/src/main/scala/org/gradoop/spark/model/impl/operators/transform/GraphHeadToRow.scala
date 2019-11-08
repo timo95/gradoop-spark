@@ -23,8 +23,8 @@ class GraphHeadToRow[G <: GraphHead] extends Serializable {
   }
 
   def call(graphHead: G): Row = {
-    new GenericRowWithSchema(Array(graphHead.getId.bytes, graphHead.getLabels,
-      graphHead.getProperties.mapValues(v => Tuple2(v.value, v.typeTag))), getSchema)
+    new GenericRowWithSchema(Array(graphHead.id.bytes, graphHead.labels,
+      graphHead.properties.mapValues(v => Tuple2(v.value, v.typeTag))), getSchema)
   }
 
   def getEncoder: ExpressionEncoder[Row] = {

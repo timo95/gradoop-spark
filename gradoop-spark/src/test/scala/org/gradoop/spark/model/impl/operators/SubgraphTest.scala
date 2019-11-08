@@ -8,7 +8,7 @@ class SubgraphTest extends EpgmGradoopSparkTestBase {
 
   describe("SocialNetworkGraph") {
     val loader = getSocialNetworkLoader
-    val graph = loader.getLogicalGraph
+    val graph = loader.logicalGraph
 
     describe("Strategy BOTH") {
 
@@ -16,7 +16,7 @@ class SubgraphTest extends EpgmGradoopSparkTestBase {
         val subgraph = graph.subgraph(new HasLabel("Person"), _ => true)
 
         it("should have 6 vertices") {
-          assert(subgraph.getVertices.count() == 6)
+          assert(subgraph.vertices.count() == 6)
         }
       }
     }

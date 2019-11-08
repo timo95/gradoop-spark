@@ -8,11 +8,11 @@ trait Identifiable extends Serializable {
    *
    * @return identifier
    */
-  def getId: Id
+  def id: Id
 
   /** Sets the identifier of that entity.
    *
    * @param id identifier
    */
-  def setId(id: GradoopId): Unit
+  def id_=(id: GradoopId): Unit
 }

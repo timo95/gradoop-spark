@@ -5,9 +5,9 @@ import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 
 trait ElementEncoderProvider[G <: GraphHead, V <: Vertex, E <: Edge] {
 
-  def getGraphHeadEncoder: Encoder[G]
+  def graphHeadEncoder: Encoder[G]
 
-  def getVertexEncoder: Encoder[V]
+  def vertexEncoder: Encoder[V]
 
-  def getEdgeEncoder: Encoder[E]
+  def edgeEncoder: Encoder[E]
 }

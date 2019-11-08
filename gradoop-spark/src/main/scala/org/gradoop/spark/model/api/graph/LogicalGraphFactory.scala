@@ -24,11 +24,11 @@ class LogicalGraphFactory[
  config: GradoopSparkConfig[G, V, E, LG, GC])
   extends BaseGraphFactory[G, V, E, LG, GC](layoutFactory, config) {
 
-  override def getGraphHeadFactory: GraphHeadFactory[G] = layoutFactory.getGraphHeadFactory
+  override def graphHeadFactory: GraphHeadFactory[G] = layoutFactory.graphHeadFactory
 
-  override def getVertexFactory: VertexFactory[V] = layoutFactory.getVertexFactory
+  override def vertexFactory: VertexFactory[V] = layoutFactory.vertexFactory
 
-  override def getEdgeFactory: EdgeFactory[E] = layoutFactory.getEdgeFactory
+  override def edgeFactory: EdgeFactory[E] = layoutFactory.edgeFactory
 
   /** Creates a logical graph from the given vertices and edges.
    *
@@ -40,7 +40,7 @@ class LogicalGraphFactory[
    */
   def create(vertices: Dataset[V], edges: Dataset[E]): LG = {
     val id = GradoopId.get
-    val graphHeads = session.createDataset[G](Seq(getGraphHeadFactory(id)))
+    val graphHeads = session.createDataset[G](Seq(graphHeadFactory(id)))
 
     // TODO add/set id to each element
 
@@ -85,7 +85,7 @@ class LogicalGraphFactory[
    * @return Logical graph
    */
   def init(vertices: Iterable[V], edges: Iterable[E]): LG = {
-    val graphHead = getGraphHeadFactory(GradoopId.get)
+    val graphHead = graphHeadFactory(GradoopId.get)
     init(graphHead, vertices, edges)
   }
 

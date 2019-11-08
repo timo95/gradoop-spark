@@ -7,18 +7,16 @@ import org.gradoop.spark.model.api.layouts.Layout
 import org.gradoop.spark.model.api.operators.BaseGraphOperators
 
 abstract class BaseGraph[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph[G, V, E, LG, GC], GC <: GraphCollection[G, V, E, LG, GC]]
-(layout: Layout[V, E], config: GradoopSparkConfig[G, V, E, LG, GC])
+(layout: Layout[V, E], val config: GradoopSparkConfig[G, V, E, LG, GC])
   extends ElementAccess[V, E] with BaseGraphOperators[G, V, E, LG, GC] {
 
-  override def getVertices: Dataset[V] = layout.getVertices
+  override def vertices: Dataset[V] = layout.vertices
 
-  override def getVerticesByLabel(label: String): Dataset[V] = layout.getVerticesByLabel(label)
+  override def verticesByLabel(label: String): Dataset[V] = layout.verticesByLabel(label)
 
-  override def getEdges: Dataset[E] = layout.getEdges
+  override def edges: Dataset[E] = layout.edges
 
-  override def getEdgesByLabel(label: String): Dataset[E] = layout.getEdgesByLabel(label)
+  override def edgesByLabel(label: String): Dataset[E] = layout.edgesByLabel(label)
 
-  def getConfig: GradoopSparkConfig[G, V, E, LG, GC] = config
-
-  def getFactory: BaseGraphFactory[G, V, E, LG, GC]
+  def factory: BaseGraphFactory[G, V, E, LG, GC]
 }

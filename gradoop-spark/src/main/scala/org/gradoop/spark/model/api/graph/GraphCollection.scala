@@ -15,7 +15,7 @@ abstract class GraphCollection[G <: GraphHead, V <: Vertex, E <: Edge, LG <: Log
    *
    * @return graph heads
    */
-  def getGraphHeads: Dataset[G]
+  def graphHeads: Dataset[G]
 
   /**
    * Returns the graph heads associated with the logical graphs in that collection filtered by label.
@@ -23,7 +23,7 @@ abstract class GraphCollection[G <: GraphHead, V <: Vertex, E <: Edge, LG <: Log
    * @param label graph head label
    * @return graph heads
    */
-  def getGraphHeadsByLabel(label: String): Dataset[G]
+  def graphHeadsByLabel(label: String): Dataset[G]
 
-  override def getFactory: GraphCollectionFactory[G, V, E, LG, GC] = config.getGraphCollectionFactory
+  override def factory: GraphCollectionFactory[G, V, E, LG, GC] = config.graphCollectionFactory
 }

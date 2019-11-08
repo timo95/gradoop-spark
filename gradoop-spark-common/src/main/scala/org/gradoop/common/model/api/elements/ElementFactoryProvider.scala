@@ -9,17 +9,17 @@ trait ElementFactoryProvider[G <: GraphHead, V <: Vertex, E <: Edge] extends Ser
    *
    * @return a factory that creates graph heads
    */
-  def getGraphHeadFactory: GraphHeadFactory[G]
+  def graphHeadFactory: GraphHeadFactory[G]
 
   /** Get the factory that is responsible for creating vertex instances.
    *
    * @return a factory that creates vertices
    */
-  def getVertexFactory: VertexFactory[V]
+  def vertexFactory: VertexFactory[V]
 
   /** Get the factory that is responsible for creating edge instances.
    *
    * @return a factory that creates edges
    */
-  def getEdgeFactory: EdgeFactory[E]
+  def edgeFactory: EdgeFactory[E]
 }

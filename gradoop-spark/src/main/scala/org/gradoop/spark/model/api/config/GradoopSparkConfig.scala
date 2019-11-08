@@ -18,43 +18,20 @@ class GradoopSparkConfig[
 (implicit sparkSession: SparkSession) extends Serializable {
 
   object implicits extends Serializable with ComponentTypes {
-    implicit def implicitGraphHeadEncoder: Encoder[G] = getGraphHeadEncoder
-    //implicit def impliticVertexEncoder: Encoder[V] = getVertexEncoder
-    //implicit def implicitEdgeEncoder: Encoder[E] = getEdgeEncoder
-
-    //implicit def implicitPropertyValueEncoder: Encoder[PropertyValue] = Encoders.kryo[PropertyValue]
-    //implicit def implicitPropertiesEncoder: Encoder[Properties] = Encoders.kryo[Properties]
+    implicit def implicitGraphHeadEncoder: Encoder[G] = graphHeadEncoder
+    implicit def impliticVertexEncoder: Encoder[V] = vertexEncoder
+    implicit def implicitEdgeEncoder: Encoder[E] = edgeEncoder
 
     implicit def implicitSparkSession: SparkSession = sparkSession
   }
 
-  def getLogicalGraphFactory: LogicalGraphFactory[G, V, E, LG, GC] = logicalGraphFactory
-
-  def getGraphCollectionFactory: GraphCollectionFactory[G, V, E, LG, GC] = graphCollectionFactory
-
   def getSparkSession: SparkSession = sparkSession
 
-  def getGraphHeadEncoder: Encoder[G] = logicalGraphFactory.encoderG
+  def graphHeadEncoder: Encoder[G] = logicalGraphFactory.graphHeadEncoder
 
-  def getVertexEncoder: Encoder[V] = logicalGraphFactory.encoderV
+  def vertexEncoder: Encoder[V] = logicalGraphFactory.vertexEncoder
 
-  def getEdgeEncoder: Encoder[E] = logicalGraphFactory.encoderE
-
-  /** Sets the layout factory that is responsible for creating a logical graph layout.
-   *
-   * @param logicalGraphFactory logical graph layout factory
-   */
-  def setLogicalGraphFactory(logicalGraphFactory: LogicalGraphFactory[G, V, E, LG, GC]): Unit = {
-    this.logicalGraphFactory = logicalGraphFactory
-  }
-
-  /** Sets the layout factory that is responsible for creating a graph collection layout.
-   *
-   * @param graphCollectionFactory graph collection layout factory
-   */
-  def setGraphCollectionFactory(graphCollectionFactory: GraphCollectionFactory[G, V, E, LG, GC]): Unit = {
-    this.graphCollectionFactory = graphCollectionFactory
-  }
+  def edgeEncoder: Encoder[E] = logicalGraphFactory.edgeEncoder
 }
 
 object GradoopSparkConfig {
@@ -69,8 +46,8 @@ object GradoopSparkConfig {
    graphCollectionLayoutFactory: GraphCollectionLayoutFactory[G, V, E, LG, GC])
   (implicit sparkSession: SparkSession): GradoopSparkConfig[G, V, E, LG, GC] = {
     val config = new GradoopSparkConfig[G, V, E, LG, GC](null, null)
-    config.setLogicalGraphFactory(new LogicalGraphFactory[G, V, E, LG, GC](logicalGraphLayoutFactory, config))
-    config.setGraphCollectionFactory(new GraphCollectionFactory[G, V, E, LG, GC](graphCollectionLayoutFactory, config))
+    config.logicalGraphFactory = new LogicalGraphFactory[G, V, E, LG, GC](logicalGraphLayoutFactory, config)
+    config.graphCollectionFactory = new GraphCollectionFactory[G, V, E, LG, GC](graphCollectionLayoutFactory, config)
     config
   }
 }

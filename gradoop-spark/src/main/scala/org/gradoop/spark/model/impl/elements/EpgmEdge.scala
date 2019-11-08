@@ -1,30 +1,18 @@
 package org.gradoop.spark.model.impl.elements
 
-import org.apache.spark.sql.{Encoder, Encoders}
+import org.apache.spark.sql.Encoder
+import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.gradoop.common.model.api.elements.{Edge, EdgeFactory}
 import org.gradoop.common.model.impl.id.GradoopId
 
-class EpgmEdge(id: Id, labels: Labels, var sourceId: Id, var targetId: Id, properties: Properties, graphIds: IdSet)
-  extends EpgmGraphElement(id, labels, properties, graphIds) with Edge {
-
-  override def getSourceId: Id = sourceId
-
-  override def getTargetId: Id = targetId
-
-  override def setSourceId(sourceId: Id): Unit = {
-    this.sourceId = sourceId
-  }
-
-  override def setTargetId(targetId: Id): Unit = {
-    this.targetId = targetId
-  }
-}
+final case class EpgmEdge(var id: Id, var labels: Labels, var sourceId: Id, var targetId: Id,
+                          var properties: Properties, var graphIds: IdSet) extends Edge
 
 object EpgmEdge extends EdgeFactory[E] {
 
-  def getEncoder: Encoder[EpgmEdge] = Encoders.kryo(classOf[EpgmEdge])
+  def encoder: Encoder[E] = ExpressionEncoder[E]
 
-  override def getType: Class[E] = classOf[EpgmEdge]
+  override def producedType: Class[E] = classOf[E]
 
   override def apply(id: Id): E = apply(id, new Labels(""), GradoopId.NULL_VALUE, GradoopId.NULL_VALUE)
 

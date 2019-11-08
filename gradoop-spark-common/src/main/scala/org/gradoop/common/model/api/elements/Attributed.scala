@@ -1,7 +1,7 @@
 package org.gradoop.common.model.api.elements
 
 trait Attributed extends Serializable {
-  def getProperties: Properties
+  def properties: Properties
 
-  def setProperties(properties: Properties): Unit
+  def properties_=(properties: Properties): Unit
 }

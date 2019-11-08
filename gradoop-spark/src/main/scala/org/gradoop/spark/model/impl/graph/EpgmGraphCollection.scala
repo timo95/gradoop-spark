@@ -8,10 +8,10 @@ import org.gradoop.spark.model.api.layouts.GraphCollectionLayout
 class EpgmGraphCollection(layout: GraphCollectionLayout[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC])
   extends GraphCollection[G, V, E, LG, GC](layout, config) {
 
-  override def getGraphHeads: Dataset[G] = layout.getGraphHeads
-  override def getGraphHeadsByLabel(label: String): Dataset[G] = layout.getGraphHeadsByLabel(label)
-  override def getVertices: Dataset[V] = layout.getVertices
-  override def getVerticesByLabel(label: String): Dataset[V] = layout.getVerticesByLabel(label)
-  override def getEdges: Dataset[E] = layout.getEdges
-  override def getEdgesByLabel(label: String): Dataset[E] = layout.getEdgesByLabel(label)
+  override def graphHeads: Dataset[G] = layout.graphHeads
+  override def graphHeadsByLabel(label: String): Dataset[G] = layout.graphHeadsByLabel(label)
+  override def vertices: Dataset[V] = layout.vertices
+  override def verticesByLabel(label: String): Dataset[V] = layout.verticesByLabel(label)
+  override def edges: Dataset[E] = layout.edges
+  override def edgesByLabel(label: String): Dataset[E] = layout.edgesByLabel(label)
 }

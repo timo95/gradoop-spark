@@ -13,7 +13,7 @@ class Grouping[
 
 
   override def execute(graph: LG): LG = {
-    val config = graph.getConfig
+    val config = graph.config
     val session = config.getSparkSession
 
     import config.implicits._

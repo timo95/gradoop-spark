@@ -8,9 +8,9 @@ import org.gradoop.spark.model.api.layouts.LogicalGraphLayout
 class EpgmLogicalGraph(layout: LogicalGraphLayout[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC])
   extends LogicalGraph[G, V, E, LG, GC](layout, config) {
 
-  override def getGraphHead: Dataset[G] = layout.getGraphHead
-  override def getVertices: Dataset[V] = layout.getVertices
-  override def getVerticesByLabel(label: String): Dataset[V] = layout.getVerticesByLabel(label)
-  override def getEdges: Dataset[E] = layout.getEdges
-  override def getEdgesByLabel(label: String): Dataset[E] = layout.getEdgesByLabel(label)
+  override def graphHead: Dataset[G] = layout.graphHead
+  override def vertices: Dataset[V] = layout.vertices
+  override def verticesByLabel(label: String): Dataset[V] = layout.verticesByLabel(label)
+  override def edges: Dataset[E] = layout.edges
+  override def edgesByLabel(label: String): Dataset[E] = layout.edgesByLabel(label)
 }

@@ -28,9 +28,9 @@ extends CsvComposer[G, V, E](metadata) with DataSink[G, V, E, LG, GC] {
   }
 
   override def write(logicalGraph: LG, saveMode: SaveMode): Unit = {
-    writeGraphHeads(logicalGraph.getGraphHead, saveMode)
-    writeVertices(logicalGraph.getVertices, saveMode)
-    writeEdges(logicalGraph.getEdges, saveMode)
+    writeGraphHeads(logicalGraph.graphHead, saveMode)
+    writeVertices(logicalGraph.vertices, saveMode)
+    writeEdges(logicalGraph.edges, saveMode)
   }
 
   override def write(graphCollection: GC): Unit = {
@@ -38,14 +38,14 @@ extends CsvComposer[G, V, E](metadata) with DataSink[G, V, E, LG, GC] {
   }
 
   override def write(graphCollection: GC, saveMode: SaveMode): Unit = {
-    writeGraphHeads(graphCollection.getGraphHeads, saveMode)
-    writeVertices(graphCollection.getVertices, saveMode)
-    writeEdges(graphCollection.getEdges, saveMode)
+    writeGraphHeads(graphCollection.graphHeads, saveMode)
+    writeVertices(graphCollection.vertices, saveMode)
+    writeEdges(graphCollection.edges, saveMode)
   }
 
   def writeGraphHeads(graphHeads: Dataset[G], saveMode: SaveMode): Unit = {
-    val objectToRow = new ObjectToRow[G](getGraphHeadComposeFunctions)
-    graphHeads.map(objectToRow.call)(objectToRow.getEncoder)
+    val objectToRow = new ObjectToRow[G](graphHeadComposeFunctions)
+    graphHeads.map(objectToRow.call)(objectToRow.encoder)
       .write
       .options(options)
       .mode(saveMode)
@@ -53,8 +53,8 @@ extends CsvComposer[G, V, E](metadata) with DataSink[G, V, E, LG, GC] {
   }
 
   def writeVertices(vertices: Dataset[V], saveMode: SaveMode): Unit = {
-    val objectToRow = new ObjectToRow[V](getVertexComposeFunctions)
-    vertices.map(objectToRow.call)(objectToRow.getEncoder)
+    val objectToRow = new ObjectToRow[V](vertexComposeFunctions)
+    vertices.map(objectToRow.call)(objectToRow.encoder)
       .write
       .options(options)
       .mode(saveMode)
@@ -62,8 +62,8 @@ extends CsvComposer[G, V, E](metadata) with DataSink[G, V, E, LG, GC] {
   }
 
   def writeEdges(edges: Dataset[E], saveMode: SaveMode): Unit = {
-    val objectToRow = new ObjectToRow[E](getEdgeComposeFunctions)
-    edges.map(objectToRow.call)(objectToRow.getEncoder)
+    val objectToRow = new ObjectToRow[E](edgeComposeFunctions)
+    edges.map(objectToRow.call)(objectToRow.encoder)
       .write
       .options(options)
       .mode(saveMode)

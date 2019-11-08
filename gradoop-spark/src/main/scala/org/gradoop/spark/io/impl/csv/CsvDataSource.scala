@@ -14,35 +14,35 @@ abstract class CsvDataSource[
   LG <: LogicalGraph[G, V, E, LG, GC],
   GC <: GraphCollection[G, V, E, LG, GC]]
 (csvPath: String, config: GradoopSparkConfig[G, V, E, LG, GC], metadata: Option[MetaData])
-  extends CsvParser[G, V, E](metadata, config.getLogicalGraphFactory) with DataSource {
+  extends CsvParser[G, V, E](metadata, config.logicalGraphFactory) with DataSource {
 
   private val options: Map[String, String] = Map(
     "sep" -> CsvConstants.TOKEN_DELIMITER,
     "quote" -> null,
     "nullValue" -> GradoopConstants.NULL_STRING)
 
-  override def getLogicalGraph: LG = config.getLogicalGraphFactory.init(getGraphHeads, getVertices, getEdges)
+  override def readLogicalGraph: LG = config.logicalGraphFactory.init(readGraphHeads, readVertices, readEdges)
 
-  override def getGraphCollection: GC = config.getGraphCollectionFactory.init(getGraphHeads, getVertices, getEdges)
+  override def readGraphCollection: GC = config.graphCollectionFactory.init(readGraphHeads, readVertices, readEdges)
 
-  def getGraphHeads: Dataset[G] = {
+  def readGraphHeads: Dataset[G] = {
     config.getSparkSession.read
       .options(options)
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.GRAPH_HEAD_FILE)
-      .flatMap(new RowToObject[G](getGraphHeadParseFunctions).call)(config.getGraphHeadEncoder)
+      .flatMap(new RowToObject[G](graphHeadParseFunctions).call)(config.graphHeadEncoder)
   }
 
-  def getVertices: Dataset[V] = {
+  def readVertices: Dataset[V] = {
     config.getSparkSession.read
       .options(options)
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.VERTEX_FILE)
-      .flatMap(new RowToObject[V](getVertexParseFunctions).call)(config.getVertexEncoder)
+      .flatMap(new RowToObject[V](vertexParseFunctions).call)(config.vertexEncoder)
   }
 
-  def getEdges: Dataset[E] = {
+  def readEdges: Dataset[E] = {
     config.getSparkSession.read
       .options(options)
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.EDGE_FILE)
-      .flatMap(new RowToObject[E](getEdgeParseFunctions).call)(config.getEdgeEncoder)
+      .flatMap(new RowToObject[E](edgeParseFunctions).call)(config.edgeEncoder)
   }
 }

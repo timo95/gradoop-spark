@@ -10,5 +10,5 @@ trait LogicalGraphLayout[G <: GraphHead, V <: Vertex, E <: Edge] extends Layout[
    *
    * @return 1-element dataset
    */
-  def getGraphHead: Dataset[G]
+  def graphHead: Dataset[G]
 }

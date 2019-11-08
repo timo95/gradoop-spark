@@ -8,11 +8,11 @@ trait DataSource {
    *
    * @return logical graph
    */
-  def getLogicalGraph: LogicalGraph[_, _, _, _, _]
+  def readLogicalGraph: LogicalGraph[_, _, _, _, _]
 
   /** Reads the input as graph collection.
    *
    * @return graph collection
    */
-  def getGraphCollection: GraphCollection[_, _, _, _, _]
+  def readGraphCollection: GraphCollection[_, _, _, _, _]
 }

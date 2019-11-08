@@ -6,5 +6,5 @@ trait ElementFactory[EL <: Element] {
    *
    * @return produced entity type
    */
-  def getType: Class[EL]
+  def producedType: Class[EL]
 }

@@ -9,25 +9,25 @@ trait ElementAccess[V <: Vertex, E <: Edge] {
    *
    * @return vertices
    */
-  def getVertices: Dataset[V]
+  def vertices: Dataset[V]
 
   /** Returns all vertices having the specified label.
    *
    * @param label vertex label
    * @return filtered vertices
    */
-  def getVerticesByLabel(label: String): Dataset[V]
+  def verticesByLabel(label: String): Dataset[V]
 
   /** Returns all edges.
    *
    * @return edges
    */
-  def getEdges: Dataset[E]
+  def edges: Dataset[E]
 
   /** Returns all edges having the specified label.
    *
    * @param label edge label
    * @return filtered edges
    */
-  def getEdgesByLabel(label: String): Dataset[E]
+  def edgesByLabel(label: String): Dataset[E]
 }
