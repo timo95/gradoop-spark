@@ -7,13 +7,7 @@ import java.util
 import java.util.Date
 import java.util.concurrent.atomic.AtomicInteger
 
-case class GradoopId(bytes: Array[Byte]) extends Ordered[GradoopId] with Serializable {
-
-  /** Returns byte representation of a GradoopId
-   *
-   * @return Byte representation
-   */
-  def toByteArray: Array[Byte] = bytes
+case class GradoopId(val bytes: Array[Byte]) extends Ordered[GradoopId] with Serializable {
 
   /** Checks if the specified object is equal to the current id.
    *
@@ -24,7 +18,7 @@ case class GradoopId(bytes: Array[Byte]) extends Ordered[GradoopId] with Seriali
     if (super.equals(o)) return true
     if (o == null || (getClass ne o.getClass)) return false
     val firstBytes = this.bytes
-    val secondBytes = o.asInstanceOf[GradoopId].toByteArray
+    val secondBytes = o.asInstanceOf[GradoopId].bytes
     var i = 0
     for (i <- 0 until GradoopId.ID_SIZE) {
       if (firstBytes(i) != secondBytes(i)) return false
@@ -48,7 +42,7 @@ case class GradoopId(bytes: Array[Byte]) extends Ordered[GradoopId] with Seriali
 
   override def compare(that: GradoopId): Int = {
     for (i <- 0 until GradoopId.ID_SIZE) {
-      if (this.toByteArray(i) != that.toByteArray(i)) return if ((this.toByteArray(i) & 0xff) < (that.toByteArray(i) & 0xff)) -1
+      if (this.bytes(i) != that.bytes(i)) return if ((this.bytes(i) & 0xff) < (that.bytes(i) & 0xff)) -1
       else 1
     }
     0

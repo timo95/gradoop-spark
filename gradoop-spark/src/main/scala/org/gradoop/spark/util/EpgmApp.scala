@@ -9,15 +9,15 @@ import org.gradoop.spark.model.impl.types.EpgmTypes
 
 trait EpgmApp extends EpgmTypes with ComponentTypes {
 
-  private var config: GradoopSparkConfig[G, V, E, LG, GC] = _
+  private var _gveConfig: GradoopSparkConfig[G, V, E, LG, GC] = _
 
   def gveConfig(implicit session: SparkSession): GradoopSparkConfig[G, V, E, LG, GC] = {
-    if (config == null) {
-      config = new GradoopSparkConfig[G, V, E, LG, GC](null, null)
+    if (_gveConfig == null) {
+      _gveConfig = new GradoopSparkConfig[G, V, E, LG, GC](null, null)
 
-      config.logicalGraphFactory = new LogicalGraphFactory[G, V, E, LG, GC](EpgmGveLayout, config)
-      config.graphCollectionFactory = new GraphCollectionFactory[G, V, E, LG, GC](EpgmGveLayout, config)
+      _gveConfig.logicalGraphFactory = new LogicalGraphFactory[G, V, E, LG, GC](EpgmGveLayout, _gveConfig)
+      _gveConfig.graphCollectionFactory = new GraphCollectionFactory[G, V, E, LG, GC](EpgmGveLayout, _gveConfig)
     }
-    config
+    _gveConfig
   }
 }

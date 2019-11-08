@@ -15,7 +15,7 @@ class GradoopSparkConfig[
   GC <: GraphCollection[G, V, E, LG, GC]]
 (var logicalGraphFactory: LogicalGraphFactory[G, V, E, LG, GC],
  var graphCollectionFactory: GraphCollectionFactory[G, V, E, LG, GC])
-(implicit sparkSession: SparkSession) extends Serializable {
+(implicit val sparkSession: SparkSession) extends Serializable {
 
   object implicits extends Serializable with ComponentTypes {
     implicit def implicitGraphHeadEncoder: Encoder[G] = graphHeadEncoder
@@ -24,8 +24,6 @@ class GradoopSparkConfig[
 
     implicit def implicitSparkSession: SparkSession = sparkSession
   }
-
-  def getSparkSession: SparkSession = sparkSession
 
   def graphHeadEncoder: Encoder[G] = logicalGraphFactory.graphHeadEncoder
 

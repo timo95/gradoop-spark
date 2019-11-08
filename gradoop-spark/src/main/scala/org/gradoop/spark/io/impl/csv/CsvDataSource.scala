@@ -26,21 +26,21 @@ abstract class CsvDataSource[
   override def readGraphCollection: GC = config.graphCollectionFactory.init(readGraphHeads, readVertices, readEdges)
 
   def readGraphHeads: Dataset[G] = {
-    config.getSparkSession.read
+    config.sparkSession.read
       .options(options)
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.GRAPH_HEAD_FILE)
       .flatMap(new RowToObject[G](graphHeadParseFunctions).call)(config.graphHeadEncoder)
   }
 
   def readVertices: Dataset[V] = {
-    config.getSparkSession.read
+    config.sparkSession.read
       .options(options)
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.VERTEX_FILE)
       .flatMap(new RowToObject[V](vertexParseFunctions).call)(config.vertexEncoder)
   }
 
   def readEdges: Dataset[E] = {
-    config.getSparkSession.read
+    config.sparkSession.read
       .options(options)
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.EDGE_FILE)
       .flatMap(new RowToObject[E](edgeParseFunctions).call)(config.edgeEncoder)

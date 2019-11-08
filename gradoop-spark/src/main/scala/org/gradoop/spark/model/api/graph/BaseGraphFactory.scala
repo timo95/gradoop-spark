@@ -18,7 +18,7 @@ abstract class BaseGraphFactory[
   implicit val vertexEncoder: Encoder[V] = layoutFactory.vertexEncoder
   implicit val edgeEncoder: Encoder[E] = layoutFactory.edgeEncoder
 
-  implicit val session: SparkSession = config.getSparkSession
+  implicit val session: SparkSession = config.sparkSession
 
   def createDataset[T](iterable: Iterable[T])(implicit encoder: Encoder[T]): Dataset[T] =
     session.createDataset(iterable.toSeq)

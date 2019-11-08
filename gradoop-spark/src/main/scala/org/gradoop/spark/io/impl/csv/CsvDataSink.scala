@@ -15,7 +15,7 @@ abstract class CsvDataSink[
   GC <: GraphCollection[G, V, E, LG, GC]]
 (csvPath: String, config: GradoopSparkConfig[G, V, E, LG, GC], metadata: Option[MetaData])
 extends CsvComposer[G, V, E](metadata) with DataSink[G, V, E, LG, GC] {
-  implicit val session: SparkSession = config.getSparkSession
+  implicit val session: SparkSession = config.sparkSession
 
   private val options: Map[String, String] = Map(
     "sep" -> CsvConstants.TOKEN_DELIMITER,
