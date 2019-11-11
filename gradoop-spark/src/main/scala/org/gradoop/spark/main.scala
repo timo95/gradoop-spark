@@ -12,11 +12,6 @@ import org.gradoop.spark.util.{EpgmApp, SparkAsciiGraphLoader}
 object main extends EpgmApp {
   def main(args: Array[String]): Unit = {
 
-    implicit val session: SparkSession = SparkSession.builder
-      .appName("Simple Application")
-      .master("local[4]")
-      .getOrCreate()
-
     val config = gveConfig
 
     //val loader = SparkAsciiGraphLoader.fromString(config, getGraphGDLString)

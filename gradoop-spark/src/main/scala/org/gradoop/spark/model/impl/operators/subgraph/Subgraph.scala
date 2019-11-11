@@ -28,8 +28,7 @@ class Subgraph[
 
     case Strategy.VERTEX_INDUCED =>
       val filteredVertices = graph.vertices.filter(vertexFilterFunction)
-      val inducedEdges = graph.edges // TODO
-      graph.factory.init(graph.graphHead, filteredVertices, inducedEdges)
+      graph.factory.init(graph.graphHead, filteredVertices, graph.edges).verify // verify induces the edges
 
     case Strategy.EDGE_INDUCED =>
       import graph.config.implicits._

@@ -1,9 +1,8 @@
 package org.gradoop.spark.model.api.config
 
-import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
+import org.apache.spark.sql.{Encoder, SparkSession}
 import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.common.model.api.types.ComponentTypes
-import org.gradoop.common.properties.PropertyValue
 import org.gradoop.spark.model.api.graph.{GraphCollection, GraphCollectionFactory, LogicalGraph, LogicalGraphFactory}
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, LogicalGraphLayoutFactory}
 

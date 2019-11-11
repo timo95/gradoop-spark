@@ -14,6 +14,9 @@ plugins {
 
     // Run scalatest tests with gradle build
     id("com.github.maiflai.scalatest") version "0.25" apply false
+
+    // Shade equivalent
+    id("com.github.johnrengelman.shadow") version "5.2.0" apply false
 }
 
 allprojects {
@@ -22,6 +25,7 @@ allprojects {
 }
 
 subprojects {
+    //apply(plugin = "java-library")
     apply(plugin = "scala")
 
     // Run scalatest tests

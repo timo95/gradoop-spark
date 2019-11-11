@@ -2,6 +2,7 @@ package org.gradoop.spark.model.api.graph
 
 import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.spark.model.impl.operators.subgraph.Subgraph
+import org.gradoop.spark.model.impl.operators.verify.Verify
 
 trait LogicalGraphOperators[
   G <: GraphHead,
@@ -19,5 +20,7 @@ trait LogicalGraphOperators[
 
   def edgeInducedSubgraph(edgeFilterFunction: E => Boolean): LG =
     Subgraph.edgeIncuded[G, V, E, LG, GC](edgeFilterFunction).execute(this)
+
+  def verify: LG = new Verify[G, V, E, LG, GC]().execute(this)
 
 }

@@ -9,6 +9,11 @@ import org.gradoop.spark.model.impl.types.EpgmTypes
 
 trait EpgmApp extends EpgmTypes with ComponentTypes {
 
+  implicit val session: SparkSession = SparkSession.builder
+    .appName("Simple Application")
+    .master("local[4]")
+    .getOrCreate()
+
   private var _gveConfig: GradoopSparkConfig[G, V, E, LG, GC] = _
 
   def gveConfig(implicit session: SparkSession): GradoopSparkConfig[G, V, E, LG, GC] = {
