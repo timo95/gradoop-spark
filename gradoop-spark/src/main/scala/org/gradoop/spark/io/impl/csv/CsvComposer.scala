@@ -37,6 +37,6 @@ abstract class CsvComposer[G <: GraphHead, V <: Vertex, E <: Edge](var metadata:
   }
 
   def composeProperties[T <: Attributed](obj: T): String = {
-    obj.properties("all").getString //obj.getProperties // TODO
+    obj.properties.values.map(p => p.getString).mkString(CsvConstants.VALUE_DELIMITER) //obj.getProperties // TODO
   }
 }

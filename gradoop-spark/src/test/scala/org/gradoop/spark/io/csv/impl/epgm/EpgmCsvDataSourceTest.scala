@@ -16,17 +16,22 @@ class EpgmCsvDataSourceTest extends EpgmGradoopSparkTestBase {
       assert(graph.vertices.count() == 2)
       assert(graph.edges.count() == 1)
     }
-    it("correct graphHead id") {
+    it("correct ids") {
       assert(graph.graphHead.collect()(0).id == GradoopId.fromString("000000000000000000000000"))
-    }
-    it("correct vertex ids") {
-      val vertexIds = graph.vertices.collect.map(v => v.id).toSet
+
       val expected = Set[String]("000000000000000000000000", "000000000000000000000001")
         .map(GradoopId.fromString)
-      assert(vertexIds == expected)
-    }
-    it("correct edge id") {
+      assert(graph.vertices.collect.map(v => v.id).toSet == expected)
+
       assert(graph.edges.collect()(0).id == GradoopId.fromString("000000000000000000000002"))
+    }
+    it("correct labels") {
+      assert(graph.graphHead.collect()(0).labels == "Forum")
+
+      val expected = Set[String]("User", "Post")
+      assert(graph.vertices.collect.map(v => v.labels).toSet == expected)
+
+      assert(graph.edges.collect()(0).labels == "creatorOf")
     }
   }
 

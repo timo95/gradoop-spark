@@ -5,7 +5,11 @@ import scala.reflect.runtime.universe._
 
 case class PropertyValue(value: Array[Byte], typeTag: String) extends Serializable {
 
-  def getString: String = value.toString
+  def getString: String = new String(value)
+
+  def get: Any = getString
+
+  override def toString: Labels = get.toString
 }
 
 object PropertyValue {
