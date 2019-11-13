@@ -18,21 +18,23 @@ object main extends EpgmApp {
     val csvDataSource = EpgmCsvDataSource("/home/timo/Projekte/graphs/ldbc_1", config)
     val csvDataSink = EpgmCsvDataSink("/home/timo/Projekte/graphs/ldbc_1_out", config)
 
-    val graph = csvDataSource.readLogicalGraph
+    //val graph = csvDataSource.readLogicalGraph
 
-    graph.graphHead.foreach(g => println(g.labels.length))
-    graph.graphHead.foreach(g => println(g.labels))
+    //graph.graphHead.foreach(g => println(g.labels.length))
+    //graph.graphHead.foreach(g => println(g.labels))
     //graph.getGraphHead.foreach(g => println(g.getLabels(0)))
 
-    graph.graphHead.foreach(g => g.properties.foreach(println))
-    graph.graphHead.display
+    //graph.graphHead.foreach(g => g.properties.foreach(println))
+    //graph.graphHead.display
 
-    csvDataSink.write(graph.factory.init(graph.graphHead, session.emptyDataset[V], session.emptyDataset[E]), SaveMode.Overwrite)
+    //csvDataSink.write(graph.factory.init(graph.graphHead, session.emptyDataset[V], session.emptyDataset[E]), SaveMode.Overwrite)
 
     //graph = graph.subgraph(new HasLabel("Person"), e => true)
 
     //println("Vertices Subgraph: " + graph.getVertices.count())
 
     session.stop()
+
+    println((0 until 26-1 by 2).toList)
   }
 }

@@ -19,7 +19,6 @@ case class GradoopId(val bytes: Array[Byte]) extends Ordered[GradoopId] with Ser
     if (o == null || (getClass ne o.getClass)) return false
     val firstBytes = this.bytes
     val secondBytes = o.asInstanceOf[GradoopId].bytes
-    var i = 0
     for (i <- 0 until GradoopId.ID_SIZE) {
       if (firstBytes(i) != secondBytes(i)) return false
     }
@@ -55,15 +54,10 @@ case class GradoopId(val bytes: Array[Byte]) extends Ordered[GradoopId] with Ser
    * @return GradoopId string representation.
    */
   override def toString: String = {
-    val chars = new Array[Char](24)
-    var i = 0
-    for (b <- bytes) {
-      chars({
-        i += 1; i - 1
-      }) = GradoopId.HEX_CHARS(b >> 4 & 0xF)
-      chars({
-        i += 1; i - 1
-      }) = GradoopId.HEX_CHARS(b & 0xF)
+    val chars = new Array[Char](GradoopId.ID_SIZE * 2)
+    for(i <- 0 until GradoopId.ID_SIZE) {
+      chars(i * 2) = GradoopId.HEX_CHARS(bytes(i) >> 4 & 0xF)
+      chars(i * 2 + 1) = GradoopId.HEX_CHARS(bytes(i) & 0xF)
     }
     String.valueOf(chars)
   }
@@ -129,13 +123,10 @@ object GradoopId {
     var machinePiece: Int = 0
     try {
       val sb: StringBuilder = new StringBuilder
-      val e: util.Enumeration[NetworkInterface] = NetworkInterface.getNetworkInterfaces
-      while ( {
-        e.hasMoreElements
-      }) {
-        val ni: NetworkInterface = e.nextElement
-        sb.append(ni.toString)
-        val mac: Array[Byte] = ni.getHardwareAddress
+      import scala.collection.JavaConverters._
+      NetworkInterface.getNetworkInterfaces.asScala.foreach(interface => {
+        sb.append(interface.toString)
+        val mac: Array[Byte] = interface.getHardwareAddress
         if (mac != null) {
           val bb: ByteBuffer = ByteBuffer.wrap(mac)
           try {
@@ -143,23 +134,20 @@ object GradoopId {
             sb.append(bb.getChar)
             sb.append(bb.getChar)
           } catch {
-            case shortHardwareAddressException: BufferUnderflowException =>
-
+            case _: BufferUnderflowException =>
             // mac with less than 6 bytes. continue
           }
         }
-      }
+      })
       machinePiece = sb.toString.hashCode
     } catch {
-      case t: SocketException =>
-        machinePiece = new SecureRandom().nextInt
+      case _: SocketException => machinePiece = new SecureRandom().nextInt
     }
     machinePiece = machinePiece & LOW_ORDER_THREE_BYTES
     machinePiece
   }
 
-  /**
-   * Creates the process identifier.  This does not have to be unique per class loader because
+  /** Creates the process identifier. This does not have to be unique per class loader because
    * NEXT_COUNTER will provide the uniqueness.
    * <p>
    * Note: Implementation taken from org.bson.types.ObjectId
@@ -181,9 +169,8 @@ object GradoopId {
    */
   private def dateToTimestampSeconds(time: Date) = (time.getTime / 1000).toInt
 
-  /**
-   * Creates a GradoopId using the given time, machine identifier, process identifier, and counter.
-   * <p>
+  /** Creates a GradoopId using the given time, machine identifier, process identifier, and counter.
+   *
    * Note: Implementation taken from org.bson.types.ObjectId
    *
    * @param timestamp         the time in seconds
@@ -220,57 +207,41 @@ object GradoopId {
 
   def get: GradoopId = apply(dateToTimestampSeconds(new Date), MACHINE_IDENTIFIER, PROCESS_IDENTIFIER, NEXT_COUNTER.getAndIncrement, false)
 
-  /**
-   * Returns the Gradoop ID represented by a specified hexadecimal string.
-   * <p>
+  /** Returns the Gradoop ID represented by a specified hexadecimal string.
+   *
    * Note: Implementation taken from org.bson.types.ObjectId
    *
    * @param string hexadecimal GradoopId representation
    * @return GradoopId
    */
   def fromString(string: String): GradoopId = {
-    if (!GradoopId.isValid(string)) throw new IllegalArgumentException("invalid hexadecimal representation of a GradoopId: [" + string + "]")
-    val b = new Array[Byte](12)
-    var i = 0
-    while ( {
-      i < b.length
-    }) {
-      b(i) = Integer.parseInt(string.substring(i * 2, i * 2 + 2), 16).toByte
-
-      {
-        i += 1; i - 1
-      }
-    }
-    new GradoopId(b)
+    if (!GradoopId.isValid(string))
+      throw new IllegalArgumentException("invalid hexadecimal representation of a GradoopId: [" + string + "]")
+    val bytes = (0 to string.length-2 by 2)
+      .map(i => Integer.parseInt(string.substring(i, i + 2), 16).toByte)
+      .toArray
+    new GradoopId(bytes)
   }
 
-  /**
-   * Checks if a string can be transformed into a GradoopId.
-   * <p>
+  /** Checks if a string can be transformed into a GradoopId.
+   *
    * Note: Implementation taken from org.bson.types.ObjectId
    *
    * @param hexString a potential GradoopId as a String.
    * @return whether the string could be an object id
-   * @throws IllegalArgumentException if hexString is null
    */
   def isValid(hexString: String): Boolean = {
-    if (hexString == null) throw new IllegalArgumentException
-    val len = hexString.length
-    if (len != 24) return false
-    var i = 0
-    for (i <- 0 until len) {
-      val c = hexString.charAt(i)
-      if (!('0' to '9' contains(c)) && !('a' to 'f' contains(c)) && !('A' to 'F' contains(c))) return false
-    }
+    if (hexString.length != 2 * ID_SIZE) return false
+    hexString.foreach(c =>
+      if(!(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F')) return false)
     true
   }
 
   //------------------------------------------------------------------------------------------------
-  // static helper functions
+  // helper functions
   //------------------------------------------------------------------------------------------------
 
-  /**
-   * Compares the given GradoopIds and returns the smaller one. It both are equal, the first argument is returned.
+  /** Compares the given GradoopIds and returns the smaller one. It both are equal, the first argument is returned.
    *
    * @param first  first GradoopId
    * @param second second GradoopId
@@ -283,8 +254,7 @@ object GradoopId {
     else second
   }
 
-  /**
-   * Returns a primitive int represented by the given 4 bytes.
+  /** Returns a primitive int represented by the given 4 bytes.
    *
    * @param b3 byte 3
    * @param b2 byte 2
@@ -292,5 +262,6 @@ object GradoopId {
    * @param b0 byte 0
    * @return int value
    */
-  private def makeInt(b3: Byte, b2: Byte, b1: Byte, b0: Byte) = (b3 << 24) | ((b2 & 0xff) << 16) | ((b1 & 0xff) << 8) | b0 & 0xff
+  private def makeInt(b3: Byte, b2: Byte, b1: Byte, b0: Byte) =
+    (b3 << 24) | ((b2 & 0xff) << 16) | ((b1 & 0xff) << 8) | b0 & 0xff
 }

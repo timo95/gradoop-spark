@@ -16,15 +16,19 @@ object SubgraphBenchmark extends BaseBenchmark {
     val outputCsv = args(1)
 
     implicit val session: SparkSession = SparkSession.builder
-      .appName("Subgraph Benchmark").master("local[1]")
+      .appName("Subgraph Benchmark")//.master("local[1]")
       .getOrCreate()
     val config = gveConfig
 
     val source = EpgmCsvDataSource(inputCsv, config)
     var graph = source.readLogicalGraph
 
-    graph = graph.subgraph(v => v.labels.equals(VERTEX_LABEL), e => e.labels.equals(EDGE_LABEL))
-    if(VERIFICATION) graph = graph.verify
+    import config.implicits._
+
+    ///graph = graph.factory.init(graph.graphHead, graph.vertices, session.emptyDataset[E])
+
+    //graph = graph.subgraph(v => v.labels.equals(VERTEX_LABEL), e => e.labels.equals(EDGE_LABEL))
+    //if(VERIFICATION) graph = graph.verify
 
     val sink = EpgmCsvDataSink(outputCsv, config)
     sink.write(graph, SaveMode.Overwrite)
