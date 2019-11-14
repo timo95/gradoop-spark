@@ -3,8 +3,7 @@ package org.gradoop.spark
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
 import org.gradoop.common.properties.PropertyValue
-import org.gradoop.spark.io.impl.csv.CsvDataSource
-import org.gradoop.spark.io.impl.csv.epgm.{EpgmCsvDataSink, EpgmCsvDataSource}
+import org.gradoop.spark.io.impl.csv.{CsvDataSink, CsvDataSource}
 import org.gradoop.spark.model.impl.elements.{EpgmGraphHead, PV}
 import org.gradoop.spark.util.{EpgmApp, SparkAsciiGraphLoader}
 
@@ -15,8 +14,8 @@ object main extends EpgmApp {
     import config.implicits._
     import session.implicits._
 
-    val csvDataSource = EpgmCsvDataSource("/home/timo/Projekte/graphs/ldbc_1", config)
-    val csvDataSink = EpgmCsvDataSink("/home/timo/Projekte/graphs/ldbc_1_out", config)
+    val csvDataSource = CsvDataSource("/home/timo/Projekte/graphs/ldbc_1", config)
+    val csvDataSink = CsvDataSink("/home/timo/Projekte/graphs/ldbc_1_out", config)
 
     //val graph = csvDataSource.readLogicalGraph
 
@@ -34,7 +33,5 @@ object main extends EpgmApp {
     //println("Vertices Subgraph: " + graph.getVertices.count())
 
     session.stop()
-
-    println((0 until 26-1 by 2).toList)
   }
 }

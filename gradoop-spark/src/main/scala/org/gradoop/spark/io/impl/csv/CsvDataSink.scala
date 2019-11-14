@@ -4,10 +4,11 @@ import org.apache.spark.sql.{Dataset, SaveMode, SparkSession}
 import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.common.util.GradoopConstants
 import org.gradoop.spark.io.api.DataSink
+import org.gradoop.spark.io.impl.csv.CsvConstants.ComposeFunction
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 
-abstract class CsvDataSink[
+class CsvDataSink[
   G <: GraphHead,
   V <: Vertex,
   E <: Edge,
@@ -68,5 +69,40 @@ extends CsvComposer[G, V, E](metadata) with DataSink[G, V, E, LG, GC] {
       .options(options)
       .mode(saveMode)
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.EDGE_FILE)
+  }
+
+  def graphHeadComposeFunctions: Array[ComposeFunction[G]] = {
+    Array[ComposeFunction[G]](composeId, composeLabels, composeProperties)
+  }
+
+  def vertexComposeFunctions: Array[ComposeFunction[V]] = {
+    Array[ComposeFunction[V]](composeId, composeGraphIds, composeLabels, composeProperties)
+  }
+
+  def edgeComposeFunctions: Array[ComposeFunction[E]] = {
+    Array[ComposeFunction[E]](composeId, composeGraphIds, composeSourceId, composeTargetId, composeLabels, composeProperties)
+  }
+}
+
+object CsvDataSink {
+
+  def apply[
+    G <: GraphHead,
+    V <: Vertex,
+    E <: Edge,
+    LG <: LogicalGraph[G, V, E, LG, GC],
+    GC <: GraphCollection[G, V, E, LG, GC]]
+  (csvPath: String, config: GradoopSparkConfig[G, V, E, LG, GC]): CsvDataSink[G, V, E, LG, GC] = {
+    new CsvDataSink(csvPath, config, None)
+  }
+
+  def apply[
+    G <: GraphHead,
+    V <: Vertex,
+    E <: Edge,
+    LG <: LogicalGraph[G, V, E, LG, GC],
+    GC <: GraphCollection[G, V, E, LG, GC]]
+  (csvPath: String, config: GradoopSparkConfig[G, V, E, LG, GC], metadata: MetaData): CsvDataSink[G, V, E, LG, GC] = {
+    new CsvDataSink(csvPath, config, Some(metadata))
   }
 }

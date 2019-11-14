@@ -1,14 +1,13 @@
-package org.gradoop.spark.io.csv.impl.epgm
+package org.gradoop.spark.io.csv.impl
 
-import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.spark.EpgmGradoopSparkTestBase
-import org.gradoop.spark.io.impl.csv.epgm.EpgmCsvDataSource
+import org.gradoop.spark.io.impl.csv.CsvDataSource
 
-class EpgmCsvDataSourceTest extends EpgmGradoopSparkTestBase {
+class CsvDataSourceTest extends EpgmGradoopSparkTestBase {
   private val config = getConfig
 
   describe("logical graph with extended properties") {
-    val csvDataSource = EpgmCsvDataSource(getClass.getResource("/data/csv/input_extended_properties").getFile, config)
+    val csvDataSource = CsvDataSource(getClass.getResource("/data/csv/input_extended_properties").getFile, config)
     val graph = csvDataSource.readLogicalGraph
 
     it("correct number of elements") {
@@ -35,7 +34,7 @@ class EpgmCsvDataSourceTest extends EpgmGradoopSparkTestBase {
   }
 
   describe("graph collection") {
-    val csvDataSource = EpgmCsvDataSource(getClass.getResource("/data/csv/input_graph_collection").getFile, config)
+    val csvDataSource = CsvDataSource(getClass.getResource("/data/csv/input_graph_collection").getFile, config)
     val collection = csvDataSource.readGraphCollection
 
     it("correct number of elements") {

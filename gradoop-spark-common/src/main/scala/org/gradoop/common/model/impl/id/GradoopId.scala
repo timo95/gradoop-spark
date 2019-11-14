@@ -3,7 +3,6 @@ package org.gradoop.common.model.impl.id
 import java.net.{NetworkInterface, SocketException}
 import java.nio.{BufferUnderflowException, ByteBuffer}
 import java.security.SecureRandom
-import java.util
 import java.util.Date
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -124,7 +123,7 @@ object GradoopId {
     try {
       val sb: StringBuilder = new StringBuilder
       import scala.collection.JavaConverters._
-      NetworkInterface.getNetworkInterfaces.asScala.foreach(interface => {
+      for(interface <- NetworkInterface.getNetworkInterfaces.asScala) {
         sb.append(interface.toString)
         val mac: Array[Byte] = interface.getHardwareAddress
         if (mac != null) {
@@ -138,7 +137,7 @@ object GradoopId {
             // mac with less than 6 bytes. continue
           }
         }
-      })
+      }
       machinePiece = sb.toString.hashCode
     } catch {
       case _: SocketException => machinePiece = new SecureRandom().nextInt
