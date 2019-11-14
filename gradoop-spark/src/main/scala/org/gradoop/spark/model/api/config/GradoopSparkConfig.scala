@@ -3,6 +3,7 @@ package org.gradoop.spark.model.api.config
 import org.apache.spark.sql.{Column, Dataset, Encoder, SparkSession}
 import org.gradoop.common.model.api.elements.{Edge, GraphHead, Identifiable, Vertex}
 import org.gradoop.common.model.api.types.ComponentTypes
+import org.gradoop.spark.functions.filter.FilterExpression
 import org.gradoop.spark.model.api.graph.{GraphCollection, GraphCollectionFactory, LogicalGraph, LogicalGraphFactory}
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, LogicalGraphLayoutFactory}
 import org.gradoop.spark.util.{ColumnSelector, DisplayConverter}
@@ -27,6 +28,7 @@ class GradoopSparkConfig[
     implicit def implicitEdgeEncoder: Encoder[E] = edgeEncoder
 
     // Wrappers
+    implicit def filterExpression(expression: String): FilterExpression = new FilterExpression(expression)
     implicit def columnSelector[T](dataset: Dataset[T]): ColumnSelector[T] = new ColumnSelector[T](dataset)
     implicit def displayConverter[T <: Identifiable](dataset: Dataset[T]): DisplayConverter[T] = new DisplayConverter[T](dataset)
   }

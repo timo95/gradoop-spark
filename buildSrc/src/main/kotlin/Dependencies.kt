@@ -11,4 +11,6 @@ object Versions {
     var gdl = "0.3"
 
     var guava = "23.0"
+
+    var scallop = "3.2.0"
 }

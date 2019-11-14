@@ -2,7 +2,9 @@ package org.gradoop.spark.benchmarks.subgraph
 
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.gradoop.spark.benchmarks.BaseBenchmark
+import org.gradoop.spark.functions.filter.FilterExpression
 import org.gradoop.spark.io.impl.csv.{CsvDataSink, CsvDataSource}
+import org.rogach.scallop.{ScallopConf, ScallopOption}
 
 object SubgraphBenchmark extends BaseBenchmark {
 
@@ -10,25 +12,40 @@ object SubgraphBenchmark extends BaseBenchmark {
   val EDGE_LABEL = "hasType"
   val VERIFICATION = false
 
+  class CmdConf(arguments: Seq[String]) extends ScallopConf(arguments) {
+    val input: ScallopOption[String] = opt[String](required = true,
+      descr = "Input path for a csv graph")
+    val output: ScallopOption[String] = opt[String](required = true,
+      descr = "Output path for a csv graph")
+    val verification: ScallopOption[Boolean] = toggle(default = Some(false),
+      descrYes = "Verifies the Graph after applying Subgraph")
+    val vertexLabel: ScallopOption[String] = opt[String](name = "vl", noshort = true,
+      descr = "Label to filter the vertices")
+    val edgeLabel: ScallopOption[String] = opt[String](name = "el", noshort = true,
+      descr = "Label to filter the edges")
+    verify()
+  }
+
   def main(args: Array[String]): Unit = {
-    // TODO Cmd parsing
-    val inputCsv = args(0)
-    val outputCsv = args(1)
+    val cmdConf = new CmdConf(args)
 
     implicit val session: SparkSession = SparkSession.builder
       .appName("Subgraph Benchmark")//.master("local[1]")
       .getOrCreate()
     val config = gveConfig
 
-    val source = CsvDataSource(inputCsv, config)
+    val source = CsvDataSource(cmdConf.input(), config)
     var graph = source.readLogicalGraph
 
-    ///graph = graph.factory.init(graph.graphHead, graph.vertices, session.emptyDataset[E])
+    val vertexFilterExpression: String = if(cmdConf.vertexLabel.isDefined)
+      FilterExpression.hasLabel(cmdConf.vertexLabel()) else FilterExpression.any
+    val edgeFilterExpression: String = if(cmdConf.edgeLabel.isDefined)
+      FilterExpression.hasLabel(cmdConf.edgeLabel()) else FilterExpression.any
+    graph = graph.subgraph(vertexFilterExpression, edgeFilterExpression)
 
-    //graph = graph.subgraph(v => v.labels.equals(VERTEX_LABEL), e => e.labels.equals(EDGE_LABEL))
-    //if(VERIFICATION) graph = graph.verify
+    if(cmdConf.verification()) graph = graph.verify
 
-    val sink = CsvDataSink(outputCsv, config)
+    val sink = CsvDataSink(cmdConf.output(), config)
     sink.write(graph, SaveMode.Overwrite)
   }
 }

@@ -72,15 +72,15 @@ extends CsvComposer[G, V, E](metadata) with DataSink[G, V, E, LG, GC] {
   }
 
   def graphHeadComposeFunctions: Array[ComposeFunction[G]] = {
-    Array[ComposeFunction[G]](composeId, composeLabels, composeProperties)
+    Array(composeId, composeLabels, composeProperties)
   }
 
   def vertexComposeFunctions: Array[ComposeFunction[V]] = {
-    Array[ComposeFunction[V]](composeId, composeGraphIds, composeLabels, composeProperties)
+    Array(composeId, composeGraphIds, composeLabels, composeProperties)
   }
 
   def edgeComposeFunctions: Array[ComposeFunction[E]] = {
-    Array[ComposeFunction[E]](composeId, composeGraphIds, composeSourceId, composeTargetId, composeLabels, composeProperties)
+    Array(composeId, composeGraphIds, composeSourceId, composeTargetId, composeLabels, composeProperties)
   }
 }
 

@@ -2,7 +2,6 @@ package org.gradoop.spark.io.impl.csv
 
 import org.apache.spark.sql.{Dataset, Row}
 import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
-import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.spark.io.api.DataSource
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
@@ -62,18 +61,13 @@ class CsvDataSource[
   }
 
   def rowToEdge(row: Row): E = {
-    try {
-      config.logicalGraphFactory.edgeFactory(
-        parseId(row.getString(0)),
-        parseLabels(row.getString(4)),
-        parseId(row.getString(2)), // sourceId
-        parseId(row.getString(3)), // targetId
-        parseProperties(row.getString(5)),
-        parseGraphIds(row.getString(1)))
-    } catch {
-      case _: NullPointerException => println(row)
-        config.logicalGraphFactory.edgeFactory.create(GradoopId.get, GradoopId.get)
-    }
+    config.logicalGraphFactory.edgeFactory(
+      parseId(row.getString(0)),
+      parseLabels(row.getString(4)),
+      parseId(row.getString(2)), // sourceId
+      parseId(row.getString(3)), // targetId
+      parseProperties(row.getString(5)),
+      parseGraphIds(row.getString(1)))
   }
 }
 

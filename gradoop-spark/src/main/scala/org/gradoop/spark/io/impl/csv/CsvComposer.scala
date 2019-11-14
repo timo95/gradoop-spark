@@ -15,28 +15,25 @@ abstract class CsvComposer[G <: GraphHead, V <: Vertex, E <: Edge](var metadata:
 
   // Compose functions
 
-  def composeId[T <: Identifiable](obj: T): String = {
-    obj.id.toString
-  }
+  def composeId[T <: Identifiable](obj: T): String = obj.id.toString
 
   def composeGraphIds[GE <: GraphElement](element: GE): String = {
     element.graphIds.mkString("[", CsvConstants.LIST_DELIMITER, "]")
   }
 
-  def composeSourceId(edge: E): String = {
-    edge.sourceId.toString
-  }
+  def composeSourceId(edge: E): String = edge.sourceId.toString
 
-  def composeTargetId(edge: E): String = {
-    edge.targetId.toString
-  }
+  def composeTargetId(edge: E): String = edge.targetId.toString
 
   def composeLabels[T <: Labeled](obj: T): String = {
-    StringEscaper.escape(obj.labels, CsvConstants.ESCAPED_CHARS)//obj.getLabels.map(label => StringEscaper.escape(label, CsvConstants.ESCAPED_CHARS))
+    StringEscaper.escape(obj.labels, CsvConstants.ESCAPED_CHARS)
+    //obj.getLabels.map(label => StringEscaper.escape(label, CsvConstants.ESCAPED_CHARS))
       //.mkString(CsvConstants.LIST_DELIMITER)
   }
 
   def composeProperties[T <: Attributed](obj: T): String = {
-    obj.properties.values.map(p => p.getString).mkString(CsvConstants.VALUE_DELIMITER) //obj.getProperties // TODO
+    obj.properties.values
+      .map(p => StringEscaper.escape(p.getString, CsvConstants.ESCAPED_CHARS))
+      .mkString(CsvConstants.VALUE_DELIMITER) // TODO metadata
   }
 }
