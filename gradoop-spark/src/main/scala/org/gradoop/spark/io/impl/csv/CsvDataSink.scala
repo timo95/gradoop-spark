@@ -5,6 +5,7 @@ import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.common.util.GradoopConstants
 import org.gradoop.spark.io.api.DataSink
 import org.gradoop.spark.io.impl.csv.CsvConstants.ComposeFunction
+import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 

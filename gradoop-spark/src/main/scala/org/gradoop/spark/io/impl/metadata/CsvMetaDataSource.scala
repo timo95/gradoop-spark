@@ -1,4 +1,4 @@
-package org.gradoop.spark.io.impl.csv.metadata
+package org.gradoop.spark.io.impl.metadata
 
 import org.gradoop.spark.io.api.MetaDataSource
 

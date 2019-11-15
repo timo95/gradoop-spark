@@ -24,12 +24,12 @@ class CsvDataSourceTest extends EpgmGradoopSparkTestBase {
       assert(graph.edges.collect()(0).id.toString == "000000000000000000000002")
     }
     it("correct labels") {
-      assert(graph.graphHead.collect()(0).labels == "Forum")
+      assert(graph.graphHead.collect()(0).label == "Forum")
 
       val expected = Set[String]("User", "Post")
-      assert(graph.vertices.collect.map(v => v.labels).toSet == expected)
+      assert(graph.vertices.collect.map(v => v.label).toSet == expected)
 
-      assert(graph.edges.collect()(0).labels == "creatorOf")
+      assert(graph.edges.collect()(0).label == "creatorOf")
     }
   }
 

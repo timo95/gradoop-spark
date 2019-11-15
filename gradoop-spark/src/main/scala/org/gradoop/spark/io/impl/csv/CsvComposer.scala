@@ -2,6 +2,7 @@ package org.gradoop.spark.io.impl.csv
 
 import org.gradoop.common.model.api.elements._
 import org.gradoop.spark.io.impl.csv.CsvConstants.ComposeFunction
+import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.util.StringEscaper
 
 abstract class CsvComposer[G <: GraphHead, V <: Vertex, E <: Edge](var metadata: Option[MetaData])
@@ -26,7 +27,7 @@ abstract class CsvComposer[G <: GraphHead, V <: Vertex, E <: Edge](var metadata:
   def composeTargetId(edge: E): String = edge.targetId.toString
 
   def composeLabels[T <: Labeled](obj: T): String = {
-    StringEscaper.escape(obj.labels, CsvConstants.ESCAPED_CHARS)
+    StringEscaper.escape(obj.label, CsvConstants.ESCAPED_CHARS)
     //obj.getLabels.map(label => StringEscaper.escape(label, CsvConstants.ESCAPED_CHARS))
       //.mkString(CsvConstants.LIST_DELIMITER)
   }

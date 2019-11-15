@@ -6,7 +6,7 @@ import org.gradoop.common.model.api.types.ComponentTypes
 import org.gradoop.spark.functions.filter.FilterExpression
 import org.gradoop.spark.model.api.graph.{GraphCollection, GraphCollectionFactory, LogicalGraph, LogicalGraphFactory}
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, LogicalGraphLayoutFactory}
-import org.gradoop.spark.util.{ColumnSelector, DisplayConverter}
+import org.gradoop.spark.util.{ColumnSelector, DisplayConverter, Implicits}
 
 class GradoopSparkConfig[
   G <: GraphHead,
@@ -18,7 +18,7 @@ class GradoopSparkConfig[
  var graphCollectionFactory: GraphCollectionFactory[G, V, E, LG, GC])
 (implicit val sparkSession: SparkSession) extends Serializable {
 
-  object implicits extends Serializable with ComponentTypes {
+  object implicits extends Implicits with ComponentTypes {
     // Spark session
     implicit def implicitSparkSession: SparkSession = sparkSession
 
@@ -26,11 +26,6 @@ class GradoopSparkConfig[
     implicit def implicitGraphHeadEncoder: Encoder[G] = graphHeadEncoder
     implicit def impliticVertexEncoder: Encoder[V] = vertexEncoder
     implicit def implicitEdgeEncoder: Encoder[E] = edgeEncoder
-
-    // Wrappers
-    implicit def filterExpression(expression: String): FilterExpression = new FilterExpression(expression)
-    implicit def columnSelector[T](dataset: Dataset[T]): ColumnSelector[T] = new ColumnSelector[T](dataset)
-    implicit def displayConverter[T <: Identifiable](dataset: Dataset[T]): DisplayConverter[T] = new DisplayConverter[T](dataset)
   }
 
   def graphHeadEncoder: Encoder[G] = logicalGraphFactory.graphHeadEncoder

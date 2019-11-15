@@ -2,7 +2,7 @@ package org.gradoop.spark.model.impl.operators.subgraph
 
 import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.common.util.ColumnNames
-import org.gradoop.spark.functions.filter.FilterExpression
+import org.gradoop.spark.functions.filter.FilterStrings
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.api.operators.LogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy.Strategy
@@ -57,7 +57,7 @@ object SubgraphSql {
     E <: Edge,
     LG <: LogicalGraph[G, V, E, LG, GC],
     GC <: GraphCollection[G, V, E, LG, GC]](vertexFilterExpression: String): SubgraphSql[G, V, E, LG, GC] = {
-    new SubgraphSql(vertexFilterExpression, FilterExpression.any, Strategy.VERTEX_INDUCED)
+    new SubgraphSql(vertexFilterExpression, FilterStrings.any, Strategy.VERTEX_INDUCED)
   }
 
   def edgeIncuded[
@@ -66,6 +66,6 @@ object SubgraphSql {
     E <: Edge,
     LG <: LogicalGraph[G, V, E, LG, GC],
     GC <: GraphCollection[G, V, E, LG, GC]](edgeFilterExpression: String): SubgraphSql[G, V, E, LG, GC] = {
-    new SubgraphSql(FilterExpression.any, edgeFilterExpression, Strategy.EDGE_INDUCED)
+    new SubgraphSql(FilterStrings.any, edgeFilterExpression, Strategy.EDGE_INDUCED)
   }
 }

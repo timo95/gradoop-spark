@@ -2,7 +2,7 @@ package org.gradoop.spark.benchmarks.subgraph
 
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.gradoop.spark.benchmarks.BaseBenchmark
-import org.gradoop.spark.functions.filter.FilterExpression
+import org.gradoop.spark.functions.filter.FilterStrings
 import org.gradoop.spark.io.impl.csv.{CsvDataSink, CsvDataSource}
 import org.rogach.scallop.{ScallopConf, ScallopOption}
 
@@ -37,11 +37,11 @@ object SubgraphBenchmark extends BaseBenchmark {
     val source = CsvDataSource(cmdConf.input(), config)
     var graph = source.readLogicalGraph
 
-    val vertexFilterExpression: String = if(cmdConf.vertexLabel.isDefined)
-      FilterExpression.hasLabel(cmdConf.vertexLabel()) else FilterExpression.any
-    val edgeFilterExpression: String = if(cmdConf.edgeLabel.isDefined)
-      FilterExpression.hasLabel(cmdConf.edgeLabel()) else FilterExpression.any
-    graph = graph.subgraph(vertexFilterExpression, edgeFilterExpression)
+    val vertexFilterString: String = if(cmdConf.vertexLabel.isDefined)
+      FilterStrings.hasLabel(cmdConf.vertexLabel()) else FilterStrings.any
+    val edgeFilterString: String = if(cmdConf.edgeLabel.isDefined)
+      FilterStrings.hasLabel(cmdConf.edgeLabel()) else FilterStrings.any
+    graph = graph.subgraph(vertexFilterString, edgeFilterString)
 
     if(cmdConf.verification()) graph = graph.verify
 

@@ -9,7 +9,7 @@ trait EdgeFactory[E <: Edge] extends ElementFactory[E] {
    * @param id             edge identifier
    * @return edge data
    */
-  def apply(id: Id): E = apply(id, new Labels(""), GradoopId.NULL_VALUE, GradoopId.NULL_VALUE)
+  def apply(id: Id): E = apply(id, new Label(""), GradoopId.NULL_VALUE, GradoopId.NULL_VALUE)
 
   /** Creates a new edge based on the given parameters.
    *
@@ -35,7 +35,7 @@ trait EdgeFactory[E <: Edge] extends ElementFactory[E] {
    * @param labels          edge labels
    * @return edge data
    */
-  def create(labels: Labels, sourceVertexId: Id, targetVertexId: Id): E
+  def create(labels: Label, sourceVertexId: Id, targetVertexId: Id): E
 
   /** Initializes an edge based on the given parameters.
    *
@@ -45,7 +45,7 @@ trait EdgeFactory[E <: Edge] extends ElementFactory[E] {
    * @param labels          edge labels
    * @return edge data
    */
-  def apply(id: Id, labels: Labels, sourceVertexId: Id, targetVertexId: Id): E
+  def apply(id: Id, labels: Label, sourceVertexId: Id, targetVertexId: Id): E
 
   /** Creates a new edge based on the given parameters.
    *
@@ -55,7 +55,7 @@ trait EdgeFactory[E <: Edge] extends ElementFactory[E] {
    * @param properties     edge properties
    * @return edge data
    */
-  def create(labels: Labels, sourceVertexId: Id, targetVertexId: Id, properties: Properties): E
+  def create(labels: Label, sourceVertexId: Id, targetVertexId: Id, properties: Properties): E
 
   /** Initializes an edge based on the given parameters.
    *
@@ -66,7 +66,7 @@ trait EdgeFactory[E <: Edge] extends ElementFactory[E] {
    * @param properties     edge properties
    * @return edge data
    */
-  def apply(id: Id, labels: Labels, sourceVertexId: Id, targetVertexId: Id, properties: Properties): E
+  def apply(id: Id, labels: Label, sourceVertexId: Id, targetVertexId: Id, properties: Properties): E
 
   /** Creates a new edge based on the given parameters.
    *
@@ -76,7 +76,7 @@ trait EdgeFactory[E <: Edge] extends ElementFactory[E] {
    * @param graphIds       graphIds, that contain the edge
    * @return edge data
    */
-  def create(labels: Labels, sourceVertexId: Id, targetVertexId: Id, graphIds: IdSet): E
+  def create(labels: Label, sourceVertexId: Id, targetVertexId: Id, graphIds: IdSet): E
 
   /** Initializes an edge based on the given parameters.
    *
@@ -87,7 +87,7 @@ trait EdgeFactory[E <: Edge] extends ElementFactory[E] {
    * @param graphIds       graphIds, that contain the edge
    * @return edge data
    */
-  def apply(id: Id, labels: Labels, sourceVertexId: Id, targetVertexId: Id, graphIds: IdSet): E
+  def apply(id: Id, labels: Label, sourceVertexId: Id, targetVertexId: Id, graphIds: IdSet): E
 
   /** Creates a new edge based on the given parameters.
    *
@@ -98,7 +98,7 @@ trait EdgeFactory[E <: Edge] extends ElementFactory[E] {
    * @param graphIds       graphIds, that contain the edge
    * @return edge data
    */
-  def create(labels: Labels, sourceVertexId: Id, targetVertexId: Id, properties: Properties, graphIds: IdSet): E
+  def create(labels: Label, sourceVertexId: Id, targetVertexId: Id, properties: Properties, graphIds: IdSet): E
 
   /** Initializes an edge based on the given parameters.
    *
@@ -110,5 +110,5 @@ trait EdgeFactory[E <: Edge] extends ElementFactory[E] {
    * @param graphIds       graphIds, that contain the edge
    * @return edge data
    */
-  def apply(id: Id, labels: Labels, sourceVertexId: Id, targetVertexId: Id, properties: Properties, graphIds: IdSet): E
+  def apply(id: Id, labels: Label, sourceVertexId: Id, targetVertexId: Id, properties: Properties, graphIds: IdSet): E
 }

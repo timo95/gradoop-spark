@@ -2,12 +2,17 @@ package org.gradoop.spark.model.impl.operators
 
 import org.gradoop.spark.EpgmGradoopSparkTestBase
 import org.gradoop.spark.functions.filter.HasLabel
+import org.gradoop.spark.io.impl.metadata.MetaData
 
 class SubgraphTest extends EpgmGradoopSparkTestBase {
 
   describe("SocialNetworkGraph") {
     val loader = getSocialNetworkLoader
     val graph = loader.logicalGraph
+
+    describe("testtest") {
+      MetaData[G, V, E, LG, GC](graph)
+    }
 
     describe("Strategy both") {
 
@@ -21,7 +26,7 @@ class SubgraphTest extends EpgmGradoopSparkTestBase {
     }
 
     describe("Strategy vertex induced") {
-      val subgraph = graph.vertexInducedSubgraph(e => e.labels.contains("Person"))
+      val subgraph = graph.vertexInducedSubgraph(e => e.label.contains("Person"))
 
       it("should have 6 vertices") {
         assert(subgraph.vertices.count() == 6)
@@ -32,7 +37,7 @@ class SubgraphTest extends EpgmGradoopSparkTestBase {
     }
 
     describe("Strategy edge induced") {
-      val subgraph = graph.edgeInducedSubgraph(e => e.labels.contains("hasMember"))
+      val subgraph = graph.edgeInducedSubgraph(e => e.label.contains("hasMember"))
 
       it("should have 6 vertices") {
         assert(subgraph.vertices.count() == 6)

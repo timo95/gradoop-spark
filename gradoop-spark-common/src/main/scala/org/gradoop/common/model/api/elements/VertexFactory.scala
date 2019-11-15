@@ -20,7 +20,7 @@ trait VertexFactory[V <: Vertex] extends ElementFactory[V] {
    * @param labels vertex labels
    * @return vertex data
    */
-  def create(labels: Labels): V
+  def create(labels: Label): V
 
   /** Initializes a vertex based on the given parameters.
    *
@@ -28,7 +28,7 @@ trait VertexFactory[V <: Vertex] extends ElementFactory[V] {
    * @param labels vertex labels
    * @return vertex data
    */
-  def apply(id: Id, labels: Labels): V
+  def apply(id: Id, labels: Label): V
 
   /** Creates a new vertex based on the given parameters.
    *
@@ -36,7 +36,7 @@ trait VertexFactory[V <: Vertex] extends ElementFactory[V] {
    * @param properties vertex properties
    * @return vertex data
    */
-  def create(labels: Labels, properties: Properties): V
+  def create(labels: Label, properties: Properties): V
 
   /** Initializes a vertex based on the given parameters.
    *
@@ -45,7 +45,7 @@ trait VertexFactory[V <: Vertex] extends ElementFactory[V] {
    * @param properties vertex properties
    * @return vertex data
    */
-  def apply(id: Id, labels: Labels, properties: Properties): V
+  def apply(id: Id, labels: Label, properties: Properties): V
 
   /** Creates a new vertex based on the given parameters.
    *
@@ -53,7 +53,7 @@ trait VertexFactory[V <: Vertex] extends ElementFactory[V] {
    * @param graphIds graphIds, that contain the vertex
    * @return vertex data
    */
-  def create(labels: Labels, graphIds: IdSet): V
+  def create(labels: Label, graphIds: IdSet): V
 
   /** Initializes a vertex based on the given parameters.
    *
@@ -62,7 +62,7 @@ trait VertexFactory[V <: Vertex] extends ElementFactory[V] {
    * @param graphIds graphIds, that contain the vertex
    * @return vertex data
    */
-  def apply(id: Id, labels: Labels, graphIds: IdSet): V
+  def apply(id: Id, labels: Label, graphIds: IdSet): V
 
   /** Creates a new vertex based on the given parameters.
    *
@@ -71,7 +71,7 @@ trait VertexFactory[V <: Vertex] extends ElementFactory[V] {
    * @param graphIds   graphIds, that contain the vertex
    * @return vertex data
    */
-  def create(labels: Labels, properties: Properties, graphIds: IdSet): V
+  def create(labels: Label, properties: Properties, graphIds: IdSet): V
 
   /** Initializes a vertex based on the given parameters.
    *
@@ -81,5 +81,5 @@ trait VertexFactory[V <: Vertex] extends ElementFactory[V] {
    * @param graphIds   graphIds, that contain the vertex
    * @return vertex data
    */
-  def apply(id: Id, labels: Labels, properties: Properties, graphIds: IdSet): V
+  def apply(id: Id, labels: Label, properties: Properties, graphIds: IdSet): V
 }

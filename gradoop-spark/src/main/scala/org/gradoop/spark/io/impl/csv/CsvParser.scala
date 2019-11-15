@@ -3,6 +3,7 @@ package org.gradoop.spark.io.impl.csv
 import org.gradoop.common.model.api.elements._
 import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
+import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.util.StringEscaper
 
 abstract protected class CsvParser[G <: GraphHead, V <: Vertex, E <: Edge](var metadata: Option[MetaData])
@@ -16,7 +17,7 @@ abstract protected class CsvParser[G <: GraphHead, V <: Vertex, E <: Edge](var m
       .map(GradoopId.fromString).toSet
   }
 
-  protected def parseLabels(labelsString: String): Labels = {
+  protected def parseLabels(labelsString: String): Label = {
     if(labelsString == null) ""
     else StringEscaper.unescape(labelsString)//StringEscaper.split(labelsString, GradoopConstants.LABEL_DELIMITER)
       //.map(StringEscaper.unescape)

@@ -20,7 +20,7 @@ trait GraphHeadFactory[G <: GraphHead] extends ElementFactory[G] {
    * @param labels graph labels
    * @return graph data
    */
-  def create(labels: Labels): G
+  def create(labels: Label): G
 
   /** Initializes a graph head based on the given parameters.
    *
@@ -28,7 +28,7 @@ trait GraphHeadFactory[G <: GraphHead] extends ElementFactory[G] {
    * @param labels graph labels
    * @return graph data
    */
-  def apply(id: Id, labels: Labels): G
+  def apply(id: Id, labels: Label): G
 
   /** Creates a new graph head based on the given parameters.
    *
@@ -36,7 +36,7 @@ trait GraphHeadFactory[G <: GraphHead] extends ElementFactory[G] {
    * @param properties graph attributes
    * @return graph data
    */
-  def create(labels: Labels, properties: Properties): G
+  def create(labels: Label, properties: Properties): G
 
   /** Initializes a graph head based on the given parameters.
    *
@@ -45,5 +45,5 @@ trait GraphHeadFactory[G <: GraphHead] extends ElementFactory[G] {
    * @param properties graph attributes
    * @return graph data
    */
-  def apply(id: Id, labels: Labels, properties: Properties): G
+  def apply(id: Id, labels: Label, properties: Properties): G
 }
