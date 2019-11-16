@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.impl
 
-import org.gradoop.spark.model.impl.types.EpgmTypes
+import org.gradoop.spark.model.impl.types.EpgmGveGraphLayout
 
-package object layouts extends EpgmTypes {
-
+package object layouts {
+  type L = EpgmGveGraphLayout
 }

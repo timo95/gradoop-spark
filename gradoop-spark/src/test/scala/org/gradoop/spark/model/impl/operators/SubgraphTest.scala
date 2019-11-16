@@ -11,7 +11,7 @@ class SubgraphTest extends EpgmGradoopSparkTestBase {
     val graph = loader.logicalGraph
 
     describe("testtest") {
-      MetaData[G, V, E, LG, GC](graph)
+      MetaData(graph)
     }
 
     describe("Strategy both") {

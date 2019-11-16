@@ -4,9 +4,10 @@ import org.gradoop.common.model.api.elements._
 import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.spark.io.impl.metadata.MetaData
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 import org.gradoop.spark.util.StringEscaper
 
-abstract protected class CsvParser[G <: GraphHead, V <: Vertex, E <: Edge](var metadata: Option[MetaData])
+abstract protected class CsvParser[L <: GveGraphLayout](var metadata: Option[MetaData])
   extends Serializable {
 
   protected def parseId(idString: String): GradoopId = GradoopId.fromString(idString)

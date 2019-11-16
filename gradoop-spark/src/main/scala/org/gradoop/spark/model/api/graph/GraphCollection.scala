@@ -3,19 +3,19 @@ package org.gradoop.spark.model.api.graph
 import org.apache.spark.sql.Dataset
 import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.api.layouts.Layout
+import org.gradoop.spark.model.api.layouts.{GraphCollectionLayout, Layout}
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 
-abstract class GraphCollection[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph[G, V, E, LG, GC], GC <: GraphCollection[G, V, E, LG, GC]]
-(layout: Layout[V, E], config: GradoopSparkConfig[G, V, E, LG, GC])
-  extends BaseGraph[G, V, E, LG, GC](layout, config) with GraphCollectionOperators[G, V, E, LG, GC] {
-  this: GC =>
+class GraphCollection[L <: GveGraphLayout]
+(layout: GraphCollectionLayout[L], config: GradoopSparkConfig[L])
+  extends BaseGraph[L](layout, config) with GraphCollectionOperators[L] {
 
   /**
    * Returns the graph heads associated with the logical graphs in that collection.
    *
    * @return graph heads
    */
-  def graphHeads: Dataset[G]
+  def graphHeads: Dataset[L#G] = layout.graphHeads
 
   /**
    * Returns the graph heads associated with the logical graphs in that collection filtered by label.
@@ -23,7 +23,7 @@ abstract class GraphCollection[G <: GraphHead, V <: Vertex, E <: Edge, LG <: Log
    * @param label graph head label
    * @return graph heads
    */
-  def graphHeadsByLabel(label: String): Dataset[G]
+  def graphHeadsByLabel(label: String): Dataset[L#G] = layout.graphHeadsByLabel(label)
 
-  override def factory: GraphCollectionFactory[G, V, E, LG, GC] = config.graphCollectionFactory
+  override def factory: GraphCollectionFactory[L] = config.graphCollectionFactory
 }

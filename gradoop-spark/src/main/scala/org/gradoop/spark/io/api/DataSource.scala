@@ -1,6 +1,7 @@
 package org.gradoop.spark.io.api
 
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 
 trait DataSource {
 
@@ -8,11 +9,11 @@ trait DataSource {
    *
    * @return logical graph
    */
-  def readLogicalGraph: LogicalGraph[_, _, _, _, _]
+  def readLogicalGraph: LogicalGraph[_]
 
   /** Reads the input as graph collection.
    *
    * @return graph collection
    */
-  def readGraphCollection: GraphCollection[_, _, _, _, _]
+  def readGraphCollection: GraphCollection[_]
 }

@@ -1,39 +1,34 @@
 package org.gradoop.spark.io.api
 
 import org.apache.spark.sql.SaveMode
-import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 
-trait DataSink[
-  G <: GraphHead,
-  V <: Vertex,
-  E <: Edge,
-  LG <: LogicalGraph[G, V, E, LG, GC],
-  GC <: GraphCollection[G, V, E, LG, GC]] {
+trait DataSink[L <: GveGraphLayout] {
 
   /** Writes a logical graph to the data sink with overwrite option.
    *
    * @param logicalGraph logical graph
    * @param saveMode     specifies, if existing files should be overwritten
    */
-  def write(logicalGraph: LG, saveMode: SaveMode): Unit
+  def write(logicalGraph: LogicalGraph[L], saveMode: SaveMode): Unit
 
   /** Writes a logical graph to the data sink.
    *
    * @param logicalGraph logical graph
    */
-  def write(logicalGraph: LG): Unit
+  def write(logicalGraph: LogicalGraph[L]): Unit
 
   /** Writes a graph collection graph to the data sink.
    *
    * @param graphCollection graph collection
    */
-  def write(graphCollection: GC): Unit
+  def write(graphCollection: GraphCollection[L]): Unit
 
   /** Writes a graph collection to the data sink with overwrite option.
    *
    * @param graphCollection graph collection
    * @param saveMode        specifies, if existing files should be overwritten
    */
-  def write(graphCollection: GC, saveMode: SaveMode): Unit
+  def write(graphCollection: GraphCollection[L], saveMode: SaveMode): Unit
 }

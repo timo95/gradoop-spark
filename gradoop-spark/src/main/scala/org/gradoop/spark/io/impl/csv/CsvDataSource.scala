@@ -6,15 +6,16 @@ import org.gradoop.spark.io.api.DataSource
 import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 
-class CsvDataSource[
-  G <: GraphHead,
-  V <: Vertex,
-  E <: Edge,
-  LG <: LogicalGraph[G, V, E, LG, GC],
-  GC <: GraphCollection[G, V, E, LG, GC]]
-(csvPath: String, config: GradoopSparkConfig[G, V, E, LG, GC], metadata: Option[MetaData])
-  extends CsvParser[G, V, E](metadata) with DataSource {
+class CsvDataSource[L <: GveGraphLayout]
+(csvPath: String, config: GradoopSparkConfig[L], metadata: Option[MetaData])
+  extends CsvParser[L](metadata) with DataSource {
+  type G = L#G
+  type V = L#V
+  type E = L#E
+  type LG = LogicalGraph[L]
+  type GC = GraphCollection[L]
   import config.implicits._
 
   private val options: Map[String, String] = Map(
@@ -74,23 +75,13 @@ class CsvDataSource[
 
 object CsvDataSource {
 
-  def apply[
-    G <: GraphHead,
-    V <: Vertex,
-    E <: Edge,
-    LG <: LogicalGraph[G, V, E, LG, GC],
-    GC <: GraphCollection[G, V, E, LG, GC]]
-  (csvPath: String, config: GradoopSparkConfig[G, V, E, LG, GC]): CsvDataSource[G, V, E, LG, GC] = {
+  def apply[L <: GveGraphLayout]
+  (csvPath: String, config: GradoopSparkConfig[L]): CsvDataSource[L] = {
     new CsvDataSource(csvPath, config, None)
   }
 
-  def apply[
-    G <: GraphHead,
-    V <: Vertex,
-    E <: Edge,
-    LG <: LogicalGraph[G, V, E, LG, GC],
-    GC <: GraphCollection[G, V, E, LG, GC]]
-  (csvPath: String, config: GradoopSparkConfig[G, V, E, LG, GC], metaData: MetaData): CsvDataSource[G, V, E, LG, GC] = {
+  def apply[L <: GveGraphLayout]
+  (csvPath: String, config: GradoopSparkConfig[L], metaData: MetaData): CsvDataSource[L] = {
     new CsvDataSource(csvPath, config, Some(metaData))
   }
 }

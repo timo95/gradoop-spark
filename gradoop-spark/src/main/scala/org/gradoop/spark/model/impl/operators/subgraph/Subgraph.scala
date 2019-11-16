@@ -5,6 +5,7 @@ import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.api.operators.LogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy.Strategy
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 
 private object Strategy extends Enumeration {
   type Strategy = Value
@@ -12,16 +13,11 @@ private object Strategy extends Enumeration {
   // TODO: Add EDGE_INDUCED_PROJECT_FIRST?
 }
 
-class Subgraph[
-  G <: GraphHead,
-  V <: Vertex,
-  E <: Edge,
-  LG <: LogicalGraph[G, V, E, LG, GC],
-  GC <: GraphCollection[G, V, E, LG, GC]] private
-(vertexFilterFunction: V => Boolean, edgeFilterFunction: E => Boolean, strategy: Strategy)
-  extends LogicalGraphToLogicalGraphOperator[LG] {
+class Subgraph[L <: GveGraphLayout] private
+(vertexFilterFunction: L#V => Boolean, edgeFilterFunction: L#E => Boolean, strategy: Strategy)
+  extends LogicalGraphToLogicalGraphOperator[LogicalGraph[L]] {
 
-  override def execute(graph: LG): LG = {
+  override def execute(graph: LogicalGraph[L]): LogicalGraph[L] = {
     val config = graph.config
     import config.implicits._
 
@@ -49,31 +45,16 @@ class Subgraph[
 
 object Subgraph {
 
-  def both[
-    G <: GraphHead,
-    V <: Vertex,
-    E <: Edge,
-    LG <: LogicalGraph[G, V, E, LG, GC],
-    GC <: GraphCollection[G, V, E, LG, GC]]
-  (vertexFilterFunction: V => Boolean, edgeFilterFunction: E => Boolean): Subgraph[G, V, E, LG, GC] = {
+  def both[L <: GveGraphLayout]
+  (vertexFilterFunction: L#V => Boolean, edgeFilterFunction: L#E => Boolean): Subgraph[L] = {
     new Subgraph(vertexFilterFunction, edgeFilterFunction, Strategy.BOTH)
   }
 
-  def vertexInduced[
-    G <: GraphHead,
-    V <: Vertex,
-    E <: Edge,
-    LG <: LogicalGraph[G, V, E, LG, GC],
-    GC <: GraphCollection[G, V, E, LG, GC]](vertexFilterFunction: V => Boolean): Subgraph[G, V, E, LG, GC] = {
+  def vertexInduced[L <: GveGraphLayout](vertexFilterFunction: L#V => Boolean): Subgraph[L] = {
     new Subgraph(vertexFilterFunction, _ => true, Strategy.VERTEX_INDUCED)
   }
 
-  def edgeIncuded[
-    G <: GraphHead,
-    V <: Vertex,
-    E <: Edge,
-    LG <: LogicalGraph[G, V, E, LG, GC],
-    GC <: GraphCollection[G, V, E, LG, GC]](edgeFilterFunction: E => Boolean): Subgraph[G, V, E, LG, GC] = {
+  def edgeIncuded[L <: GveGraphLayout](edgeFilterFunction: L#E => Boolean): Subgraph[L] = {
     new Subgraph(_ => true, edgeFilterFunction, Strategy.EDGE_INDUCED)
   }
 }

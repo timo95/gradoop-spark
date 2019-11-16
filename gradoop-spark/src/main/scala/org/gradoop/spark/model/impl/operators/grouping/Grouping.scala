@@ -3,14 +3,10 @@ package org.gradoop.spark.model.impl.operators.grouping
 import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.api.operators.LogicalGraphToLogicalGraphOperator
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 
-class Grouping[
-  G <: GraphHead,
-  V <: Vertex,
-  E <: Edge,
-  LG <: LogicalGraph[G, V, E, LG, GC],
-  GC <: GraphCollection[G, V, E, LG, GC]] extends LogicalGraphToLogicalGraphOperator[LG] {
-
+class Grouping[L <: GveGraphLayout] extends LogicalGraphToLogicalGraphOperator[LogicalGraph[L]] {
+  type LG = LogicalGraph[L]
 
   override def execute(graph: LG): LG = {
     val config = graph.config

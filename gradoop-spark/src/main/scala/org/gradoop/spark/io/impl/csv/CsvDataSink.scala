@@ -1,22 +1,17 @@
 package org.gradoop.spark.io.impl.csv
 
 import org.apache.spark.sql.{Dataset, SaveMode, SparkSession}
-import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.common.util.GradoopConstants
 import org.gradoop.spark.io.api.DataSink
 import org.gradoop.spark.io.impl.csv.CsvConstants.ComposeFunction
 import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 
-class CsvDataSink[
-  G <: GraphHead,
-  V <: Vertex,
-  E <: Edge,
-  LG <: LogicalGraph[G, V, E, LG, GC],
-  GC <: GraphCollection[G, V, E, LG, GC]]
-(csvPath: String, config: GradoopSparkConfig[G, V, E, LG, GC], metadata: Option[MetaData])
-extends CsvComposer[G, V, E](metadata) with DataSink[G, V, E, LG, GC] {
+class CsvDataSink[L <: GveGraphLayout]
+(csvPath: String, config: GradoopSparkConfig[L], metadata: Option[MetaData])
+extends CsvComposer[L](metadata) with DataSink[L] {
   implicit val session: SparkSession = config.sparkSession
 
   private val options: Map[String, String] = Map(
@@ -25,28 +20,28 @@ extends CsvComposer[G, V, E](metadata) with DataSink[G, V, E, LG, GC] {
     "escapeQuotes" -> "false",
     "emptyValue" -> "")
 
-  override def write(logicalGraph: LG): Unit = {
+  override def write(logicalGraph: LogicalGraph[L]): Unit = {
     write(logicalGraph, SaveMode.ErrorIfExists)
   }
 
-  override def write(logicalGraph: LG, saveMode: SaveMode): Unit = {
+  override def write(logicalGraph: LogicalGraph[L], saveMode: SaveMode): Unit = {
     writeGraphHeads(logicalGraph.graphHead, saveMode)
     writeVertices(logicalGraph.vertices, saveMode)
     writeEdges(logicalGraph.edges, saveMode)
   }
 
-  override def write(graphCollection: GC): Unit = {
+  override def write(graphCollection: GraphCollection[L]): Unit = {
     write(graphCollection, SaveMode.ErrorIfExists)
   }
 
-  override def write(graphCollection: GC, saveMode: SaveMode): Unit = {
+  override def write(graphCollection: GraphCollection[L], saveMode: SaveMode): Unit = {
     writeGraphHeads(graphCollection.graphHeads, saveMode)
     writeVertices(graphCollection.vertices, saveMode)
     writeEdges(graphCollection.edges, saveMode)
   }
 
-  def writeGraphHeads(graphHeads: Dataset[G], saveMode: SaveMode): Unit = {
-    val objectToRow = new ObjectToRow[G](graphHeadComposeFunctions)
+  def writeGraphHeads(graphHeads: Dataset[L#G], saveMode: SaveMode): Unit = {
+    val objectToRow = new ObjectToRow[L#G](graphHeadComposeFunctions)
     graphHeads.map(objectToRow.call)(objectToRow.encoder)
       .write
       .options(options)
@@ -54,8 +49,8 @@ extends CsvComposer[G, V, E](metadata) with DataSink[G, V, E, LG, GC] {
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.GRAPH_HEAD_FILE)
   }
 
-  def writeVertices(vertices: Dataset[V], saveMode: SaveMode): Unit = {
-    val objectToRow = new ObjectToRow[V](vertexComposeFunctions)
+  def writeVertices(vertices: Dataset[L#V], saveMode: SaveMode): Unit = {
+    val objectToRow = new ObjectToRow[L#V](vertexComposeFunctions)
     vertices.map(objectToRow.call)(objectToRow.encoder)
       .write
       .options(options)
@@ -63,8 +58,8 @@ extends CsvComposer[G, V, E](metadata) with DataSink[G, V, E, LG, GC] {
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.VERTEX_FILE)
   }
 
-  def writeEdges(edges: Dataset[E], saveMode: SaveMode): Unit = {
-    val objectToRow = new ObjectToRow[E](edgeComposeFunctions)
+  def writeEdges(edges: Dataset[L#E], saveMode: SaveMode): Unit = {
+    val objectToRow = new ObjectToRow[L#E](edgeComposeFunctions)
     edges.map(objectToRow.call)(objectToRow.encoder)
       .write
       .options(options)
@@ -72,38 +67,28 @@ extends CsvComposer[G, V, E](metadata) with DataSink[G, V, E, LG, GC] {
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.EDGE_FILE)
   }
 
-  def graphHeadComposeFunctions: Array[ComposeFunction[G]] = {
+  def graphHeadComposeFunctions: Array[ComposeFunction[L#G]] = {
     Array(composeId, composeLabels, composeProperties)
   }
 
-  def vertexComposeFunctions: Array[ComposeFunction[V]] = {
+  def vertexComposeFunctions: Array[ComposeFunction[L#V]] = {
     Array(composeId, composeGraphIds, composeLabels, composeProperties)
   }
 
-  def edgeComposeFunctions: Array[ComposeFunction[E]] = {
+  def edgeComposeFunctions: Array[ComposeFunction[L#E]] = {
     Array(composeId, composeGraphIds, composeSourceId, composeTargetId, composeLabels, composeProperties)
   }
 }
 
 object CsvDataSink {
 
-  def apply[
-    G <: GraphHead,
-    V <: Vertex,
-    E <: Edge,
-    LG <: LogicalGraph[G, V, E, LG, GC],
-    GC <: GraphCollection[G, V, E, LG, GC]]
-  (csvPath: String, config: GradoopSparkConfig[G, V, E, LG, GC]): CsvDataSink[G, V, E, LG, GC] = {
+  def apply[L <: GveGraphLayout]
+  (csvPath: String, config: GradoopSparkConfig[L]): CsvDataSink[L] = {
     new CsvDataSink(csvPath, config, None)
   }
 
-  def apply[
-    G <: GraphHead,
-    V <: Vertex,
-    E <: Edge,
-    LG <: LogicalGraph[G, V, E, LG, GC],
-    GC <: GraphCollection[G, V, E, LG, GC]]
-  (csvPath: String, config: GradoopSparkConfig[G, V, E, LG, GC], metadata: MetaData): CsvDataSink[G, V, E, LG, GC] = {
+  def apply[L <: GveGraphLayout]
+  (csvPath: String, config: GradoopSparkConfig[L], metadata: MetaData): CsvDataSink[L] = {
     new CsvDataSink(csvPath, config, Some(metadata))
   }
 }

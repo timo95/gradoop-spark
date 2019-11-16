@@ -1,6 +1,8 @@
 package org.gradoop.spark.model.api.layouts
 
-import org.gradoop.common.model.api.elements.{Edge, ElementFactoryProvider, GraphHead, Vertex}
+import org.gradoop.common.model.api.elements.ElementFactoryProvider
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 
-trait BaseLayoutFactory[G <: GraphHead, V <: Vertex, E <: Edge] extends ElementEncoderProvider[G, V, E]
-  with ElementFactoryProvider[G, V, E]
+trait BaseLayoutFactory[L <: GveGraphLayout] extends ElementEncoderProvider[L#G, L#V, L#E]
+  with ElementFactoryProvider[L#G, L#V, L#E] {
+}

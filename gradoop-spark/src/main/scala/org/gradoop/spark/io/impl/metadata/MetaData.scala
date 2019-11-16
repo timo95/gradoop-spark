@@ -1,9 +1,10 @@
 package org.gradoop.spark.io.impl.metadata
 
 import org.apache.spark.sql.{Dataset, SparkSession}
-import org.gradoop.common.model.api.elements.{Edge, Element, GraphHead, Vertex}
+import org.gradoop.common.model.api.elements.Element
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 
 class MetaData(graphHeadMetaData: Dataset[ElementMetaData],
                vertexMetaData: Dataset[ElementMetaData],
@@ -12,24 +13,14 @@ class MetaData(graphHeadMetaData: Dataset[ElementMetaData],
 
 object MetaData {
 
-  def apply[
-    G <: GraphHead,
-    V <: Vertex,
-    E <: Edge,
-    LG <: LogicalGraph[G, V, E, LG, GC],
-    GC <: GraphCollection[G, V, E, LG, GC]](logicalGraph: LG): MetaData = {
+  def apply[L <: GveGraphLayout](logicalGraph: LogicalGraph[L]): MetaData = {
     import logicalGraph.config.implicits._
     new MetaData(fromElements(logicalGraph.graphHead),
       fromElements(logicalGraph.vertices),
       fromElements(logicalGraph.edges))
   }
 
-  def apply[
-    G <: GraphHead,
-    V <: Vertex,
-    E <: Edge,
-    LG <: LogicalGraph[G, V, E, LG, GC],
-    GC <: GraphCollection[G, V, E, LG, GC]](graphCollection: GC): MetaData = {
+  def apply[L <: GveGraphLayout](graphCollection: GraphCollection[L]): MetaData = {
     import graphCollection.config.implicits._
     new MetaData(fromElements(graphCollection.graphHeads),
       fromElements(graphCollection.vertices),
@@ -38,10 +29,10 @@ object MetaData {
 
   private def fromElements[EL <: Element]
   (dataset: Dataset[EL])(implicit session: SparkSession): Dataset[ElementMetaData] = {
+    import ColumnNames._
     import org.apache.spark.sql.functions._
     import org.gradoop.spark.util.Implicits._
     import session.implicits._
-    import ColumnNames._
 
     dataset
       // one row for each property per element

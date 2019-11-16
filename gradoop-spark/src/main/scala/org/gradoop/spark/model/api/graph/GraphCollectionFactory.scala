@@ -4,30 +4,19 @@ import org.apache.spark.sql.Dataset
 import org.gradoop.common.model.api.elements._
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.layouts.GraphCollectionLayoutFactory
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 
-/** Creates a graph collection with a specific layout.
- *
- * @tparam G
- * @tparam V
- * @tparam E
- * @tparam LG
- * @tparam GC
- */
-class GraphCollectionFactory[
-  G <: GraphHead,
-  V <: Vertex,
-  E <: Edge,
-  LG <: LogicalGraph[G, V, E, LG, GC],
-  GC <: GraphCollection[G, V, E, LG, GC]]
-(layoutFactory: GraphCollectionLayoutFactory[G, V, E, LG, GC],
- config: GradoopSparkConfig[G, V, E, LG, GC])
-  extends BaseGraphFactory[G, V, E, LG, GC](layoutFactory, config) {
+/** Creates a graph collection with a specific layout. */
+class GraphCollectionFactory[L <: GveGraphLayout]
+(layoutFactory: GraphCollectionLayoutFactory[L],
+ config: GradoopSparkConfig[L])
+  extends BaseGraphFactory[L](layoutFactory, config) {
 
-  override def graphHeadFactory: GraphHeadFactory[G] = layoutFactory.graphHeadFactory
+  override def graphHeadFactory: GraphHeadFactory[L#G] = layoutFactory.graphHeadFactory
 
-  override def vertexFactory: VertexFactory[V] = layoutFactory.vertexFactory
+  override def vertexFactory: VertexFactory[L#V] = layoutFactory.vertexFactory
 
-  override def edgeFactory: EdgeFactory[E] = layoutFactory.edgeFactory
+  override def edgeFactory: EdgeFactory[L#E] = layoutFactory.edgeFactory
 
   /** Creates a graph collection layout from the given datasets.
    *
@@ -36,7 +25,7 @@ class GraphCollectionFactory[
    * @param edges      Edge Dataset
    * @return Graph collection
    */
-  def init(graphHeads: Dataset[G], vertices: Dataset[V], edges: Dataset[E]): GC = {
+  def init(graphHeads: Dataset[L#G], vertices: Dataset[L#V], edges: Dataset[L#E]): GraphCollection[L] = {
     layoutFactory.createGraphCollection(layoutFactory(graphHeads, vertices, edges), config)
   }
 
@@ -47,10 +36,10 @@ class GraphCollectionFactory[
    * @param edges      Edge collection
    * @return Graph collection
    */
-  def init(graphHeads: Iterable[G], vertices: Iterable[V], edges: Iterable[E]): GC = {
-    val graphHeadDS: Dataset[G] = createDataset[G](graphHeads)
-    val vertexDS: Dataset[V] = createDataset[V](vertices)
-    val edgeDS: Dataset[E] = createDataset[E](edges)
+  def init(graphHeads: Iterable[L#G], vertices: Iterable[L#V], edges: Iterable[L#E]): GraphCollection[L] = {
+    val graphHeadDS: Dataset[L#G] = createDataset[L#G](graphHeads)
+    val vertexDS: Dataset[L#V] = createDataset[L#V](vertices)
+    val edgeDS: Dataset[L#E] = createDataset[L#E](edges)
 
     init(graphHeadDS, vertexDS, edgeDS)
   }
@@ -60,12 +49,12 @@ class GraphCollectionFactory[
    * @param logicalGraphs input graphs
    * @return graph collection
    */
-  def init(logicalGraphs: LG*): GC = {
-    val graphHeads: Dataset[G] = session.emptyDataset[G]
-    val vertices: Dataset[V] = session.emptyDataset[V]
-    val edges: Dataset[E] = session.emptyDataset[E]
+  def init(logicalGraph: LogicalGraph[L], logicalGraphs: LogicalGraph[L]*): GraphCollection[L] = {
+    val graphHeads = logicalGraph.graphHead
+    val vertices = logicalGraph.vertices
+    val edges = logicalGraph.edges
 
-    for (logicalGraph <- logicalGraphs) {
+    for (logicalGraph: LogicalGraph[L] <- logicalGraphs) {
       graphHeads.union(logicalGraph.graphHead)
       vertices.union(logicalGraph.vertices)
       edges.union(logicalGraph.edges)
@@ -78,10 +67,10 @@ class GraphCollectionFactory[
    *
    * @return empty graph collection
    */
-  def empty: GC = {
-    var graphHeads: Dataset[G] = session.emptyDataset[G]
-    var vertices: Dataset[V] = session.emptyDataset[V]
-    var edges: Dataset[E] = session.emptyDataset[E]
+  def empty: GraphCollection[L] = {
+    var graphHeads: Dataset[L#G] = session.emptyDataset[L#G]
+    var vertices: Dataset[L#V] = session.emptyDataset[L#V]
+    var edges: Dataset[L#E] = session.emptyDataset[L#E]
 
     init(graphHeads, vertices, edges)
   }

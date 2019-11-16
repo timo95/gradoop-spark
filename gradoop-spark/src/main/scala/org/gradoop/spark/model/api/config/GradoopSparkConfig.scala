@@ -1,21 +1,15 @@
 package org.gradoop.spark.model.api.config
 
-import org.apache.spark.sql.{Column, Dataset, Encoder, SparkSession}
-import org.gradoop.common.model.api.elements.{Edge, GraphHead, Identifiable, Vertex}
+import org.apache.spark.sql.{Encoder, SparkSession}
 import org.gradoop.common.model.api.types.ComponentTypes
-import org.gradoop.spark.functions.filter.FilterExpression
-import org.gradoop.spark.model.api.graph.{GraphCollection, GraphCollectionFactory, LogicalGraph, LogicalGraphFactory}
+import org.gradoop.spark.model.api.graph.{GraphCollectionFactory, LogicalGraphFactory}
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, LogicalGraphLayoutFactory}
-import org.gradoop.spark.util.{ColumnSelector, DisplayConverter, Implicits}
+import org.gradoop.spark.model.impl.types.GveGraphLayout
+import org.gradoop.spark.util.Implicits
 
-class GradoopSparkConfig[
-  G <: GraphHead,
-  V <: Vertex,
-  E <: Edge,
-  LG <: LogicalGraph[G, V, E, LG, GC],
-  GC <: GraphCollection[G, V, E, LG, GC]]
-(var logicalGraphFactory: LogicalGraphFactory[G, V, E, LG, GC],
- var graphCollectionFactory: GraphCollectionFactory[G, V, E, LG, GC])
+class GradoopSparkConfig[L <: GveGraphLayout]
+(var logicalGraphFactory: LogicalGraphFactory[L],
+ var graphCollectionFactory: GraphCollectionFactory[L])
 (implicit val sparkSession: SparkSession) extends Serializable {
 
   object implicits extends Implicits with ComponentTypes {
@@ -23,32 +17,27 @@ class GradoopSparkConfig[
     implicit def implicitSparkSession: SparkSession = sparkSession
 
     // Encoder
-    implicit def implicitGraphHeadEncoder: Encoder[G] = graphHeadEncoder
-    implicit def impliticVertexEncoder: Encoder[V] = vertexEncoder
-    implicit def implicitEdgeEncoder: Encoder[E] = edgeEncoder
+    implicit def implicitGraphHeadEncoder: Encoder[L#G] = graphHeadEncoder
+    implicit def impliticVertexEncoder: Encoder[L#V] = vertexEncoder
+    implicit def implicitEdgeEncoder: Encoder[L#E] = edgeEncoder
   }
 
-  def graphHeadEncoder: Encoder[G] = logicalGraphFactory.graphHeadEncoder
+  def graphHeadEncoder: Encoder[L#G] = logicalGraphFactory.graphHeadEncoder
 
-  def vertexEncoder: Encoder[V] = logicalGraphFactory.vertexEncoder
+  def vertexEncoder: Encoder[L#V] = logicalGraphFactory.vertexEncoder
 
-  def edgeEncoder: Encoder[E] = logicalGraphFactory.edgeEncoder
+  def edgeEncoder: Encoder[L#E] = logicalGraphFactory.edgeEncoder
 }
 
 object GradoopSparkConfig {
 
-  def create[
-    G <: GraphHead,
-    V <: Vertex,
-    E <: Edge,
-    LG <: LogicalGraph[G, V, E, LG, GC],
-    GC <: GraphCollection[G, V, E, LG, GC]]
-  (logicalGraphLayoutFactory: LogicalGraphLayoutFactory[G, V, E, LG, GC],
-   graphCollectionLayoutFactory: GraphCollectionLayoutFactory[G, V, E, LG, GC])
-  (implicit sparkSession: SparkSession): GradoopSparkConfig[G, V, E, LG, GC] = {
-    val config = new GradoopSparkConfig[G, V, E, LG, GC](null, null)
-    config.logicalGraphFactory = new LogicalGraphFactory[G, V, E, LG, GC](logicalGraphLayoutFactory, config)
-    config.graphCollectionFactory = new GraphCollectionFactory[G, V, E, LG, GC](graphCollectionLayoutFactory, config)
+  def create[L <: GveGraphLayout]
+  (logicalGraphLayoutFactory: LogicalGraphLayoutFactory[L],
+   graphCollectionLayoutFactory: GraphCollectionLayoutFactory[L])
+  (implicit sparkSession: SparkSession): GradoopSparkConfig[L] = {
+    val config = new GradoopSparkConfig[L](null, null)
+    config.logicalGraphFactory = new LogicalGraphFactory[L](logicalGraphLayoutFactory, config)
+    config.graphCollectionFactory = new GraphCollectionFactory[L](graphCollectionLayoutFactory, config)
     config
   }
 }

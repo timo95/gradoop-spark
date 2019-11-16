@@ -1,22 +1,17 @@
 package org.gradoop.spark.model.api.graph
 
 import org.apache.spark.sql.{Dataset, Encoder, SparkSession}
-import org.gradoop.common.model.api.elements.{Edge, ElementFactoryProvider, GraphHead, Vertex}
+import org.gradoop.common.model.api.elements.ElementFactoryProvider
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.layouts.BaseLayoutFactory
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 
-abstract class BaseGraphFactory[
-  G <: GraphHead,
-  V <: Vertex,
-  E <: Edge,
-  LG <: LogicalGraph[G, V, E, LG, GC],
-  GC <: GraphCollection[G, V, E, LG, GC]]
-(layoutFactory: BaseLayoutFactory[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC])
-  extends ElementFactoryProvider[G, V, E] {
+abstract class BaseGraphFactory[L <: GveGraphLayout]
+(layoutFactory: BaseLayoutFactory[L], config: GradoopSparkConfig[L]) extends ElementFactoryProvider[L#G, L#V, L#E] {
 
-  implicit val graphHeadEncoder: Encoder[G] = layoutFactory.graphHeadEncoder
-  implicit val vertexEncoder: Encoder[V] = layoutFactory.vertexEncoder
-  implicit val edgeEncoder: Encoder[E] = layoutFactory.edgeEncoder
+  implicit val graphHeadEncoder: Encoder[L#G] = layoutFactory.graphHeadEncoder
+  implicit val vertexEncoder: Encoder[L#V] = layoutFactory.vertexEncoder
+  implicit val edgeEncoder: Encoder[L#E] = layoutFactory.edgeEncoder
 
   implicit val session: SparkSession = config.sparkSession
 

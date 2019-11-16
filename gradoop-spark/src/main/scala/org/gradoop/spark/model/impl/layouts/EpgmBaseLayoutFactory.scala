@@ -5,17 +5,17 @@ import org.gradoop.common.model.api.elements.{EdgeFactory, GraphHeadFactory, Ver
 import org.gradoop.spark.model.api.layouts.BaseLayoutFactory
 import org.gradoop.spark.model.impl.elements.{EpgmEdge, EpgmGraphHead, EpgmVertex}
 
-trait EpgmBaseLayoutFactory extends BaseLayoutFactory[G, V, E] {
+trait EpgmBaseLayoutFactory extends BaseLayoutFactory[L] {
 
-  override def graphHeadEncoder: Encoder[EpgmGraphHead] = EpgmGraphHead.encoder
+  override def graphHeadEncoder: Encoder[L#G] = EpgmGraphHead.encoder
 
-  override def vertexEncoder: Encoder[EpgmVertex] = EpgmVertex.encoder
+  override def vertexEncoder: Encoder[L#V] = EpgmVertex.encoder
 
-  override def edgeEncoder: Encoder[EpgmEdge] = EpgmEdge.encoder
+  override def edgeEncoder: Encoder[L#E] = EpgmEdge.encoder
 
-  override def graphHeadFactory: GraphHeadFactory[G] = EpgmGraphHead
+  override def graphHeadFactory: GraphHeadFactory[L#G] = EpgmGraphHead
 
-  override def vertexFactory: VertexFactory[V] = EpgmVertex
+  override def vertexFactory: VertexFactory[L#V] = EpgmVertex
 
-  override def edgeFactory: EdgeFactory[E] = EpgmEdge
+  override def edgeFactory: EdgeFactory[L#E] = EpgmEdge
 }

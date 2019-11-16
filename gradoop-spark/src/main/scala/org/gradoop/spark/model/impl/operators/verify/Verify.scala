@@ -1,18 +1,13 @@
 package org.gradoop.spark.model.impl.operators.verify
 
-import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
-import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
+import org.gradoop.spark.model.api.graph.LogicalGraph
 import org.gradoop.spark.model.api.operators.LogicalGraphToLogicalGraphOperator
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 
-class Verify[
-  G <: GraphHead,
-  V <: Vertex,
-  E <: Edge,
-  LG <: LogicalGraph[G, V, E, LG, GC],
-  GC <: GraphCollection[G, V, E, LG, GC]]
-  extends LogicalGraphToLogicalGraphOperator[LG] {
+class Verify[L <: GveGraphLayout]
+  extends LogicalGraphToLogicalGraphOperator[LogicalGraph[L]] {
 
-  override def execute(graph: LG): LG = {
+  override def execute(graph: LogicalGraph[L]): LogicalGraph[L] = {
     import graph.config.implicits._
     val verifiedEdgesSource = graph.edges
       .joinWith(graph.vertices, graph.edges.sourceId === graph.vertices.id)

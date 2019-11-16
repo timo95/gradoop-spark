@@ -3,16 +3,17 @@ package org.gradoop.spark.io.impl.csv
 import org.gradoop.common.model.api.elements._
 import org.gradoop.spark.io.impl.csv.CsvConstants.ComposeFunction
 import org.gradoop.spark.io.impl.metadata.MetaData
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 import org.gradoop.spark.util.StringEscaper
 
-abstract class CsvComposer[G <: GraphHead, V <: Vertex, E <: Edge](var metadata: Option[MetaData])
+abstract class CsvComposer[L <: GveGraphLayout](var metadata: Option[MetaData])
   extends Serializable {
 
-  def graphHeadComposeFunctions: Array[ComposeFunction[G]]
+  def graphHeadComposeFunctions: Array[ComposeFunction[L#G]]
 
-  def vertexComposeFunctions: Array[ComposeFunction[V]]
+  def vertexComposeFunctions: Array[ComposeFunction[L#V]]
 
-  def edgeComposeFunctions: Array[ComposeFunction[E]]
+  def edgeComposeFunctions: Array[ComposeFunction[L#E]]
 
   // Compose functions
 
@@ -22,9 +23,9 @@ abstract class CsvComposer[G <: GraphHead, V <: Vertex, E <: Edge](var metadata:
     element.graphIds.mkString("[", CsvConstants.LIST_DELIMITER, "]")
   }
 
-  def composeSourceId(edge: E): String = edge.sourceId.toString
+  def composeSourceId(edge: L#E): String = edge.sourceId.toString
 
-  def composeTargetId(edge: E): String = edge.targetId.toString
+  def composeTargetId(edge: L#E): String = edge.targetId.toString
 
   def composeLabels[T <: Labeled](obj: T): String = {
     StringEscaper.escape(obj.label, CsvConstants.ESCAPED_CHARS)

@@ -4,18 +4,19 @@ import org.apache.spark.sql.SparkSession
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollectionFactory, LogicalGraphFactory}
 import org.gradoop.spark.model.impl.layouts.EpgmGveLayout
-import org.gradoop.spark.model.impl.types.EpgmTypes
+import org.gradoop.spark.model.impl.types.EpgmGveGraphLayout
 
-trait BaseBenchmark extends EpgmTypes {
+trait BaseBenchmark {
+  type L = EpgmGveGraphLayout
 
-  private var _gveConfig: GradoopSparkConfig[G, V, E, LG, GC] = _
+  private var _gveConfig: GradoopSparkConfig[L] = _
 
-  def gveConfig(implicit session: SparkSession): GradoopSparkConfig[G, V, E, LG, GC] = {
+  def gveConfig(implicit session: SparkSession): GradoopSparkConfig[L] = {
     if (_gveConfig == null) {
-      _gveConfig = new GradoopSparkConfig[G, V, E, LG, GC](null, null)
+      _gveConfig = new GradoopSparkConfig[L](null, null)
 
-      _gveConfig.logicalGraphFactory = new LogicalGraphFactory[G, V, E, LG, GC](EpgmGveLayout, _gveConfig)
-      _gveConfig.graphCollectionFactory = new GraphCollectionFactory[G, V, E, LG, GC](EpgmGveLayout, _gveConfig)
+      _gveConfig.logicalGraphFactory = new LogicalGraphFactory[L](EpgmGveLayout, _gveConfig)
+      _gveConfig.graphCollectionFactory = new GraphCollectionFactory[L](EpgmGveLayout, _gveConfig)
     }
     _gveConfig
   }

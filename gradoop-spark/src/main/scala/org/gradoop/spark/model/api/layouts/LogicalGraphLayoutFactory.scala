@@ -1,17 +1,12 @@
 package org.gradoop.spark.model.api.layouts
 
 import org.apache.spark.sql.Dataset
-import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
+import org.gradoop.spark.model.api.graph.LogicalGraph
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 
-trait LogicalGraphLayoutFactory[
-  G <: GraphHead,
-  V <: Vertex,
-  E <: Edge,
-  LG <: LogicalGraph[G, V, E, LG, GC],
-  GC <: GraphCollection[G, V, E, LG, GC]] extends BaseLayoutFactory[G, V, E] {
-  def apply(graphHeads: Dataset[G], vertices: Dataset[V], edges: Dataset[E]): LogicalGraphLayout[G, V, E]
+trait LogicalGraphLayoutFactory[L <: GveGraphLayout] extends BaseLayoutFactory[L] {
+  def apply(graphHeads: Dataset[L#G], vertices: Dataset[L#V], edges: Dataset[L#E]): LogicalGraphLayout[L]
 
-  def createLogicalGraph(layout: LogicalGraphLayout[G, V, E], config: GradoopSparkConfig[G, V, E, LG, GC]): LG
+  def createLogicalGraph(layout: LogicalGraphLayout[L], config: GradoopSparkConfig[L]): LogicalGraph[L]
 }

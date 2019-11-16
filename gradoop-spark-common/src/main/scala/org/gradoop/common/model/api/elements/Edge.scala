@@ -1,11 +1,5 @@
 package org.gradoop.common.model.api.elements
 
-trait Edge extends GraphElement {
-  def sourceId: Id
+trait Edge extends GraphElement with EdgeType {
 
-  def targetId: Id
-
-  def sourceId_=(sourceId: Id): Unit
-
-  def targetId_=(targetId: Id): Unit
 }

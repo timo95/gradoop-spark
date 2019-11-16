@@ -5,30 +5,19 @@ import org.gradoop.common.model.api.elements._
 import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.layouts.LogicalGraphLayoutFactory
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 
-/** Creates a logical graph with a specific layout.
- *
- * @tparam G
- * @tparam V
- * @tparam E
- * @tparam LG
- * @tparam GC
- */
-class LogicalGraphFactory[
-  G <: GraphHead,
-  V <: Vertex,
-  E <: Edge,
-  LG <: LogicalGraph[G, V, E, LG, GC],
-  GC <: GraphCollection[G, V, E, LG, GC]]
-(layoutFactory: LogicalGraphLayoutFactory[G, V, E, LG, GC],
- config: GradoopSparkConfig[G, V, E, LG, GC])
-  extends BaseGraphFactory[G, V, E, LG, GC](layoutFactory, config) {
+/** Creates a logical graph with a specific layout. */
+class LogicalGraphFactory[L <: GveGraphLayout]
+(layoutFactory: LogicalGraphLayoutFactory[L],
+ config: GradoopSparkConfig[L])
+  extends BaseGraphFactory[L](layoutFactory, config) {
 
-  override def graphHeadFactory: GraphHeadFactory[G] = layoutFactory.graphHeadFactory
+  override def graphHeadFactory: GraphHeadFactory[L#G] = layoutFactory.graphHeadFactory
 
-  override def vertexFactory: VertexFactory[V] = layoutFactory.vertexFactory
+  override def vertexFactory: VertexFactory[L#V] = layoutFactory.vertexFactory
 
-  override def edgeFactory: EdgeFactory[E] = layoutFactory.edgeFactory
+  override def edgeFactory: EdgeFactory[L#E] = layoutFactory.edgeFactory
 
   /** Creates a logical graph from the given vertices and edges.
    *
@@ -38,9 +27,9 @@ class LogicalGraphFactory[
    * @param edges    Edge Dataset
    * @return Logical graph
    */
-  def create(vertices: Dataset[V], edges: Dataset[E]): LG = {
+  def create(vertices: Dataset[L#V], edges: Dataset[L#E]): LogicalGraph[L] = {
     val id = GradoopId.get
-    val graphHeads = session.createDataset[G](Seq(graphHeadFactory(id)))
+    val graphHeads = session.createDataset[L#G](Seq(graphHeadFactory(id)))
 
     // TODO add/set id to each element
 
@@ -56,7 +45,7 @@ class LogicalGraphFactory[
    * @param edges     Edge Dataset
    * @return Logical graph
    */
-  def init(graphHead: Dataset[G], vertices: Dataset[V], edges: Dataset[E]): LG = {
+  def init(graphHead: Dataset[L#G], vertices: Dataset[L#V], edges: Dataset[L#E]): LogicalGraph[L] = {
     layoutFactory.createLogicalGraph(layoutFactory(graphHead, vertices, edges), config)
     // TODO limit to graphHead.first?
   }
@@ -68,10 +57,10 @@ class LogicalGraphFactory[
    * @param edges     Edge collection
    * @return Logical graph
    */
-  def init(graphHead: G, vertices: Iterable[V], edges: Iterable[E]): LG = {
-    val graphHeadDS: Dataset[G] = session.createDataset[G](Seq(graphHead))
-    val vertexDS: Dataset[V] = createDataset[V](vertices)
-    val edgeDS: Dataset[E] = createDataset[E](edges)
+  def init(graphHead: L#G, vertices: Iterable[L#V], edges: Iterable[L#E]): LogicalGraph[L] = {
+    val graphHeadDS: Dataset[L#G] = session.createDataset[L#G](Seq(graphHead))
+    val vertexDS: Dataset[L#V] = createDataset[L#V](vertices)
+    val edgeDS: Dataset[L#E] = createDataset[L#E](edges)
 
     init(graphHeadDS, vertexDS, edgeDS)
   }
@@ -84,7 +73,7 @@ class LogicalGraphFactory[
    * @param edges    Edge collection
    * @return Logical graph
    */
-  def init(vertices: Iterable[V], edges: Iterable[E]): LG = {
+  def init(vertices: Iterable[L#V], edges: Iterable[L#E]): LogicalGraph[L] = {
     val graphHead = graphHeadFactory(GradoopId.get)
     init(graphHead, vertices, edges)
   }
@@ -93,10 +82,10 @@ class LogicalGraphFactory[
    *
    * @return empty graph
    */
-  def empty: LG = {
-    val graphHeads: Dataset[G] = session.emptyDataset[G]
-    val vertices: Dataset[V] = session.emptyDataset[V]
-    val edges: Dataset[E] = session.emptyDataset[E]
+  def empty: LogicalGraph[L] = {
+    val graphHeads: Dataset[L#G] = session.emptyDataset[L#G]
+    val vertices: Dataset[L#V] = session.emptyDataset[L#V]
+    val edges: Dataset[L#E] = session.emptyDataset[L#E]
 
     init(graphHeads, vertices, edges)
   }

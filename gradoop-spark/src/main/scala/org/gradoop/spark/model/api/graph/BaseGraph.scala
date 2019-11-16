@@ -5,18 +5,18 @@ import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.layouts.Layout
 import org.gradoop.spark.model.api.operators.BaseGraphOperators
+import org.gradoop.spark.model.impl.types.GveGraphLayout
 
-abstract class BaseGraph[G <: GraphHead, V <: Vertex, E <: Edge, LG <: LogicalGraph[G, V, E, LG, GC], GC <: GraphCollection[G, V, E, LG, GC]]
-(layout: Layout[V, E], val config: GradoopSparkConfig[G, V, E, LG, GC])
-  extends ElementAccess[V, E] with BaseGraphOperators[G, V, E, LG, GC] {
+abstract class BaseGraph[L <: GveGraphLayout]
+(layout: Layout[L], val config: GradoopSparkConfig[L]) extends ElementAccess[L#V, L#E] with BaseGraphOperators[L] {
 
-  override def vertices: Dataset[V] = layout.vertices
+  override def vertices: Dataset[L#V] = layout.vertices
 
-  override def verticesByLabel(label: String): Dataset[V] = layout.verticesByLabel(label)
+  override def verticesByLabel(label: String): Dataset[L#V] = layout.verticesByLabel(label)
 
-  override def edges: Dataset[E] = layout.edges
+  override def edges: Dataset[L#E] = layout.edges
 
-  override def edgesByLabel(label: String): Dataset[E] = layout.edgesByLabel(label)
+  override def edgesByLabel(label: String): Dataset[L#E] = layout.edgesByLabel(label)
 
-  def factory: BaseGraphFactory[G, V, E, LG, GC]
+  def factory: BaseGraphFactory[L]
 }
