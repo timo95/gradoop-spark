@@ -1,14 +1,12 @@
 package org.gradoop.spark.io.impl.csv
 
-import org.gradoop.common.model.api.elements._
 import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.model.impl.types.GveLayoutType
 import org.gradoop.spark.util.StringEscaper
 
-abstract protected class CsvParser[L <: GveLayoutType](var metadata: Option[MetaData])
-  extends Serializable {
+abstract protected class CsvParser[L <: GveLayoutType](var metadata: Option[MetaData]) extends Serializable {
 
   protected def parseId(idString: String): GradoopId = GradoopId.fromString(idString)
 

@@ -3,7 +3,7 @@ package org.gradoop.spark.benchmarks
 import org.apache.spark.sql.SparkSession
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollectionFactory, LogicalGraphFactory}
-import org.gradoop.spark.model.impl.layouts.EpgmGveLayout
+import org.gradoop.spark.model.impl.gve.EpgmGveLayout
 import org.gradoop.spark.model.impl.types.EpgmGveLayoutType
 
 trait BaseBenchmark {

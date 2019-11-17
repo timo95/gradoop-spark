@@ -2,7 +2,8 @@ package org.gradoop.common.util
 
 import java.io.InputStream
 
-import org.gradoop.common.model.api.elements._
+import org.gradoop.common.model.api.components._
+import org.gradoop.common.model.api.gve.{Edge, EdgeFactory, ElementFactoryProvider, GraphHead, GraphHeadFactory, Vertex, VertexFactory}
 import org.gradoop.common.properties.PropertyValue
 import org.s1ck.gdl.GDLHandler
 

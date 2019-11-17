@@ -1,15 +1,13 @@
 package org.gradoop.spark.io.impl.csv
 
 import org.apache.spark.sql.{Dataset, Row}
-import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.spark.io.api.DataSource
 import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
-class CsvDataSource[L <: GveLayoutType]
-(csvPath: String, config: GradoopSparkConfig[L], metadata: Option[MetaData])
+class CsvDataSource[L <: GveLayoutType](csvPath: String, config: GradoopSparkConfig[L], metadata: Option[MetaData])
   extends CsvParser[L](metadata) with DataSource[L] {
   import config.implicits._
 

@@ -8,8 +8,7 @@ import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
 
-class SparkAsciiGraphLoader[L <: GveLayoutType]
-(config: GradoopSparkConfig[L], loader: AsciiGraphLoader[L#G, L#V, L#E]) {
+class SparkAsciiGraphLoader[L <: GveLayoutType](config: GradoopSparkConfig[L], loader: AsciiGraphLoader[L#G, L#V, L#E]) {
 
   /** Appends the given ASCII GDL String to the database.
    *

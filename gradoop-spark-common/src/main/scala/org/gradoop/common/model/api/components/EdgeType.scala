@@ -1,6 +1,7 @@
-package org.gradoop.common.model.api.elements
+package org.gradoop.common.model.api.components
 
 trait EdgeType {
+
   def sourceId: Id
 
   def targetId: Id

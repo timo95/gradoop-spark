@@ -1,7 +1,8 @@
 package org.gradoop.spark.util
 
 import org.apache.spark.sql.{Column, Dataset}
-import org.gradoop.common.model.api.elements.{Attributed, Edge, GraphElement, Identifiable, Labeled}
+import org.gradoop.common.model.api.components.{Attributed, Identifiable, Labeled}
+import org.gradoop.common.model.api.gve.{Edge, GraphElement}
 import org.gradoop.common.util.ColumnNames._
 
 class ColumnSelector[T](val dataset: Dataset[T]) extends AnyVal {

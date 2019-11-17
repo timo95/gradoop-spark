@@ -1,7 +1,7 @@
 package org.gradoop.spark.util
 
 import org.apache.spark.sql.Dataset
-import org.gradoop.common.model.api.elements.Identifiable
+import org.gradoop.common.model.api.components.Identifiable
 import org.gradoop.spark.functions.filter.FilterExpression
 import org.gradoop.spark.model.api.graph.BaseGraph
 import org.gradoop.spark.model.api.layouts.GveLayout

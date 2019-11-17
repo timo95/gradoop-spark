@@ -1,7 +1,5 @@
 package org.gradoop.common
 
-import org.gradoop.common.model.api.types.ComponentTypes
+import org.gradoop.common.model.api.ComponentTypes
 
-package object util extends ComponentTypes {
-
-}
+package object util extends ComponentTypes

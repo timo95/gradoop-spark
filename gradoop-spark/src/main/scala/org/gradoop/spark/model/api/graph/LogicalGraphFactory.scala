@@ -1,23 +1,15 @@
 package org.gradoop.spark.model.api.graph
 
 import org.apache.spark.sql.Dataset
-import org.gradoop.common.model.api.elements._
+import org.gradoop.common.model.api.gve.{EdgeFactory, ElementFactoryProvider, GraphHeadFactory, VertexFactory}
 import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.api.layouts.LogicalGraphLayoutFactory
+import org.gradoop.spark.model.api.layouts.{GveBaseLayoutFactory, LogicalGraphLayoutFactory}
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
 /** Creates a logical graph with a specific layout. */
-class LogicalGraphFactory[L <: GveLayoutType]
-(layoutFactory: LogicalGraphLayoutFactory[L],
- config: GradoopSparkConfig[L])
+class LogicalGraphFactory[L <: GveLayoutType](val layoutFactory: GveBaseLayoutFactory[L] with LogicalGraphLayoutFactory[L], config: GradoopSparkConfig[L])
   extends BaseGraphFactory[L](layoutFactory, config) {
-
-  override def graphHeadFactory: GraphHeadFactory[L#G] = layoutFactory.graphHeadFactory
-
-  override def vertexFactory: VertexFactory[L#V] = layoutFactory.vertexFactory
-
-  override def edgeFactory: EdgeFactory[L#E] = layoutFactory.edgeFactory
 
   /** Creates a logical graph from the given vertices and edges.
    *

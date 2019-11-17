@@ -1,9 +1,8 @@
 package org.gradoop.spark.model.impl.operators.subgraph
 
-import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.functions.filter.FilterStrings
-import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
+import org.gradoop.spark.model.api.graph.LogicalGraph
 import org.gradoop.spark.model.api.operators.LogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy.Strategy
 import org.gradoop.spark.model.impl.types.GveLayoutType
@@ -37,8 +36,7 @@ class SubgraphSql[L <: GveLayoutType] private
 
 object SubgraphSql {
 
-  def both[L <: GveLayoutType]
-  (vertexFilterExpression: String, edgeFilterExpression: String): SubgraphSql[L] = {
+  def both[L <: GveLayoutType](vertexFilterExpression: String, edgeFilterExpression: String): SubgraphSql[L] = {
     new SubgraphSql(vertexFilterExpression, edgeFilterExpression, Strategy.BOTH)
   }
 

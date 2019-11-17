@@ -1,13 +1,13 @@
 package org.gradoop.spark.io.impl.csv
 
-import org.gradoop.common.model.api.elements._
+import org.gradoop.common.model.api.components._
+import org.gradoop.common.model.api.gve.GraphElement
 import org.gradoop.spark.io.impl.csv.CsvConstants.ComposeFunction
 import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.model.impl.types.GveLayoutType
 import org.gradoop.spark.util.StringEscaper
 
-abstract class CsvComposer[L <: GveLayoutType](var metadata: Option[MetaData])
-  extends Serializable {
+abstract class CsvComposer[L <: GveLayoutType](var metadata: Option[MetaData]) extends Serializable {
 
   def graphHeadComposeFunctions: Array[ComposeFunction[L#G]]
 

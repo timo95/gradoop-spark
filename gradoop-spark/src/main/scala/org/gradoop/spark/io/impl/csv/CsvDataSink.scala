@@ -7,13 +7,12 @@ import org.gradoop.spark.io.impl.csv.CsvConstants.ComposeFunction
 import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
-import org.gradoop.spark.model.api.layouts.GveLayout
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
-class CsvDataSink[L <: GveLayoutType]
-(csvPath: String, config: GradoopSparkConfig[L], metadata: Option[MetaData])
-extends CsvComposer[L](metadata) with DataSink[L] {
+class CsvDataSink[L <: GveLayoutType](csvPath: String, config: GradoopSparkConfig[L], metadata: Option[MetaData])
+  extends CsvComposer[L](metadata) with DataSink[L] {
   implicit val session: SparkSession = config.sparkSession
+  import config.implicits._
 
   private val options: Map[String, String] = Map(
     "sep" -> CsvConstants.TOKEN_DELIMITER,
@@ -22,14 +21,12 @@ extends CsvComposer[L](metadata) with DataSink[L] {
     "emptyValue" -> "")
 
   override def write(logicalGraph: LogicalGraph[L], saveMode: SaveMode): Unit = {
-    import logicalGraph.config.implicits._
     writeGraphHeads(logicalGraph.graphHead, saveMode)
     writeVertices(logicalGraph.vertices, saveMode)
     writeEdges(logicalGraph.edges, saveMode)
   }
 
   override def write(graphCollection: GraphCollection[L], saveMode: SaveMode): Unit = {
-    import graphCollection.config.implicits._
     writeGraphHeads(graphCollection.graphHeads, saveMode)
     writeVertices(graphCollection.vertices, saveMode)
     writeEdges(graphCollection.edges, saveMode)

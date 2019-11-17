@@ -1,7 +1,7 @@
 package org.gradoop.spark.util
 
 import org.apache.spark.sql.{Dataset, Encoder}
-import org.gradoop.common.model.api.elements.Identifiable
+import org.gradoop.common.model.api.components.Identifiable
 import org.gradoop.common.model.impl.id.GradoopId
 
 class DisplayConverter[E <: Identifiable](val dataset: Dataset[E]) extends AnyVal {

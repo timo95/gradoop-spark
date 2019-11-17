@@ -4,7 +4,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.spark.io.impl.csv.{CsvDataSink, CsvDataSource}
-import org.gradoop.spark.model.impl.elements.{EpgmGraphHead, PV}
+import org.gradoop.spark.model.impl.elements.PV
 import org.gradoop.spark.util.{EpgmApp, SparkAsciiGraphLoader}
 
 object main extends EpgmApp {

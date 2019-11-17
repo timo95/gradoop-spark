@@ -1,6 +1,6 @@
 package org.gradoop.spark.model.impl.types
 
-import org.gradoop.common.model.api.elements.{EdgeType, GraphMember, Identifiable}
+import org.gradoop.common.model.api.components.{EdgeType, GraphMember, Identifiable}
 import org.gradoop.spark.model.api.layouts.Layout
 
 class LayoutType {

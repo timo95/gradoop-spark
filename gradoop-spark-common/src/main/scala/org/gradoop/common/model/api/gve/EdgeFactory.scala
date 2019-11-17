@@ -1,5 +1,6 @@
-package org.gradoop.common.model.api.elements
+package org.gradoop.common.model.api.gve
 
+import org.gradoop.common.model.api.components._
 import org.gradoop.common.model.impl.id.GradoopId
 
 trait EdgeFactory[E <: Edge] extends ElementFactory[E] {

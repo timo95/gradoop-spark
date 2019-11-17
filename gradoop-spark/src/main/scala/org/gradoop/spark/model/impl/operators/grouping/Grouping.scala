@@ -5,9 +5,8 @@ import org.gradoop.spark.model.api.operators.LogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
 class Grouping[L <: GveLayoutType] extends LogicalGraphToLogicalGraphOperator[LogicalGraph[L]] {
-  type LG = LogicalGraph[L]
 
-  override def execute(graph: LG): LG = {
+  override def execute(graph: LogicalGraph[L]): LogicalGraph[L] = {
     val config = graph.config
     val session = config.sparkSession
 

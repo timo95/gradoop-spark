@@ -1,10 +1,10 @@
 package org.gradoop.spark.util
 
 import org.apache.spark.sql.SparkSession
-import org.gradoop.common.model.api.types.ComponentTypes
+import org.gradoop.common.model.api.ComponentTypes
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollectionFactory, LogicalGraphFactory}
-import org.gradoop.spark.model.impl.layouts.EpgmGveLayout
+import org.gradoop.spark.model.impl.gve.EpgmGveLayout
 import org.gradoop.spark.model.impl.types.EpgmGveLayoutType
 
 trait EpgmApp extends ComponentTypes {

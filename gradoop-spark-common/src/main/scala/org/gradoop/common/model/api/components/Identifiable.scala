@@ -1,4 +1,4 @@
-package org.gradoop.common.model.api.elements
+package org.gradoop.common.model.api.components
 
 import org.gradoop.common.model.impl.id.GradoopId
 

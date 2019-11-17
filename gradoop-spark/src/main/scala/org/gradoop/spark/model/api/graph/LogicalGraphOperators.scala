@@ -32,5 +32,4 @@ trait LogicalGraphOperators[L <: GveLayoutType] {
   def verify(implicit ev: L <:< {def verify: LogicalGraph[L]}): Unit = {
     layout.verify
   }*/
-
 }

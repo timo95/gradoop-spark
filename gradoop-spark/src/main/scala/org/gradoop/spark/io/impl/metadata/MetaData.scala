@@ -1,7 +1,7 @@
 package org.gradoop.spark.io.impl.metadata
 
 import org.apache.spark.sql.{Dataset, SparkSession}
-import org.gradoop.common.model.api.elements.Element
+import org.gradoop.common.model.api.gve.Element
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.impl.types.GveLayoutType

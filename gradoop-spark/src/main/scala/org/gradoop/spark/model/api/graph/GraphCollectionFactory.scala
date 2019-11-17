@@ -1,22 +1,14 @@
 package org.gradoop.spark.model.api.graph
 
 import org.apache.spark.sql.Dataset
-import org.gradoop.common.model.api.elements._
+import org.gradoop.common.model.api.gve.{EdgeFactory, GraphHeadFactory, VertexFactory}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.api.layouts.GraphCollectionLayoutFactory
+import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, GveBaseLayoutFactory}
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
 /** Creates a graph collection with a specific layout. */
-class GraphCollectionFactory[L <: GveLayoutType]
-(layoutFactory: GraphCollectionLayoutFactory[L],
- config: GradoopSparkConfig[L])
+class GraphCollectionFactory[L <: GveLayoutType](val layoutFactory: GveBaseLayoutFactory[L] with GraphCollectionLayoutFactory[L], config: GradoopSparkConfig[L])
   extends BaseGraphFactory[L](layoutFactory, config) {
-
-  override def graphHeadFactory: GraphHeadFactory[L#G] = layoutFactory.graphHeadFactory
-
-  override def vertexFactory: VertexFactory[L#V] = layoutFactory.vertexFactory
-
-  override def edgeFactory: EdgeFactory[L#E] = layoutFactory.edgeFactory
 
   /** Creates a graph collection layout from the given datasets.
    *

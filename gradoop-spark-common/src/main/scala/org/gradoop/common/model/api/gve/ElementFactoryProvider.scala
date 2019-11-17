@@ -1,4 +1,4 @@
-package org.gradoop.common.model.api.elements
+package org.gradoop.common.model.api.gve
 
 /**
  * Trait that provides getters for the element factories.

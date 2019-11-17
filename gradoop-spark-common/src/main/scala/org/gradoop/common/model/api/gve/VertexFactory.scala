@@ -1,4 +1,6 @@
-package org.gradoop.common.model.api.elements
+package org.gradoop.common.model.api.gve
+
+import org.gradoop.common.model.api.components._
 
 trait VertexFactory[V <: Vertex] extends ElementFactory[V] {
 
