@@ -3,8 +3,11 @@ package org.gradoop.spark.model.impl.operators
 import org.gradoop.spark.EpgmGradoopSparkTestBase
 import org.gradoop.spark.functions.filter.HasLabel
 import org.gradoop.spark.io.impl.metadata.MetaData
+import org.gradoop.spark.model.api.config.GradoopSparkConfig
 
 class SubgraphTest extends EpgmGradoopSparkTestBase {
+  private val config: GradoopSparkConfig[L] = getConfig
+  import config.implicits._
 
   describe("SocialNetworkGraph") {
     val loader = getSocialNetworkLoader

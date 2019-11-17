@@ -4,10 +4,10 @@ import org.apache.spark.sql.Dataset
 import org.gradoop.common.model.api.elements._
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.layouts.GraphCollectionLayoutFactory
-import org.gradoop.spark.model.impl.types.GveGraphLayout
+import org.gradoop.spark.model.impl.types.GveLayoutType
 
 /** Creates a graph collection with a specific layout. */
-class GraphCollectionFactory[L <: GveGraphLayout]
+class GraphCollectionFactory[L <: GveLayoutType]
 (layoutFactory: GraphCollectionLayoutFactory[L],
  config: GradoopSparkConfig[L])
   extends BaseGraphFactory[L](layoutFactory, config) {
@@ -50,6 +50,7 @@ class GraphCollectionFactory[L <: GveGraphLayout]
    * @return graph collection
    */
   def init(logicalGraph: LogicalGraph[L], logicalGraphs: LogicalGraph[L]*): GraphCollection[L] = {
+    import logicalGraph.config.implicits._
     val graphHeads = logicalGraph.graphHead
     val vertices = logicalGraph.vertices
     val edges = logicalGraph.edges

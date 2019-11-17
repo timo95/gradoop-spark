@@ -2,9 +2,9 @@ package org.gradoop.spark.model.api.graph
 
 import org.gradoop.spark.model.impl.operators.subgraph.{Subgraph, SubgraphSql}
 import org.gradoop.spark.model.impl.operators.verify.Verify
-import org.gradoop.spark.model.impl.types.GveGraphLayout
+import org.gradoop.spark.model.impl.types.GveLayoutType
 
-trait LogicalGraphOperators[L <: GveGraphLayout] {
+trait LogicalGraphOperators[L <: GveLayoutType] {
   this: LogicalGraph[L] =>
 
   def subgraph(vertexFilterFunction: L#V => Boolean, edgeFilterFunction: L#E => Boolean): LogicalGraph[L] =

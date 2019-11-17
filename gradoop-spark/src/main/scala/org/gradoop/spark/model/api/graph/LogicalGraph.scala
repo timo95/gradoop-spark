@@ -1,20 +1,12 @@
 package org.gradoop.spark.model.api.graph
 
-import org.apache.spark.sql.Dataset
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.api.layouts.LogicalGraphLayout
-import org.gradoop.spark.model.impl.types.GveGraphLayout
+import org.gradoop.spark.model.api.layouts.{GveLayout, LogicalGraphLayout}
+import org.gradoop.spark.model.impl.types.GveLayoutType
 
-class LogicalGraph[L <: GveGraphLayout]
-(layout: LogicalGraphLayout[L], config: GradoopSparkConfig[L])
+class LogicalGraph[L <: GveLayoutType]
+(layout: GveLayout[L] with LogicalGraphLayout[L], config: GradoopSparkConfig[L])
   extends BaseGraph[L](layout, config) with LogicalGraphOperators[L] {
-
-  /**
-   * Returns a Dataset containing a single graph head associated with that logical graph.
-   *
-   * @return 1-element Dataset
-   */
-  def graphHead: Dataset[L#G] = layout.graphHead
 
   override def factory: LogicalGraphFactory[L] = config.logicalGraphFactory
 }

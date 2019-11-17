@@ -4,10 +4,10 @@ import org.apache.spark.sql.{Encoder, SparkSession}
 import org.gradoop.common.model.api.types.ComponentTypes
 import org.gradoop.spark.model.api.graph.{GraphCollectionFactory, LogicalGraphFactory}
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, LogicalGraphLayoutFactory}
-import org.gradoop.spark.model.impl.types.GveGraphLayout
+import org.gradoop.spark.model.impl.types.GveLayoutType
 import org.gradoop.spark.util.Implicits
 
-class GradoopSparkConfig[L <: GveGraphLayout]
+class GradoopSparkConfig[L <: GveLayoutType]
 (var logicalGraphFactory: LogicalGraphFactory[L],
  var graphCollectionFactory: GraphCollectionFactory[L])
 (implicit val sparkSession: SparkSession) extends Serializable {
@@ -31,7 +31,7 @@ class GradoopSparkConfig[L <: GveGraphLayout]
 
 object GradoopSparkConfig {
 
-  def create[L <: GveGraphLayout]
+  def create[L <: GveLayoutType]
   (logicalGraphLayoutFactory: LogicalGraphLayoutFactory[L],
    graphCollectionLayoutFactory: GraphCollectionLayoutFactory[L])
   (implicit sparkSession: SparkSession): GradoopSparkConfig[L] = {

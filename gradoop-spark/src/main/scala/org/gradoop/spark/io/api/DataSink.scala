@@ -2,9 +2,15 @@ package org.gradoop.spark.io.api
 
 import org.apache.spark.sql.SaveMode
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
-import org.gradoop.spark.model.impl.types.GveGraphLayout
+import org.gradoop.spark.model.impl.types.GveLayoutType
 
-trait DataSink[L <: GveGraphLayout] {
+trait DataSink[L <: GveLayoutType] {
+
+  /** Writes a logical graph to the data sink.
+   *
+   * @param logicalGraph logical graph
+   */
+  def write(logicalGraph: LogicalGraph[L]): Unit = write(logicalGraph, SaveMode.ErrorIfExists)
 
   /** Writes a logical graph to the data sink with overwrite option.
    *
@@ -13,17 +19,11 @@ trait DataSink[L <: GveGraphLayout] {
    */
   def write(logicalGraph: LogicalGraph[L], saveMode: SaveMode): Unit
 
-  /** Writes a logical graph to the data sink.
-   *
-   * @param logicalGraph logical graph
-   */
-  def write(logicalGraph: LogicalGraph[L]): Unit
-
   /** Writes a graph collection graph to the data sink.
    *
    * @param graphCollection graph collection
    */
-  def write(graphCollection: GraphCollection[L]): Unit
+  def write(graphCollection: GraphCollection[L]): Unit = write(graphCollection, SaveMode.ErrorIfExists)
 
   /** Writes a graph collection to the data sink with overwrite option.
    *

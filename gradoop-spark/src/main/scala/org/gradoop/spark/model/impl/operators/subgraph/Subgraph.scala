@@ -1,26 +1,17 @@
 package org.gradoop.spark.model.impl.operators.subgraph
 
-import org.gradoop.common.model.api.elements.{Edge, GraphHead, Vertex}
 import org.gradoop.common.util.ColumnNames
-import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
+import org.gradoop.spark.model.api.graph.LogicalGraph
 import org.gradoop.spark.model.api.operators.LogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy.Strategy
-import org.gradoop.spark.model.impl.types.GveGraphLayout
+import org.gradoop.spark.model.impl.types.GveLayoutType
 
-private object Strategy extends Enumeration {
-  type Strategy = Value
-  val BOTH, VERTEX_INDUCED, EDGE_INDUCED = Value
-  // TODO: Add EDGE_INDUCED_PROJECT_FIRST?
-}
-
-class Subgraph[L <: GveGraphLayout] private
+class Subgraph[L <: GveLayoutType] private
 (vertexFilterFunction: L#V => Boolean, edgeFilterFunction: L#E => Boolean, strategy: Strategy)
   extends LogicalGraphToLogicalGraphOperator[LogicalGraph[L]] {
 
   override def execute(graph: LogicalGraph[L]): LogicalGraph[L] = {
-    val config = graph.config
-    import config.implicits._
-
+    import graph.config.implicits._
     strategy match {
       case Strategy.BOTH =>
         val filteredVertices = graph.vertices.filter(vertexFilterFunction)
@@ -45,16 +36,22 @@ class Subgraph[L <: GveGraphLayout] private
 
 object Subgraph {
 
-  def both[L <: GveGraphLayout]
+  def both[L <: GveLayoutType]
   (vertexFilterFunction: L#V => Boolean, edgeFilterFunction: L#E => Boolean): Subgraph[L] = {
     new Subgraph(vertexFilterFunction, edgeFilterFunction, Strategy.BOTH)
   }
 
-  def vertexInduced[L <: GveGraphLayout](vertexFilterFunction: L#V => Boolean): Subgraph[L] = {
+  def vertexInduced[L <: GveLayoutType](vertexFilterFunction: L#V => Boolean): Subgraph[L] = {
     new Subgraph(vertexFilterFunction, _ => true, Strategy.VERTEX_INDUCED)
   }
 
-  def edgeIncuded[L <: GveGraphLayout](edgeFilterFunction: L#E => Boolean): Subgraph[L] = {
+  def edgeIncuded[L <: GveLayoutType](edgeFilterFunction: L#E => Boolean): Subgraph[L] = {
     new Subgraph(_ => true, edgeFilterFunction, Strategy.EDGE_INDUCED)
   }
+}
+
+private object Strategy extends Enumeration {
+  type Strategy = Value
+  val BOTH, VERTEX_INDUCED, EDGE_INDUCED = Value
+  // TODO: Add EDGE_INDUCED_PROJECT_FIRST?
 }

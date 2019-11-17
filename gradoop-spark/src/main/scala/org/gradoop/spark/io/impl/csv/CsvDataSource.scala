@@ -6,55 +6,50 @@ import org.gradoop.spark.io.api.DataSource
 import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
-import org.gradoop.spark.model.impl.types.GveGraphLayout
+import org.gradoop.spark.model.impl.types.GveLayoutType
 
-class CsvDataSource[L <: GveGraphLayout]
+class CsvDataSource[L <: GveLayoutType]
 (csvPath: String, config: GradoopSparkConfig[L], metadata: Option[MetaData])
-  extends CsvParser[L](metadata) with DataSource {
-  type G = L#G
-  type V = L#V
-  type E = L#E
-  type LG = LogicalGraph[L]
-  type GC = GraphCollection[L]
+  extends CsvParser[L](metadata) with DataSource[L] {
   import config.implicits._
 
   private val options: Map[String, String] = Map(
     "sep" -> CsvConstants.TOKEN_DELIMITER,
     "quote" -> null) // default is '"' but we don't support quoting and don't escape quotes
 
-  override def readLogicalGraph: LG = config.logicalGraphFactory.init(readGraphHeads, readVertices, readEdges)
+  override def readLogicalGraph: LogicalGraph[L] = config.logicalGraphFactory.init(readGraphHeads, readVertices, readEdges)
 
-  override def readGraphCollection: GC = config.graphCollectionFactory.init(readGraphHeads, readVertices, readEdges)
+  override def readGraphCollection: GraphCollection[L] = config.graphCollectionFactory.init(readGraphHeads, readVertices, readEdges)
 
-  def readGraphHeads: Dataset[G] = {
+  def readGraphHeads: Dataset[L#G] = {
     config.sparkSession.read
       .options(options)
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.GRAPH_HEAD_FILE)
       .map(rowToGraphHead)
   }
 
-  def readVertices: Dataset[V] = {
+  def readVertices: Dataset[L#V] = {
     config.sparkSession.read
       .options(options)
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.VERTEX_FILE)
       .map(rowToVertex)
   }
 
-  def readEdges: Dataset[E] = {
+  def readEdges: Dataset[L#E] = {
     config.sparkSession.read
       .options(options)
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.EDGE_FILE)
       .map(rowToEdge)
   }
 
-  def rowToGraphHead(row: Row): G = {
+  def rowToGraphHead(row: Row): L#G = {
     config.logicalGraphFactory.graphHeadFactory(
       parseId(row.getString(0)),
       parseLabels(row.getString(1)),
       parseProperties(row.getString(2)))
   }
 
-  def rowToVertex(row: Row): V = {
+  def rowToVertex(row: Row): L#V = {
     config.logicalGraphFactory.vertexFactory(
       parseId(row.getString(0)),
       parseLabels(row.getString(2)),
@@ -62,7 +57,7 @@ class CsvDataSource[L <: GveGraphLayout]
       parseGraphIds(row.getString(1)))
   }
 
-  def rowToEdge(row: Row): E = {
+  def rowToEdge(row: Row): L#E = {
     config.logicalGraphFactory.edgeFactory(
       parseId(row.getString(0)),
       parseLabels(row.getString(4)),
@@ -75,12 +70,12 @@ class CsvDataSource[L <: GveGraphLayout]
 
 object CsvDataSource {
 
-  def apply[L <: GveGraphLayout]
+  def apply[L <: GveLayoutType]
   (csvPath: String, config: GradoopSparkConfig[L]): CsvDataSource[L] = {
     new CsvDataSource(csvPath, config, None)
   }
 
-  def apply[L <: GveGraphLayout]
+  def apply[L <: GveLayoutType]
   (csvPath: String, config: GradoopSparkConfig[L], metaData: MetaData): CsvDataSource[L] = {
     new CsvDataSource(csvPath, config, Some(metaData))
   }

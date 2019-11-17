@@ -3,10 +3,10 @@ package org.gradoop.spark.io.impl.csv
 import org.gradoop.common.model.api.elements._
 import org.gradoop.spark.io.impl.csv.CsvConstants.ComposeFunction
 import org.gradoop.spark.io.impl.metadata.MetaData
-import org.gradoop.spark.model.impl.types.GveGraphLayout
+import org.gradoop.spark.model.impl.types.GveLayoutType
 import org.gradoop.spark.util.StringEscaper
 
-abstract class CsvComposer[L <: GveGraphLayout](var metadata: Option[MetaData])
+abstract class CsvComposer[L <: GveLayoutType](var metadata: Option[MetaData])
   extends Serializable {
 
   def graphHeadComposeFunctions: Array[ComposeFunction[L#G]]

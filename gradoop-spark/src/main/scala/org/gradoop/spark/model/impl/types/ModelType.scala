@@ -1,5 +1,5 @@
 package org.gradoop.spark.model.impl.types
 
-trait GraphModel {
-
+trait ModelType {
+  type M <: ModelType
 }

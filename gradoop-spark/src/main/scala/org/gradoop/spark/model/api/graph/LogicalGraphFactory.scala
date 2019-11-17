@@ -5,10 +5,10 @@ import org.gradoop.common.model.api.elements._
 import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.layouts.LogicalGraphLayoutFactory
-import org.gradoop.spark.model.impl.types.GveGraphLayout
+import org.gradoop.spark.model.impl.types.GveLayoutType
 
 /** Creates a logical graph with a specific layout. */
-class LogicalGraphFactory[L <: GveGraphLayout]
+class LogicalGraphFactory[L <: GveLayoutType]
 (layoutFactory: LogicalGraphLayoutFactory[L],
  config: GradoopSparkConfig[L])
   extends BaseGraphFactory[L](layoutFactory, config) {

@@ -9,5 +9,4 @@ trait ComponentTypes {
   type IdSet = Set[Id]
   type PV = PropertyValue
   type Properties = Map[String, PV]//String
-  type EncodedPropertyValue = Array[Byte]
 }

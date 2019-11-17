@@ -2,10 +2,10 @@ package org.gradoop.spark
 
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.impl.layouts.EpgmGveLayout
-import org.gradoop.spark.model.impl.types.{EpgmGveGraphLayout, OldEpgmModel}
+import org.gradoop.spark.model.impl.types.EpgmGveLayoutType
 
-trait EpgmGradoopSparkTestBase extends GradoopSparkTestBase[EpgmGveGraphLayout] {
-  type L = EpgmGveGraphLayout
+trait EpgmGradoopSparkTestBase extends GradoopSparkTestBase[EpgmGveLayoutType] {
+  type L = EpgmGveLayoutType
 
   private var gveConfig: Option[GradoopSparkConfig[L]] = None
 

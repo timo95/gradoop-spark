@@ -12,10 +12,10 @@ object EpgmGveLayout extends EpgmBaseLayoutFactory
   with LogicalGraphLayoutFactory[L]
   with GraphCollectionLayoutFactory[L] {
 
-  override def createLogicalGraph(layout: LogicalGraphLayout[L], config: GradoopSparkConfig[L]):
+  override def createLogicalGraph(layout: GveLayout[L] with LogicalGraphLayout[L], config: GradoopSparkConfig[L]):
   LogicalGraph[L] = new LogicalGraph[L](layout, config)
 
-  override def createGraphCollection(layout: GraphCollectionLayout[L], config:
+  override def createGraphCollection(layout: GveLayout[L] with GraphCollectionLayout[L], config:
   GradoopSparkConfig[L]): GraphCollection[L] = new GraphCollection[L](layout, config)
 
   /** Creates a Epgm Gve layout from the given Datasets.

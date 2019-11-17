@@ -5,10 +5,10 @@ import java.io.InputStream
 import org.gradoop.common.util.{AsciiGraphLoader, GradoopConstants}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
-import org.gradoop.spark.model.impl.types.GveGraphLayout
+import org.gradoop.spark.model.impl.types.GveLayoutType
 
 
-class SparkAsciiGraphLoader[L <: GveGraphLayout]
+class SparkAsciiGraphLoader[L <: GveLayoutType]
 (config: GradoopSparkConfig[L], loader: AsciiGraphLoader[L#G, L#V, L#E]) {
 
   /** Appends the given ASCII GDL String to the database.
@@ -154,7 +154,7 @@ object SparkAsciiGraphLoader {
    *
    * @param asciiGraphs GDL string
    */
-  def fromString[L <: GveGraphLayout]
+  def fromString[L <: GveLayoutType]
   (config: GradoopSparkConfig[L], asciiGraphs: String): SparkAsciiGraphLoader[L] = {
     val loader = AsciiGraphLoader.fromString(config.logicalGraphFactory, asciiGraphs)
     new SparkAsciiGraphLoader(config, loader)
@@ -164,7 +164,7 @@ object SparkAsciiGraphLoader {
    *
    * @param fileName GDL file name
    */
-  def fromFile[L <: GveGraphLayout]
+  def fromFile[L <: GveLayoutType]
   (config: GradoopSparkConfig[L], fileName: String): SparkAsciiGraphLoader[L] = {
     val loader = AsciiGraphLoader.fromFile(config.logicalGraphFactory, fileName)
     new SparkAsciiGraphLoader(config, loader)
@@ -174,7 +174,7 @@ object SparkAsciiGraphLoader {
    *
    * @param stream GDL stream
    */
-  def fromStream[L <: GveGraphLayout]
+  def fromStream[L <: GveLayoutType]
   (config: GradoopSparkConfig[L], stream: InputStream): SparkAsciiGraphLoader[L] = {
     val loader = AsciiGraphLoader.fromStream(config.logicalGraphFactory, stream)
     new SparkAsciiGraphLoader(config, loader)

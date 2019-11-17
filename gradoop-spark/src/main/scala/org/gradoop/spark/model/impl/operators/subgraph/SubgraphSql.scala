@@ -6,13 +6,14 @@ import org.gradoop.spark.functions.filter.FilterStrings
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.api.operators.LogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy.Strategy
-import org.gradoop.spark.model.impl.types.GveGraphLayout
+import org.gradoop.spark.model.impl.types.GveLayoutType
 
-class SubgraphSql[L <: GveGraphLayout] private
+class SubgraphSql[L <: GveLayoutType] private
 (vertexFilterExpression: String, edgeFilterExpression: String, strategy: Strategy)
   extends LogicalGraphToLogicalGraphOperator[LogicalGraph[L]] {
 
   override def execute(graph: LogicalGraph[L]): LogicalGraph[L] = {
+    import graph.config.implicits._
     strategy match {
       case Strategy.BOTH =>
         val filteredVertices = graph.vertices.filter(vertexFilterExpression)
@@ -24,7 +25,6 @@ class SubgraphSql[L <: GveGraphLayout] private
         graph.factory.init(graph.graphHead, filteredVertices, graph.edges).verify // verify induces the edges
 
       case Strategy.EDGE_INDUCED =>
-        import graph.config.implicits._
         val filteredEdges = graph.edges.filter(edgeFilterExpression)
         val inducedVertices = graph.vertices
           .joinWith(filteredEdges, graph.vertices.id isin (filteredEdges.sourceId, filteredEdges.targetId)) // TODO strings -> constants
@@ -37,16 +37,16 @@ class SubgraphSql[L <: GveGraphLayout] private
 
 object SubgraphSql {
 
-  def both[L <: GveGraphLayout]
+  def both[L <: GveLayoutType]
   (vertexFilterExpression: String, edgeFilterExpression: String): SubgraphSql[L] = {
     new SubgraphSql(vertexFilterExpression, edgeFilterExpression, Strategy.BOTH)
   }
 
-  def vertexInduced[L <: GveGraphLayout](vertexFilterExpression: String): SubgraphSql[L] = {
+  def vertexInduced[L <: GveLayoutType](vertexFilterExpression: String): SubgraphSql[L] = {
     new SubgraphSql(vertexFilterExpression, FilterStrings.any, Strategy.VERTEX_INDUCED)
   }
 
-  def edgeIncuded[L <: GveGraphLayout](edgeFilterExpression: String): SubgraphSql[L] = {
+  def edgeIncuded[L <: GveLayoutType](edgeFilterExpression: String): SubgraphSql[L] = {
     new SubgraphSql(FilterStrings.any, edgeFilterExpression, Strategy.EDGE_INDUCED)
   }
 }
