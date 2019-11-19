@@ -1,13 +1,13 @@
 package org.gradoop.spark.model.api.graph
 
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.api.layouts.{GveLayout, LogicalGraphLayout}
+import org.gradoop.spark.model.api.layouts.{GveBaseLayoutFactory, GveLayout, LogicalGraphLayout, LogicalGraphLayoutFactory}
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
 class LogicalGraph[L <: GveLayoutType](layout: GveLayout[L] with LogicalGraphLayout[L], config: GradoopSparkConfig[L])
   extends BaseGraph[L](layout, config) with LogicalGraphOperators[L] {
 
-  override def factory: LogicalGraphFactory[L] = config.logicalGraphFactory
+  override def factory: GveBaseLayoutFactory[L, LogicalGraph[L]] with LogicalGraphLayoutFactory[L] = config.logicalGraphFactory
 }
 
 // ---------------------------

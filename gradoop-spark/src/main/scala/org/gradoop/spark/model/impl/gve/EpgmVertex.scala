@@ -4,7 +4,6 @@ import org.apache.spark.sql.Encoder
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.gradoop.common.model.api.gve.{Vertex, VertexFactory}
 import org.gradoop.common.model.impl.id.GradoopId
-import org.gradoop.spark.model.impl.elements.{Id, IdSet, Label, Properties}
 
 final case class EpgmVertex(var id: Id, var label: Label, var properties: Properties, var graphIds: IdSet)
   extends Vertex

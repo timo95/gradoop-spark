@@ -1,18 +1,10 @@
 package org.gradoop.spark
 
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.impl.gve.EpgmGveLayout
 import org.gradoop.spark.model.impl.types.EpgmGveLayoutType
+import org.gradoop.spark.util.EpgmConfigs
 
-trait EpgmGradoopSparkTestBase extends GradoopSparkTestBase[EpgmGveLayoutType] {
-  type L = EpgmGveLayoutType
+trait EpgmGradoopSparkTestBase extends GradoopSparkTestBase[EpgmGveLayoutType] with EpgmConfigs {
 
-  private var gveConfig: Option[GradoopSparkConfig[L]] = None
-
-  protected def getGveConfig: GradoopSparkConfig[L] = {
-    if (gveConfig.isEmpty) gveConfig = Some(GradoopSparkConfig.create(EpgmGveLayout, EpgmGveLayout))
-    gveConfig.get
-  }
-
-  override def getConfig: GradoopSparkConfig[L] = getGveConfig
+  override def getConfig: GradoopSparkConfig[L] = gveConfig
 }

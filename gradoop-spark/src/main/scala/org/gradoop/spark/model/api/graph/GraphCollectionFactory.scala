@@ -1,70 +1,13 @@
 package org.gradoop.spark.model.api.graph
 
-import org.apache.spark.sql.Dataset
-import org.gradoop.common.model.api.gve.{EdgeFactory, GraphHeadFactory, VertexFactory}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, GveBaseLayoutFactory}
+import org.gradoop.spark.model.api.layouts.GveLayout
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
 /** Creates a graph collection with a specific layout. */
-class GraphCollectionFactory[L <: GveLayoutType](val layoutFactory: GveBaseLayoutFactory[L] with GraphCollectionLayoutFactory[L], config: GradoopSparkConfig[L])
-  extends BaseGraphFactory[L](layoutFactory, config) {
+class GraphCollectionFactory[L <: GveLayoutType] extends BaseGraphFactory[L, GraphCollection[L]] {
 
-  /** Creates a graph collection layout from the given datasets.
-   *
-   * @param graphHeads GraphHead Dataset
-   * @param vertices   Vertex Dataset
-   * @param edges      Edge Dataset
-   * @return Graph collection
-   */
-  def init(graphHeads: Dataset[L#G], vertices: Dataset[L#V], edges: Dataset[L#E]): GraphCollection[L] = {
-    layoutFactory.createGraphCollection(layoutFactory(graphHeads, vertices, edges), config)
-  }
-
-  /** Creates a graph collection from the given collections.
-   *
-   * @param graphHeads Graph Head collection
-   * @param vertices   Vertex collection
-   * @param edges      Edge collection
-   * @return Graph collection
-   */
-  def init(graphHeads: Iterable[L#G], vertices: Iterable[L#V], edges: Iterable[L#E]): GraphCollection[L] = {
-    val graphHeadDS: Dataset[L#G] = createDataset[L#G](graphHeads)
-    val vertexDS: Dataset[L#V] = createDataset[L#V](vertices)
-    val edgeDS: Dataset[L#E] = createDataset[L#E](edges)
-
-    init(graphHeadDS, vertexDS, edgeDS)
-  }
-
-  /** Creates a graph collection from multiple given logical graphs.
-   *
-   * @param logicalGraphs input graphs
-   * @return graph collection
-   */
-  def init(logicalGraph: LogicalGraph[L], logicalGraphs: LogicalGraph[L]*): GraphCollection[L] = {
-    import logicalGraph.config.implicits._
-    val graphHeads = logicalGraph.graphHead
-    val vertices = logicalGraph.vertices
-    val edges = logicalGraph.edges
-
-    for (logicalGraph: LogicalGraph[L] <- logicalGraphs) {
-      graphHeads.union(logicalGraph.graphHead)
-      vertices.union(logicalGraph.vertices)
-      edges.union(logicalGraph.edges)
-    }
-
-    init(graphHeads, vertices, edges)
-  }
-
-  /** Creates an empty graph collection.
-   *
-   * @return empty graph collection
-   */
-  def empty: GraphCollection[L] = {
-    var graphHeads: Dataset[L#G] = session.emptyDataset[L#G]
-    var vertices: Dataset[L#V] = session.emptyDataset[L#V]
-    var edges: Dataset[L#E] = session.emptyDataset[L#E]
-
-    init(graphHeads, vertices, edges)
+  override def createGraph(layout: GveLayout[L], config: GradoopSparkConfig[L]): GraphCollection[L] = {
+    new GraphCollection[L](layout, config)
   }
 }

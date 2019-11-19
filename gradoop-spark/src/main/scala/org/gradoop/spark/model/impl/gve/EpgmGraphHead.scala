@@ -4,7 +4,6 @@ import org.apache.spark.sql.Encoder
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.gradoop.common.model.api.gve.{GraphHead, GraphHeadFactory}
 import org.gradoop.common.model.impl.id.GradoopId
-import org.gradoop.spark.model.impl.elements.{Id, Label, PV, Properties}
 
 final case class EpgmGraphHead(var id: Id, var label: Label, var properties: Properties) extends GraphHead
 
