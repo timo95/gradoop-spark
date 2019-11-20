@@ -1,7 +1,6 @@
-package org.gradoop.spark.io.csv.impl
+package org.gradoop.spark.io.impl.csv
 
 import org.gradoop.spark.EpgmGradoopSparkTestBase
-import org.gradoop.spark.io.impl.csv.CsvDataSource
 
 class CsvDataSourceTest extends EpgmGradoopSparkTestBase {
   private val config = getConfig

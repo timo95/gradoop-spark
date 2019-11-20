@@ -1,7 +1,6 @@
-package org.gradoop.spark.io.csv.impl
+package org.gradoop.spark.io.impl.csv
 
 import org.gradoop.spark.EpgmGradoopSparkTestBase
-import org.gradoop.spark.io.impl.csv.CsvMetaDataSource
 import org.gradoop.spark.io.impl.metadata.PropertyMetaData
 
 class CsvMetaDataSourceTest extends EpgmGradoopSparkTestBase {
@@ -9,7 +8,7 @@ class CsvMetaDataSourceTest extends EpgmGradoopSparkTestBase {
 
   describe("graph collection metadata") {
     val path = getClass.getResource("/data/csv/input_graph_collection").getFile
-    val metaDataSource = new CsvMetaDataSource(path, config)
+    val metaDataSource = new CsvMetaDataSource(path)
 
     val metaData = metaDataSource.read
 

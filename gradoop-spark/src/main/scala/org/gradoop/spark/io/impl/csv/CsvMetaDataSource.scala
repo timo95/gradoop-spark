@@ -4,11 +4,9 @@ import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.gradoop.spark.io.api.MetaDataSource
 import org.gradoop.spark.io.impl.metadata.{ElementMetaData, MetaData, PropertyMetaData}
-import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.impl.types.GveLayoutType
 import org.gradoop.spark.util.StringEscaper
 
-class CsvMetaDataSource[L <: GveLayoutType](csvPath: String, config: GradoopSparkConfig[L])(implicit session: SparkSession)
+class CsvMetaDataSource(csvPath: String)(implicit session: SparkSession)
   extends MetaDataSource {
 
   private val options: Map[String, String] = Map(
@@ -21,7 +19,7 @@ class CsvMetaDataSource[L <: GveLayoutType](csvPath: String, config: GradoopSpar
     StructField("properties", DataTypes.StringType, true)))
 
   override def read: MetaData = {
-    val dataFrame = config.sparkSession.read
+    val dataFrame = session.read
       .options(options)
       .schema(schema)
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.METADATA_FILE)
@@ -31,11 +29,11 @@ class CsvMetaDataSource[L <: GveLayoutType](csvPath: String, config: GradoopSpar
       getElementMetaData(dataFrame, CsvConstants.EDGE_TYPE))
   }
 
-  private def getElementMetaData(dataFrame: DataFrame, typeString: String): Dataset[ElementMetaData] = {
+  private def getElementMetaData(dataFrame: DataFrame, elementType: String): Dataset[ElementMetaData] = {
     import session.implicits._
 
     dataFrame
-      .filter(s"type = '$typeString'")
+      .filter(s"type = '$elementType'")
       .select("label", "properties")
       .map(rowToElementMetaData)
   }
@@ -45,9 +43,9 @@ class CsvMetaDataSource[L <: GveLayoutType](csvPath: String, config: GradoopSpar
     val propertyMetaData =
       if(row.getString(1) == null) Array.empty[PropertyMetaData]
       else StringEscaper.split(row.getString(1), CsvConstants.LIST_DELIMITER)
-        .map(string => StringEscaper.split(string, CsvConstants.PROPERTY_TOKEN_DELIMITER))
-        .map(array => PropertyMetaData(StringEscaper.unescape(array(0)), array(1)))
+        .map(string => StringEscaper.split(string, CsvConstants.PROPERTY_TOKEN_DELIMITER, 2))
+        .map(array => PropertyMetaData(StringEscaper.unescape(array(0)), array(1).toLowerCase))
 
-    ElementMetaData(label, propertyMetaData)
+    ElementMetaData(label, propertyMetaData) // TODO: complex types
   }
 }

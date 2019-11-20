@@ -1,23 +1,34 @@
 package org.gradoop.spark.io.impl.csv
 
 import org.apache.spark.sql.{Dataset, Row}
+import org.gradoop.common.properties.PropertyValue
+import org.gradoop.spark.functions.filter.FilterStrings
 import org.gradoop.spark.io.api.DataSource
-import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
-class CsvDataSource[L <: GveLayoutType](csvPath: String, config: GradoopSparkConfig[L], metadata: Option[MetaData])
-  extends CsvParser[L](metadata) with DataSource[L] {
+class CsvDataSource[L <: GveLayoutType](csvPath: String, config: GradoopSparkConfig[L])
+  extends CsvParser[L] with DataSource[L] {
   import config.implicits._
 
   private val options: Map[String, String] = Map(
     "sep" -> CsvConstants.TOKEN_DELIMITER,
     "quote" -> null) // default is '"' but we don't support quoting and don't escape quotes
 
-  override def readLogicalGraph: LogicalGraph[L] = config.logicalGraphFactory.init(readGraphHeads, readVertices, readEdges)
+  private val metaData = new CsvMetaDataSource(csvPath).read
 
-  override def readGraphCollection: GraphCollection[L] = config.graphCollectionFactory.init(readGraphHeads, readVertices, readEdges)
+  private val graphHeadMetaData = metaData.graphHeadMetaData.collect()
+  private val vertexMetaData = metaData.vertexMetaData.collect()
+  private val edgeMetaData = metaData.edgeMetaData.collect()
+
+  override def readLogicalGraph: LogicalGraph[L] = {
+    config.logicalGraphFactory.init(readGraphHeads, readVertices, readEdges)
+  }
+
+  override def readGraphCollection: GraphCollection[L] = {
+    config.graphCollectionFactory.init(readGraphHeads, readVertices, readEdges)
+  }
 
   def readGraphHeads: Dataset[L#G] = {
     config.sparkSession.read
@@ -41,40 +52,38 @@ class CsvDataSource[L <: GveLayoutType](csvPath: String, config: GradoopSparkCon
   }
 
   def rowToGraphHead(row: Row): L#G = {
+    val label = parseLabel(row.getString(1))
+    val elementMetaData = graphHeadMetaData.filter(m => m.label == label)
     config.logicalGraphFactory.graphHeadFactory(
       parseId(row.getString(0)),
-      parseLabels(row.getString(1)),
-      parseProperties(row.getString(2)))
+      label,
+      if(elementMetaData.isEmpty) Map.empty[String, PropertyValue] else parseProperties(row.getString(2), elementMetaData(0))) // TODO property parsing with sql - join metadata and transform
   }
 
   def rowToVertex(row: Row): L#V = {
+    val label = parseLabel(row.getString(2))
+    val elementMetaData = vertexMetaData.filter(m => m.label == label)
     config.logicalGraphFactory.vertexFactory(
       parseId(row.getString(0)),
-      parseLabels(row.getString(2)),
-      parseProperties(row.getString(3)),
+      label,
+      if(elementMetaData.isEmpty) Map.empty[String, PropertyValue] else parseProperties(row.getString(3), elementMetaData(0)),
       parseGraphIds(row.getString(1)))
   }
 
   def rowToEdge(row: Row): L#E = {
+    val label = parseLabel(row.getString(4))
+    val elementMetaData = edgeMetaData.filter(m => m.label == label)
     config.logicalGraphFactory.edgeFactory(
       parseId(row.getString(0)),
-      parseLabels(row.getString(4)),
+      label,
       parseId(row.getString(2)), // sourceId
       parseId(row.getString(3)), // targetId
-      parseProperties(row.getString(5)),
+      if(elementMetaData.isEmpty) Map.empty[String, PropertyValue] else parseProperties(row.getString(5), elementMetaData(0)),
       parseGraphIds(row.getString(1)))
   }
 }
 
 object CsvDataSource {
 
-  def apply[L <: GveLayoutType]
-  (csvPath: String, config: GradoopSparkConfig[L]): CsvDataSource[L] = {
-    new CsvDataSource(csvPath, config, None)
-  }
-
-  def apply[L <: GveLayoutType]
-  (csvPath: String, config: GradoopSparkConfig[L], metaData: MetaData): CsvDataSource[L] = {
-    new CsvDataSource(csvPath, config, Some(metaData))
-  }
+  def apply[L <: GveLayoutType](csvPath: String, config: GradoopSparkConfig[L]): CsvDataSource[L] = new CsvDataSource(csvPath, config)
 }

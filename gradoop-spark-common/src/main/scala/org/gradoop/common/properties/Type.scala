@@ -20,7 +20,12 @@ object Type {
   case object Short extends Type("short", 0x0e)
   case object Set extends Type("set", 0x0f)
 
-  def apply(typeString: String): Type = {
+  // Complex types
+  case class TypedList(elementType: Type) extends Type(s"${List.string}:${elementType.string}", List.byte)
+  case class TypedSet(elementType: Type) extends Type(s"${Set.string}:${elementType.string}", Set.byte)
+  case class TypedMap(keyType: Type, valueType: Type) extends Type(s"${Map.string}:${keyType.string}:${valueType.string}", Map.byte)
+
+  def apply(typeString: String): Type = { // TODO for complex types
     typeString.toLowerCase match {
       case Type.Null.string => Type.Null
       case Type.Boolean.string => Type.Boolean
