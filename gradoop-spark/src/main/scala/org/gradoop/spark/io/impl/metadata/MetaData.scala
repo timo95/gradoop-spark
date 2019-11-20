@@ -6,9 +6,9 @@ import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
-class MetaData(graphHeadMetaData: Dataset[ElementMetaData],
-               vertexMetaData: Dataset[ElementMetaData],
-               edgeMetaData: Dataset[ElementMetaData]) {
+class MetaData(val graphHeadMetaData: Dataset[ElementMetaData],
+               val vertexMetaData: Dataset[ElementMetaData],
+               val edgeMetaData: Dataset[ElementMetaData]) {
 }
 
 object MetaData {

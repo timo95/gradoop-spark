@@ -73,4 +73,18 @@ object CsvConstants {
 
   /** Characters to be escaped in csv strings. */
   val ESCAPED_CHARS: Set[Char] = Set[Char]('\\', ';', ',', '|', ':', '\n', '=')
+
+  // CSV MetaData
+
+  /** Used to separate the property name from the type */
+  val PROPERTY_TOKEN_DELIMITER = ":"
+
+  /** Used to tag a graph head entity. */
+  val GRAPH_TYPE = "g"
+
+  /** Used to tag a vertex entity. */
+  val VERTEX_TYPE = "v"
+
+  /** Used to tag an edge entity. */
+  val EDGE_TYPE = "e"
 }

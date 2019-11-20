@@ -8,7 +8,8 @@ class CsvDataSourceTest extends EpgmGradoopSparkTestBase {
   import config.implicits._
 
   describe("logical graph with extended properties") {
-    val csvDataSource = CsvDataSource(getClass.getResource("/data/csv/input_extended_properties").getFile, config)
+    val path = getClass.getResource("/data/csv/input_extended_properties").getFile
+    val csvDataSource = CsvDataSource(path, config)
     val graph = csvDataSource.readLogicalGraph
 
     it("correct number of elements") {

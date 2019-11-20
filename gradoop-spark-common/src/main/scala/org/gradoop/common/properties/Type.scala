@@ -21,7 +21,7 @@ object Type {
   case object Set extends Type("set", 0x0f)
 
   def apply(typeString: String): Type = {
-    typeString match {
+    typeString.toLowerCase match {
       case Type.Null.string => Type.Null
       case Type.Boolean.string => Type.Boolean
       case Type.Integer.string => Type.Integer
