@@ -19,7 +19,7 @@ class CsvDataSource[L <: GveLayoutType](csvPath: String, config: GradoopSparkCon
   private val metaData = new CsvMetaDataSource(csvPath).read
 
   private val graphHeadMetaData = metaData.graphHeadMetaData.collect()
-  private val vertexMetaData = metaData.vertexMetaData.collect()
+  private val vertexMetaData = metaData.vertexMetaData.collect() // TODO: property parsing with sql - join metadata and transform
   private val edgeMetaData = metaData.edgeMetaData.collect()
 
   override def readLogicalGraph: LogicalGraph[L] = {
@@ -57,7 +57,7 @@ class CsvDataSource[L <: GveLayoutType](csvPath: String, config: GradoopSparkCon
     config.logicalGraphFactory.graphHeadFactory(
       parseId(row.getString(0)),
       label,
-      if(elementMetaData.isEmpty) Map.empty[String, PropertyValue] else parseProperties(row.getString(2), elementMetaData(0))) // TODO property parsing with sql - join metadata and transform
+      if(elementMetaData.isEmpty) Map.empty[String, PropertyValue] else parseProperties(row.getString(2), elementMetaData(0)))
   }
 
   def rowToVertex(row: Row): L#V = {

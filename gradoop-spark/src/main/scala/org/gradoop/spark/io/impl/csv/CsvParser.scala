@@ -2,9 +2,8 @@ package org.gradoop.spark.io.impl.csv
 
 import java.time.{LocalDate, LocalDateTime, LocalTime}
 
-import org.apache.spark.sql.Dataset
 import org.gradoop.common.model.impl.id.GradoopId
-import org.gradoop.common.properties.{PropertyValue, Type}
+import org.gradoop.common.properties.{ComplexType, PropertyValue, Type}
 import org.gradoop.spark.io.impl.metadata.ElementMetaData
 import org.gradoop.spark.model.impl.types.GveLayoutType
 import org.gradoop.spark.util.StringEscaper
@@ -33,6 +32,7 @@ abstract protected class CsvParser[L <: GveLayoutType] extends Serializable {
       if(propertyStrings.length != properties.length) println(s"Number of Properties for '${metaData.label}' does not fit metadata. Parsed Properties might be corrupt.") //TODO: Add logging
       val length = propertyStrings.length min properties.length // only parse when metadata exists for it
       (0 until length)
+        .filter(i => !propertyStrings(i).equals("")) // empty value => no property value
         .map(i => (properties(i).key, parsePropertyValue(propertyStrings(i), properties(i).typeString)))
         .toMap
     }
@@ -49,14 +49,18 @@ abstract protected class CsvParser[L <: GveLayoutType] extends Serializable {
       case Type.String.string => StringEscaper.unescape(valueString)
       case Type.BigDecimal.string => BigDecimal(valueString)
       case Type.GradoopId.string => GradoopId.fromString(valueString)
-      //case Type.Map.string =>
-      //case Type.List.string =>
       case Type.Date.string => LocalDate.parse(valueString)
       case Type.Time.string => LocalTime.parse(valueString)
       case Type.DateTime.string => LocalDateTime.parse(valueString)
       case Type.Short.string => java.lang.Short.parseShort(valueString)
-      //case Type.Set.string =>
-      case _ => throw new IllegalArgumentException("Type not yet supported: " + typeString) // TODO complex types
+      case list if list.startsWith(Type.List.string) => complexParser(valueString, ComplexType(list))
+      case set if set.startsWith(Type.Set.string) => complexParser(valueString, ComplexType(set))
+      case map if map.startsWith(Type.Map.string) => complexParser(valueString, ComplexType(map))
+      case _ => throw new IllegalArgumentException("Type not yet supported: " + typeString)
     })
+  }
+
+  private def complexParser(valueString: String, complexType: ComplexType): PropertyValue = {
+    PropertyValue(valueString) // TODO parse
   }
 }

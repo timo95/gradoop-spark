@@ -1,8 +1,14 @@
 package org.gradoop.common.properties
 
+import org.gradoop.common.properties.Type.{List, Map, Set, TYPE_TOKEN_DELIMITER}
+
 sealed abstract class Type(val string: String, val byte: Byte)
 
 object Type {
+
+  /** Used to separate external type from internal types */
+  val TYPE_TOKEN_DELIMITER = ":"
+
   case object Null extends Type("null", 0x00)
   case object Boolean extends Type("boolean", 0x01)
   case object Integer extends Type("int", 0x02)
@@ -19,11 +25,6 @@ object Type {
   case object DateTime extends Type("localdatetime", 0x0d)
   case object Short extends Type("short", 0x0e)
   case object Set extends Type("set", 0x0f)
-
-  // Complex types
-  case class TypedList(elementType: Type) extends Type(s"${List.string}:${elementType.string}", List.byte)
-  case class TypedSet(elementType: Type) extends Type(s"${Set.string}:${elementType.string}", Set.byte)
-  case class TypedMap(keyType: Type, valueType: Type) extends Type(s"${Map.string}:${keyType.string}:${valueType.string}", Map.byte)
 
   def apply(typeString: String): Type = { // TODO for complex types
     typeString.toLowerCase match {
@@ -43,7 +44,7 @@ object Type {
       case Type.DateTime.string => Type.DateTime
       case Type.Short.string => Type.Short
       case Type.Set.string => Type.Set
-      case _ => throw new IllegalArgumentException("Type could not be found: " + typeString)
+      case _ => ComplexType(typeString)
     }
   }
 
@@ -66,6 +67,27 @@ object Type {
       case Type.Short.byte => Type.Short
       case Type.Set.byte => Type.Set
       case _ => throw new IllegalArgumentException("Type could not be found: " + typeByte)
+    }
+  }
+}
+
+sealed abstract class ComplexType(string: String, val mainType: Type) extends Type(string, mainType.byte)
+
+object ComplexType {
+
+  // Complex types
+  case class TypedList(elementType: Type) extends ComplexType(s"${List.string}:${elementType.string}", List)
+  case class TypedSet(elementType: Type) extends ComplexType(s"${Set.string}:${elementType.string}", Set)
+  case class TypedMap(keyType: Type, valueType: Type) extends ComplexType(s"${Map.string}:${keyType.string}:${valueType.string}", Map)
+
+  def apply(typeString: String): ComplexType = {
+    typeString match {
+      case list if list.startsWith(List.string) => TypedList(Type(list.substring(List.string.length + 1)))
+      case set if set.startsWith(Set.string) => TypedSet(Type(set.substring(Set.string.length + 1)))
+      case map if map.startsWith(Map.string) =>
+        val tokens = map.split(TYPE_TOKEN_DELIMITER)
+        TypedMap(Type(tokens(1)), Type(tokens(2)))
+      case _ => throw new IllegalArgumentException("Type could not be found: " + typeString)
     }
   }
 }
