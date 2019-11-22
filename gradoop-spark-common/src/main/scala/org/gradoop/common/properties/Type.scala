@@ -1,32 +1,46 @@
 package org.gradoop.common.properties
 
-import org.gradoop.common.properties.Type.{List, Map, Set, TYPE_TOKEN_DELIMITER}
+import org.gradoop.common.properties.Type.{List, Map, Set, TypedList, TypedMap, TypedSet}
 
-sealed abstract class Type(val string: String, val byte: Byte)
+sealed abstract class Type {
+  def string: String
+  def byte: Byte
+}
+
+sealed abstract class PrimitiveType(val string: String, val byte: Byte) extends Type
+
+sealed abstract class CompoundType(val string: String, val mainType: Type) extends Type {
+  override def byte: Byte = mainType.byte
+}
 
 object Type {
+  // Primitive types
+  case object Null extends PrimitiveType("null", 0x00)
+  case object Boolean extends PrimitiveType("boolean", 0x01)
+  case object Integer extends PrimitiveType("int", 0x02)
+  case object Long extends PrimitiveType("long", 0x03)
+  case object Float extends PrimitiveType("float", 0x04)
+  case object Double extends PrimitiveType("double", 0x05)
+  case object String extends PrimitiveType("string", 0x06)
+  case object BigDecimal extends PrimitiveType("bigdecimal", 0x07)
+  case object GradoopId extends PrimitiveType("gradoopid", 0x08)
+  case object Map extends PrimitiveType("map", 0x09)
+  case object List extends PrimitiveType("list", 0x0a)
+  case object Date extends PrimitiveType("localdate", 0x0b)
+  case object Time extends PrimitiveType("localtime", 0x0c)
+  case object DateTime extends PrimitiveType("localdatetime", 0x0d)
+  case object Short extends PrimitiveType("short", 0x0e)
+  case object Set extends PrimitiveType("set", 0x0f)
 
-  /** Used to separate external type from internal types */
-  val TYPE_TOKEN_DELIMITER = ":"
+  // Compound types
+  case class TypedList(elementType: Type)
+    extends CompoundType(s"${List.string}:${elementType.string}", List)
+  case class TypedSet(elementType: Type)
+    extends CompoundType(s"${Set.string}:${elementType.string}", Set)
+  case class TypedMap(keyType: Type, valueType: Type)
+    extends CompoundType(s"${Map.string}:${keyType.string}:${valueType.string}", Map)
 
-  case object Null extends Type("null", 0x00)
-  case object Boolean extends Type("boolean", 0x01)
-  case object Integer extends Type("int", 0x02)
-  case object Long extends Type("long", 0x03)
-  case object Float extends Type("float", 0x04)
-  case object Double extends Type("double", 0x05)
-  case object String extends Type("string", 0x06)
-  case object BigDecimal extends Type("bigdecimal", 0x07)
-  case object GradoopId extends Type("gradoopid", 0x08)
-  case object Map extends Type("map", 0x09)
-  case object List extends Type("list", 0x0a)
-  case object Date extends Type("localdate", 0x0b)
-  case object Time extends Type("localtime", 0x0c)
-  case object DateTime extends Type("localdatetime", 0x0d)
-  case object Short extends Type("short", 0x0e)
-  case object Set extends Type("set", 0x0f)
-
-  def apply(typeString: String): Type = { // TODO for complex types
+  def apply(typeString: String): Type = {
     typeString.toLowerCase match {
       case Type.Null.string => Type.Null
       case Type.Boolean.string => Type.Boolean
@@ -44,7 +58,7 @@ object Type {
       case Type.DateTime.string => Type.DateTime
       case Type.Short.string => Type.Short
       case Type.Set.string => Type.Set
-      case _ => ComplexType(typeString)
+      case _ => CompoundType(typeString)
     }
   }
 
@@ -71,16 +85,13 @@ object Type {
   }
 }
 
-sealed abstract class ComplexType(string: String, val mainType: Type) extends Type(string, mainType.byte)
 
-object ComplexType {
+object CompoundType {
 
-  // Complex types
-  case class TypedList(elementType: Type) extends ComplexType(s"${List.string}:${elementType.string}", List)
-  case class TypedSet(elementType: Type) extends ComplexType(s"${Set.string}:${elementType.string}", Set)
-  case class TypedMap(keyType: Type, valueType: Type) extends ComplexType(s"${Map.string}:${keyType.string}:${valueType.string}", Map)
+  /** Used to separate external type from internal types */
+  val TYPE_TOKEN_DELIMITER = ":"
 
-  def apply(typeString: String): ComplexType = {
+  def apply(typeString: String): CompoundType = {
     typeString match {
       case list if list.startsWith(List.string) => TypedList(Type(list.substring(List.string.length + 1)))
       case set if set.startsWith(Set.string) => TypedSet(Type(set.substring(Set.string.length + 1)))

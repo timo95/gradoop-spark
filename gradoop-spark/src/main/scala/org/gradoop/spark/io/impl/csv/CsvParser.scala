@@ -3,7 +3,7 @@ package org.gradoop.spark.io.impl.csv
 import java.time.{LocalDate, LocalDateTime, LocalTime}
 
 import org.gradoop.common.model.impl.id.GradoopId
-import org.gradoop.common.properties.{ComplexType, PropertyValue, Type}
+import org.gradoop.common.properties.{CompoundType, PropertyValue, Type}
 import org.gradoop.spark.io.impl.metadata.ElementMetaData
 import org.gradoop.spark.model.impl.types.GveLayoutType
 import org.gradoop.spark.util.StringEscaper
@@ -33,13 +33,13 @@ abstract protected class CsvParser[L <: GveLayoutType] extends Serializable {
       val length = propertyStrings.length min properties.length // only parse when metadata exists for it
       (0 until length)
         .filter(i => !propertyStrings(i).equals("")) // empty value => no property value
-        .map(i => (properties(i).key, parsePropertyValue(propertyStrings(i), properties(i).typeString)))
+        .map(i => (properties(i).key, propertyParser(properties(i).typeString)(propertyStrings(i))))
         .toMap
     }
   }
 
-  private def parsePropertyValue(valueString: String, typeString: String): PropertyValue = {
-    PropertyValue(typeString match {
+  private def propertyParser(typeString: String): String => PropertyValue = {
+    valueString: String => PropertyValue(typeString match {
       case Type.Null.string => null
       case Type.Boolean.string => java.lang.Boolean.parseBoolean(valueString)
       case Type.Integer.string => java.lang.Integer.parseInt(valueString)
@@ -53,14 +53,33 @@ abstract protected class CsvParser[L <: GveLayoutType] extends Serializable {
       case Type.Time.string => LocalTime.parse(valueString)
       case Type.DateTime.string => LocalDateTime.parse(valueString)
       case Type.Short.string => java.lang.Short.parseShort(valueString)
-      case list if list.startsWith(Type.List.string) => complexParser(valueString, ComplexType(list))
-      case set if set.startsWith(Type.Set.string) => complexParser(valueString, ComplexType(set))
-      case map if map.startsWith(Type.Map.string) => complexParser(valueString, ComplexType(map))
+      case list if list.startsWith(Type.List.string) => compoundParser(CompoundType(list))(valueString)
+      case set if set.startsWith(Type.Set.string) => compoundParser(CompoundType(set))(valueString)
+      case map if map.startsWith(Type.Map.string) => compoundParser(CompoundType(map))(valueString)
       case _ => throw new IllegalArgumentException("Type not yet supported: " + typeString)
     })
   }
 
-  private def complexParser(valueString: String, complexType: ComplexType): PropertyValue = {
-    PropertyValue(valueString) // TODO parse
+  private def compoundParser(compoundType: CompoundType): String => Iterable[_] = {
+    valueString: String => compoundType match {
+      case Type.TypedList(elementType) => arrayParser(propertyParser(elementType.string))(valueString).toList
+      case Type.TypedSet(elementType) => arrayParser(propertyParser(elementType.string))(valueString).toSet
+      case Type.TypedMap(keyType, valueType) =>
+        mapParser(propertyParser(keyType.string), propertyParser(valueType.string))(valueString)
+      case _ => throw new IllegalArgumentException("Type not yet supported: " + compoundType.string)
+    }
+  }
+
+  private def arrayParser(elementParser: String => PropertyValue): String => Array[PropertyValue] = {
+    arrayString: String => StringEscaper.split(arrayString.substring(1, arrayString.length - 1), CsvConstants.LIST_DELIMITER)
+      .map(elementParser)
+  }
+
+  private def mapParser(keyParser: String => PropertyValue, valueParser: String => PropertyValue):
+  String => Map[PropertyValue, PropertyValue] = {
+    mapString: String => StringEscaper.split(mapString.substring(1, mapString.length - 1), CsvConstants.LIST_DELIMITER)
+      .map(entry => StringEscaper.split(entry, CsvConstants.MAP_SEPARATOR, 2))
+      .map(entry => (PropertyValue(entry(0)), PropertyValue(entry(1))))
+      .toMap
   }
 }
