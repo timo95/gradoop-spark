@@ -89,7 +89,7 @@ object Type {
 object CompoundType {
 
   /** Used to separate external type from internal types */
-  val TYPE_TOKEN_DELIMITER = ":"
+  val TYPE_TOKEN_DELIMITER = ':'
 
   def apply(typeString: String): CompoundType = {
     typeString match {

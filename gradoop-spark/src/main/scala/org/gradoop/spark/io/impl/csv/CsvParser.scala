@@ -53,9 +53,7 @@ abstract protected class CsvParser[L <: GveLayoutType] extends Serializable {
       case Type.Time.string => LocalTime.parse(valueString)
       case Type.DateTime.string => LocalDateTime.parse(valueString)
       case Type.Short.string => java.lang.Short.parseShort(valueString)
-      case list if list.startsWith(Type.List.string) => compoundParser(CompoundType(list))(valueString)
-      case set if set.startsWith(Type.Set.string) => compoundParser(CompoundType(set))(valueString)
-      case map if map.startsWith(Type.Map.string) => compoundParser(CompoundType(map))(valueString)
+      case compound if compound.contains(CompoundType.TYPE_TOKEN_DELIMITER) => compoundParser(CompoundType(compound))(valueString)
       case _ => throw new IllegalArgumentException("Type not yet supported: " + typeString)
     })
   }
