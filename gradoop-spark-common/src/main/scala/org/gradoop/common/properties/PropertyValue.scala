@@ -1,6 +1,6 @@
 package org.gradoop.common.properties
 
-case class PropertyValue(value: Array[Byte], typeByte: Byte) extends Serializable {
+case class PropertyValue(value: Array[Byte], typeByte: Byte) {
 
   def getType: Type = Type(typeByte)
 
@@ -13,14 +13,14 @@ case class PropertyValue(value: Array[Byte], typeByte: Byte) extends Serializabl
 
 object PropertyValue {
 
-  val NULL_VALUE = new PropertyValue(Array.empty, Type.Null.byte)
+  val NULL_VALUE = new PropertyValue(Array.empty, Type.NULL.byte)
 
   def apply(value: Any): PropertyValue = {
     if(value == null) PropertyValue("")
     else PropertyValue(value.toString)
   } // TODO to byte for supported types
 
-  def apply(value: Int): PropertyValue = new PropertyValue(Array(value.toByte), Type.Integer.byte)
-  def apply(value: Double): PropertyValue = new PropertyValue(Array(value.toByte), Type.Double.byte)
-  def apply(value: String): PropertyValue = new PropertyValue(value.getBytes, Type.String.byte)
+  def apply(value: Int): PropertyValue = new PropertyValue(Array(value.toByte), Type.INTEGER.byte)
+  def apply(value: Double): PropertyValue = new PropertyValue(Array(value.toByte), Type.DOUBLE.byte)
+  def apply(value: String): PropertyValue = new PropertyValue(value.getBytes, Type.STRING.byte)
 }

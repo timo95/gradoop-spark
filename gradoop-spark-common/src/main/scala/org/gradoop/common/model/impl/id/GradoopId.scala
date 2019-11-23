@@ -6,7 +6,7 @@ import java.security.SecureRandom
 import java.util.Date
 import java.util.concurrent.atomic.AtomicInteger
 
-case class GradoopId(val bytes: Array[Byte]) extends Ordered[GradoopId] with Serializable {
+case class GradoopId(val bytes: Array[Byte]) extends Ordered[GradoopId] {
 
   /** Checks if the specified object is equal to the current id.
    *

@@ -40,19 +40,19 @@ abstract protected class CsvParser[L <: GveLayoutType] extends Serializable {
 
   private def propertyParser(typeString: String): String => PropertyValue = {
     valueString: String => PropertyValue(typeString match {
-      case Type.Null.string => null
-      case Type.Boolean.string => java.lang.Boolean.parseBoolean(valueString)
-      case Type.Integer.string => java.lang.Integer.parseInt(valueString)
-      case Type.Long.string => java.lang.Long.parseLong(valueString)
-      case Type.Float.string => java.lang.Float.parseFloat(valueString)
-      case Type.Double.string => java.lang.Double.parseDouble(valueString)
-      case Type.String.string => StringEscaper.unescape(valueString)
-      case Type.BigDecimal.string => BigDecimal(valueString)
-      case Type.GradoopId.string => GradoopId.fromString(valueString)
-      case Type.Date.string => LocalDate.parse(valueString)
-      case Type.Time.string => LocalTime.parse(valueString)
-      case Type.DateTime.string => LocalDateTime.parse(valueString)
-      case Type.Short.string => java.lang.Short.parseShort(valueString)
+      case Type.NULL.string => null
+      case Type.BOOLEAN.string => java.lang.Boolean.parseBoolean(valueString)
+      case Type.INTEGER.string => java.lang.Integer.parseInt(valueString)
+      case Type.LONG.string => java.lang.Long.parseLong(valueString)
+      case Type.FLOAT.string => java.lang.Float.parseFloat(valueString)
+      case Type.DOUBLE.string => java.lang.Double.parseDouble(valueString)
+      case Type.STRING.string => StringEscaper.unescape(valueString)
+      case Type.BIG_DECIMAL.string => BigDecimal(valueString)
+      case Type.GRADOOP_ID.string => GradoopId.fromString(valueString)
+      case Type.DATE.string => LocalDate.parse(valueString)
+      case Type.TIME.string => LocalTime.parse(valueString)
+      case Type.DATE_TIME.string => LocalDateTime.parse(valueString)
+      case Type.SHORT.string => java.lang.Short.parseShort(valueString)
       case compound if compound.contains(CompoundType.TYPE_TOKEN_DELIMITER) => compoundParser(CompoundType(compound))(valueString)
       case _ => throw new IllegalArgumentException("Type not yet supported: " + typeString)
     })
@@ -60,9 +60,9 @@ abstract protected class CsvParser[L <: GveLayoutType] extends Serializable {
 
   private def compoundParser(compoundType: CompoundType): String => Iterable[_] = {
     valueString: String => compoundType match {
-      case Type.TypedList(elementType) => arrayParser(propertyParser(elementType.string))(valueString).toList
-      case Type.TypedSet(elementType) => arrayParser(propertyParser(elementType.string))(valueString).toSet
-      case Type.TypedMap(keyType, valueType) =>
+      case Type.TYPED_LIST(elementType) => arrayParser(propertyParser(elementType.string))(valueString).toList
+      case Type.TYPED_SET(elementType) => arrayParser(propertyParser(elementType.string))(valueString).toSet
+      case Type.TYPED_MAP(keyType, valueType) =>
         mapParser(propertyParser(keyType.string), propertyParser(valueType.string))(valueString)
       case _ => throw new IllegalArgumentException("Type not yet supported: " + compoundType.string)
     }
