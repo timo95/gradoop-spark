@@ -1,6 +1,7 @@
 package org.gradoop.common.properties
 
-import org.gradoop.common.properties.Type.{LIST, MAP, SET, TYPED_LIST, TYPED_MAP, TYPED_SET}
+import org.gradoop.common.properties.CompoundType.TYPE_TOKEN_DELIMITER
+import org.gradoop.common.properties.Type._
 
 sealed abstract class Type {
   def string: String
@@ -34,11 +35,11 @@ object Type {
 
   // Compound types
   case class TYPED_LIST(elementType: Type)
-    extends CompoundType(s"${LIST.string}:${elementType.string}", LIST)
+    extends CompoundType(LIST.string + TYPE_TOKEN_DELIMITER + elementType.string, LIST)
   case class TYPED_SET(elementType: Type)
-    extends CompoundType(s"${SET.string}:${elementType.string}", SET)
+    extends CompoundType(SET.string + TYPE_TOKEN_DELIMITER + elementType.string, SET)
   case class TYPED_MAP(keyType: Type, valueType: Type)
-    extends CompoundType(s"${MAP.string}:${keyType.string}:${valueType.string}", MAP)
+    extends CompoundType(MAP.string + TYPE_TOKEN_DELIMITER + keyType.string + TYPE_TOKEN_DELIMITER + valueType.string, MAP)
 
   def apply(typeString: String): Type = {
     typeString.toLowerCase match {
@@ -85,9 +86,7 @@ object Type {
   }
 }
 
-
 object CompoundType {
-
   /** Used to separate external type from internal types */
   val TYPE_TOKEN_DELIMITER = ':'
 
