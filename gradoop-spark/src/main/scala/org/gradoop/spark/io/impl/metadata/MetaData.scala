@@ -48,7 +48,7 @@ object MetaData {
     import org.gradoop.spark.util.Implicits._
     import session.implicits._
 
-    val byteToString = udf((s: String) => Type(s).string)
+    val byteToString = udf((b: Byte) => Type(b).string)
 
     dataset
       // one row for each property per element
