@@ -2,7 +2,7 @@ package org.gradoop.common.properties
 
 case class PropertyValue(value: Array[Byte], typeByte: Byte) {
 
-  def getType: Type = Type(typeByte)
+  def getType: Type = Type(typeByte) // TODO typeByte does not have compound types
 
   def getString: String = new String(value)
 

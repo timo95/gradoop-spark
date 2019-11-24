@@ -13,6 +13,7 @@ class SubgraphSql[L <: GveLayoutType] private
 
   override def execute(graph: LogicalGraph[L]): LogicalGraph[L] = {
     import graph.config.implicits._
+    import graph.config.sparkSession.implicits._
     strategy match {
       case Strategy.BOTH =>
         val filteredVertices = graph.vertices.filter(vertexFilterExpression)
@@ -26,7 +27,7 @@ class SubgraphSql[L <: GveLayoutType] private
       case Strategy.EDGE_INDUCED =>
         val filteredEdges = graph.edges.filter(edgeFilterExpression)
         val inducedVertices = graph.vertices
-          .joinWith(filteredEdges, graph.vertices.id isin (filteredEdges.sourceId, filteredEdges.targetId)) // TODO strings -> constants
+          .joinWith(filteredEdges, graph.vertices.id isin (filteredEdges.sourceId, filteredEdges.targetId))
           .map(t => t._1)
           .dropDuplicates(ColumnNames.ID)
         graph.factory.init(graph.graphHead, inducedVertices, filteredEdges)

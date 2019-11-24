@@ -8,6 +8,7 @@ class Verify[L <: GveLayoutType] extends LogicalGraphToLogicalGraphOperator[Logi
 
   override def execute(graph: LogicalGraph[L]): LogicalGraph[L] = {
     import graph.config.implicits._
+    import graph.config.sparkSession.implicits._
     val verifiedEdgesSource = graph.edges
       .joinWith(graph.vertices, graph.edges.sourceId === graph.vertices.id)
       .map(t => t._1)
