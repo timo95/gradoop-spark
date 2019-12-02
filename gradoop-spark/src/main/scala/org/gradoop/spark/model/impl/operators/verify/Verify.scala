@@ -7,7 +7,8 @@ import org.gradoop.spark.model.impl.types.GveLayoutType
 class Verify[L <: GveLayoutType] extends LogicalGraphToLogicalGraphOperator[LogicalGraph[L]] {
 
   override def execute(graph: LogicalGraph[L]): LogicalGraph[L] = {
-    import graph.config.implicits._
+    val factory = graph.factory
+    import factory.implicits._
     import graph.config.sparkSession.implicits._
     val verifiedEdgesSource = graph.edges
       .joinWith(graph.vertices, graph.edges.sourceId === graph.vertices.id)

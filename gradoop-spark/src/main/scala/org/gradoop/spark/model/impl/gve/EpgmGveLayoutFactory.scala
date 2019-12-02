@@ -6,7 +6,7 @@ import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{BaseGraph, BaseGraphFactory}
 import org.gradoop.spark.model.api.layouts.GveBaseLayoutFactory
 
-class EpgmGveLayoutFactory[G <: BaseGraph[L]](config: GradoopSparkConfig[L], graphFactory: BaseGraphFactory[L, G])
+class EpgmGveLayoutFactory[G <: BaseGraph[L]](var config: GradoopSparkConfig[L], graphFactory: BaseGraphFactory[L, G])
                                              (implicit session: SparkSession) extends GveBaseLayoutFactory[L, G] {
 
   override implicit def sparkSession: SparkSession = session

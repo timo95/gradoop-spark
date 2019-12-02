@@ -2,7 +2,6 @@ package org.gradoop.spark.io.impl.csv
 
 import org.apache.spark.sql.{Dataset, Row}
 import org.gradoop.common.properties.PropertyValue
-import org.gradoop.spark.functions.filter.FilterStrings
 import org.gradoop.spark.io.api.DataSource
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
@@ -11,6 +10,8 @@ import org.gradoop.spark.model.impl.types.GveLayoutType
 class CsvDataSource[L <: GveLayoutType](csvPath: String, config: GradoopSparkConfig[L])
   extends CsvParser[L] with DataSource[L] {
   import config.implicits._
+  val factory = config.logicalGraphFactory
+  import factory.implicits._
 
   private val options: Map[String, String] = Map(
     "sep" -> CsvConstants.TOKEN_DELIMITER,

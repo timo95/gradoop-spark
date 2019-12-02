@@ -11,7 +11,8 @@ class Subgraph[L <: GveLayoutType] private
   extends LogicalGraphToLogicalGraphOperator[LogicalGraph[L]] {
 
   override def execute(graph: LogicalGraph[L]): LogicalGraph[L] = {
-    import graph.config.implicits._
+    val factory = graph.factory
+    import factory.implicits._
     import graph.config.sparkSession.implicits._
     strategy match {
       case Strategy.BOTH =>
