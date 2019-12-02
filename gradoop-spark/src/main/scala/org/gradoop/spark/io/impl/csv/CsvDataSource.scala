@@ -7,7 +7,7 @@ import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
-class CsvDataSource[L <: GveLayoutType](csvPath: String, config: GradoopSparkConfig[L])
+class CsvDataSource[L <: GveLayoutType[L]](csvPath: String, config: GradoopSparkConfig[L])
   extends CsvParser[L] with DataSource[L] {
   import config.implicits._
   val factory = config.logicalGraphFactory
@@ -86,5 +86,5 @@ class CsvDataSource[L <: GveLayoutType](csvPath: String, config: GradoopSparkCon
 
 object CsvDataSource {
 
-  def apply[L <: GveLayoutType](csvPath: String, config: GradoopSparkConfig[L]): CsvDataSource[L] = new CsvDataSource(csvPath, config)
+  def apply[L <: GveLayoutType[L]](csvPath: String, config: GradoopSparkConfig[L]): CsvDataSource[L] = new CsvDataSource(csvPath, config)
 }

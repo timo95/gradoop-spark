@@ -4,7 +4,7 @@ import org.apache.spark.sql.Dataset
 import org.gradoop.spark.functions.filter.HasLabel
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
-abstract class GveLayout[L <: GveLayoutType](val graphHeads: Dataset[L#G], val vertices: Dataset[L#V], val edges: Dataset[L#E])
+abstract class GveLayout[L <: GveLayoutType[L]](val graphHeads: Dataset[L#G], val vertices: Dataset[L#V], val edges: Dataset[L#E])
   extends GraphCollectionLayout[L] with LogicalGraphLayout[L] with ElementAccess[L#V, L#E] {
 
   /**

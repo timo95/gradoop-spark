@@ -8,7 +8,7 @@ import org.gradoop.spark.io.impl.metadata.ElementMetaData
 import org.gradoop.spark.model.impl.types.GveLayoutType
 import org.gradoop.spark.util.StringEscaper
 
-abstract protected class CsvParser[L <: GveLayoutType] extends Serializable {
+abstract protected class CsvParser[L <: GveLayoutType[L]] extends Serializable {
 
   protected def parseId(idString: String): GradoopId = GradoopId.fromString(idString)
 

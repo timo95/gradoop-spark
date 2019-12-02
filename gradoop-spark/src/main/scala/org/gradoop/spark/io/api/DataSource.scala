@@ -3,7 +3,7 @@ package org.gradoop.spark.io.api
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
-trait DataSource[L <: GveLayoutType] {
+trait DataSource[L <: GveLayoutType[L]] {
 
   /** Reads the input as logical graph.
    *

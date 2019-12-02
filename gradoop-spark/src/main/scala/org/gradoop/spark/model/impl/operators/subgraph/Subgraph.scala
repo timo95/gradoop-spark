@@ -6,7 +6,7 @@ import org.gradoop.spark.model.api.operators.LogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy.Strategy
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
-class Subgraph[L <: GveLayoutType] private
+class Subgraph[L <: GveLayoutType[L]] private
 (vertexFilterFunction: L#V => Boolean, edgeFilterFunction: L#E => Boolean, strategy: Strategy)
   extends LogicalGraphToLogicalGraphOperator[LogicalGraph[L]] {
 
@@ -22,7 +22,7 @@ class Subgraph[L <: GveLayoutType] private
 
       case Strategy.VERTEX_INDUCED =>
         val filteredVertices = graph.vertices.filter(vertexFilterFunction)
-        graph.factory.init(graph.graphHead, filteredVertices, graph.edges).verify // verify induces the edges
+        graph.factory.init(graph.graphHead, filteredVertices, graph.edges)//.verify // verify induces the edges
 
       case Strategy.EDGE_INDUCED =>
         val filteredEdges = graph.edges.filter(edgeFilterFunction)
@@ -37,16 +37,16 @@ class Subgraph[L <: GveLayoutType] private
 
 object Subgraph {
 
-  def both[L <: GveLayoutType]
+  def both[L <: GveLayoutType[L]]
   (vertexFilterFunction: L#V => Boolean, edgeFilterFunction: L#E => Boolean): Subgraph[L] = {
     new Subgraph(vertexFilterFunction, edgeFilterFunction, Strategy.BOTH)
   }
 
-  def vertexInduced[L <: GveLayoutType](vertexFilterFunction: L#V => Boolean): Subgraph[L] = {
+  def vertexInduced[L <: GveLayoutType[L]](vertexFilterFunction: L#V => Boolean): Subgraph[L] = {
     new Subgraph(vertexFilterFunction, _ => true, Strategy.VERTEX_INDUCED)
   }
 
-  def edgeIncuded[L <: GveLayoutType](edgeFilterFunction: L#E => Boolean): Subgraph[L] = {
+  def edgeIncuded[L <: GveLayoutType[L]](edgeFilterFunction: L#E => Boolean): Subgraph[L] = {
     new Subgraph(_ => true, edgeFilterFunction, Strategy.EDGE_INDUCED)
   }
 }

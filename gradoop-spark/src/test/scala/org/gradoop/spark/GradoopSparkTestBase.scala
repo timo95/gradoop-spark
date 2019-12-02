@@ -8,7 +8,7 @@ import org.gradoop.spark.util.SparkAsciiGraphLoader
 import org.scalatest.FunSpec
 
 
-trait GradoopSparkTestBase[L <: GveLayoutType] extends FunSpec {
+trait GradoopSparkTestBase[L <: GveLayoutType[L]] extends FunSpec {
 
   protected implicit val session: SparkSession = SparkSession.builder
     .appName("Simple Application")

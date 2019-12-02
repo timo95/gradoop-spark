@@ -13,7 +13,7 @@ trait Implicits extends Serializable {
   implicit def columnSelector[T](dataset: Dataset[T]): ColumnSelector[T] = new ColumnSelector[T](dataset)
   implicit def displayConverter[T <: Identifiable](dataset: Dataset[T]): DisplayConverter[T] = new DisplayConverter[T](dataset)
 
-  implicit def getGveLayout[L <: GveLayoutType](graph: BaseGraph[L]): GveLayout[L] = graph.layout
+  implicit def getGveLayout[L <: GveLayoutType[L]](graph: BaseGraph[L]): GveLayout[L] = graph.layout
 }
 
 object Implicits extends Implicits

@@ -1,9 +1,9 @@
 package org.gradoop.spark.model.api.layouts
 
 import org.apache.spark.sql.{Dataset, Encoder, SparkSession}
-import org.gradoop.spark.model.impl.types.GveLayoutType
+import org.gradoop.spark.model.impl.types.LayoutType
 
-trait BaseLayoutFactory[L <: GveLayoutType] extends Serializable {
+trait BaseLayoutFactory[L <: LayoutType[L]] extends Serializable {
 
   implicit def sparkSession: SparkSession
 

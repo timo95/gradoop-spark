@@ -9,7 +9,7 @@ import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
-class CsvDataSink[L <: GveLayoutType](csvPath: String, config: GradoopSparkConfig[L], metadata: Option[MetaData])
+class CsvDataSink[L <: GveLayoutType[L]](csvPath: String, config: GradoopSparkConfig[L], metadata: Option[MetaData])
   extends CsvComposer[L](metadata) with DataSink[L] {
   implicit val session: SparkSession = config.sparkSession
   import config.implicits._
@@ -74,12 +74,12 @@ class CsvDataSink[L <: GveLayoutType](csvPath: String, config: GradoopSparkConfi
 
 object CsvDataSink {
 
-  def apply[L <: GveLayoutType]
+  def apply[L <: GveLayoutType[L]]
   (csvPath: String, config: GradoopSparkConfig[L]): CsvDataSink[L] = {
     new CsvDataSink(csvPath, config, None)
   }
 
-  def apply[L <: GveLayoutType]
+  def apply[L <: GveLayoutType[L]]
   (csvPath: String, config: GradoopSparkConfig[L], metadata: MetaData): CsvDataSink[L] = {
     new CsvDataSink(csvPath, config, Some(metadata))
   }

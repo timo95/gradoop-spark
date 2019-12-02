@@ -8,7 +8,7 @@ import org.gradoop.spark.model.api.graph.BaseGraph
 import org.gradoop.spark.model.impl.types.GveLayoutType
 import org.gradoop.spark.util.Implicits
 
-trait GveBaseLayoutFactory[L <: GveLayoutType, G <: BaseGraph[L]] extends LogicalGraphLayoutFactory[L] with GraphCollectionLayoutFactory[L]
+trait GveBaseLayoutFactory[L <: GveLayoutType[L], G <: BaseGraph[L]] extends LogicalGraphLayoutFactory[L] with GraphCollectionLayoutFactory[L]
   with ElementFactoryProvider[L#G, L#V, L#E] {
 
   object implicits extends Implicits with ComponentTypes {

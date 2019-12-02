@@ -7,7 +7,7 @@ import org.gradoop.spark.model.api.operators.LogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy.Strategy
 import org.gradoop.spark.model.impl.types.GveLayoutType
 
-class SubgraphSql[L <: GveLayoutType] private
+class SubgraphSql[L <: GveLayoutType[L]] private
 (vertexFilterExpression: String, edgeFilterExpression: String, strategy: Strategy)
   extends LogicalGraphToLogicalGraphOperator[LogicalGraph[L]] {
 
@@ -23,7 +23,7 @@ class SubgraphSql[L <: GveLayoutType] private
 
       case Strategy.VERTEX_INDUCED =>
         val filteredVertices = graph.vertices.filter(vertexFilterExpression)
-        graph.factory.init(graph.graphHead, filteredVertices, graph.edges).verify // verify induces the edges
+        graph.factory.init(graph.graphHead, filteredVertices, graph.edges)//.verify // verify induces the edges
 
       case Strategy.EDGE_INDUCED =>
         val filteredEdges = graph.edges.filter(edgeFilterExpression)
@@ -38,15 +38,15 @@ class SubgraphSql[L <: GveLayoutType] private
 
 object SubgraphSql {
 
-  def both[L <: GveLayoutType](vertexFilterExpression: String, edgeFilterExpression: String): SubgraphSql[L] = {
+  def both[L <: GveLayoutType[L]](vertexFilterExpression: String, edgeFilterExpression: String): SubgraphSql[L] = {
     new SubgraphSql(vertexFilterExpression, edgeFilterExpression, Strategy.BOTH)
   }
 
-  def vertexInduced[L <: GveLayoutType](vertexFilterExpression: String): SubgraphSql[L] = {
+  def vertexInduced[L <: GveLayoutType[L]](vertexFilterExpression: String): SubgraphSql[L] = {
     new SubgraphSql(vertexFilterExpression, FilterStrings.any, Strategy.VERTEX_INDUCED)
   }
 
-  def edgeIncuded[L <: GveLayoutType](edgeFilterExpression: String): SubgraphSql[L] = {
+  def edgeIncuded[L <: GveLayoutType[L]](edgeFilterExpression: String): SubgraphSql[L] = {
     new SubgraphSql(FilterStrings.any, edgeFilterExpression, Strategy.EDGE_INDUCED)
   }
 }

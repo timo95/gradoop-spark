@@ -7,7 +7,7 @@ import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.model.impl.types.GveLayoutType
 import org.gradoop.spark.util.StringEscaper
 
-abstract class CsvComposer[L <: GveLayoutType](var metadata: Option[MetaData]) extends Serializable {
+abstract class CsvComposer[L <: GveLayoutType[L]](var metadata: Option[MetaData]) extends Serializable {
 
   def graphHeadComposeFunctions: Array[ComposeFunction[L#G]]
 

@@ -2,11 +2,11 @@ package org.gradoop.spark.model.api.graph
 
 import org.gradoop.spark.model.impl.operators.subgraph.{Subgraph, SubgraphSql}
 import org.gradoop.spark.model.impl.operators.verify.Verify
-import org.gradoop.spark.model.impl.types.GveLayoutType
+import org.gradoop.spark.model.impl.types.{GveLayoutType, LayoutType}
 
-trait LogicalGraphOperators[L <: GveLayoutType] {
+trait LogicalGraphOperators[L <: LayoutType[L]] {
   this: LogicalGraph[L] =>
-
+/*
   def subgraph(vertexFilterFunction: L#V => Boolean, edgeFilterFunction: L#E => Boolean): LogicalGraph[L] =
     Subgraph.both[L](vertexFilterFunction, edgeFilterFunction).execute(this)
 
@@ -23,10 +23,9 @@ trait LogicalGraphOperators[L <: GveLayoutType] {
     SubgraphSql.vertexInduced[L](vertexFilterExpression).execute(this)
 
   def edgeInducedSubgraph(edgeFilterExpression: String): LogicalGraph[L] =
-    SubgraphSql.edgeIncuded[L](edgeFilterExpression).execute(this)
+    SubgraphSql.edgeIncuded[L](edgeFilterExpression).execute(this)*/
 
-  def verify: LogicalGraph[L] = new Verify[L]().execute(this)
-
+  //def verify(implicit ev: L <:< GveLayoutType[L]): LogicalGraph[L] = new Verify[L]().execute(this)
 
   /* Structural Type bound
   def verify(implicit ev: L <:< {def verify: LogicalGraph[L]}): Unit = {
