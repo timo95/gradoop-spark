@@ -2,8 +2,7 @@ package org.gradoop.spark.util
 
 import org.apache.spark.sql.SparkSession
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.api.graph.{GraphCollection, GraphCollectionFactory, LogicalGraph, LogicalGraphFactory}
-import org.gradoop.spark.model.impl.gve.EpgmGveLayoutFactory
+import org.gradoop.spark.model.impl.gve.{EpgmGveGraphCollectionFactory, EpgmGveLogicalGraphFactory}
 import org.gradoop.spark.model.impl.types.EpgmGveLayoutType
 
 trait EpgmConfigs {
@@ -13,8 +12,8 @@ trait EpgmConfigs {
 
   protected def gveConfig(implicit session: SparkSession): GradoopSparkConfig[L] = {
     if (_gveConfig.isEmpty) {
-      val lgFac = new EpgmGveLayoutFactory[LogicalGraph[L]](null, new LogicalGraphFactory[L])
-      val gcFac = new EpgmGveLayoutFactory[GraphCollection[L]](null, new GraphCollectionFactory[L])
+      val lgFac = new EpgmGveLogicalGraphFactory(null)
+      val gcFac = new EpgmGveGraphCollectionFactory(null)
       val config = new GradoopSparkConfig[L](lgFac, gcFac)
       lgFac.config = config
       gcFac.config = config

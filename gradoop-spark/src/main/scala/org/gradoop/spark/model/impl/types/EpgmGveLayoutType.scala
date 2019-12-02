@@ -1,7 +1,6 @@
 package org.gradoop.spark.model.impl.types
 
-import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
-import org.gradoop.spark.model.impl.gve.{EpgmEdge, EpgmGraphHead, EpgmGveLayout, EpgmGveLayoutFactory, EpgmVertex}
+import org.gradoop.spark.model.impl.gve._
 
 final class EpgmGveLayoutType extends GveLayoutType[EpgmGveLayoutType] with Epgm {
   type T = EpgmGveLayoutType
@@ -10,6 +9,6 @@ final class EpgmGveLayoutType extends GveLayoutType[EpgmGveLayoutType] with Epgm
   type V = EpgmVertex
   type E = EpgmEdge
 
-  type LGF = EpgmGveLayoutFactory[LogicalGraph[T]]
-  type GCF = EpgmGveLayoutFactory[GraphCollection[T]]
+  type LGF = EpgmGveLogicalGraphFactory
+  type GCF = EpgmGveGraphCollectionFactory
 }

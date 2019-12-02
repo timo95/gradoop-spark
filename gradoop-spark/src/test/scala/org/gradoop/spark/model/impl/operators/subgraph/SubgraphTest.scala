@@ -1,4 +1,4 @@
-package org.gradoop.spark.model.impl.operators
+package org.gradoop.spark.model.impl.operators.subgraph
 
 import org.gradoop.spark.EpgmGradoopSparkTestBase
 import org.gradoop.spark.functions.filter.HasLabel
@@ -8,7 +8,7 @@ class SubgraphTest extends EpgmGradoopSparkTestBase {
   private val config: GradoopSparkConfig[L] = getConfig
   import config.implicits._
 
-/*  describe("SocialNetworkGraph") {
+  describe("SocialNetworkGraph") {
     val loader = getSocialNetworkLoader
     val graph = loader.logicalGraph
 
@@ -44,5 +44,5 @@ class SubgraphTest extends EpgmGradoopSparkTestBase {
         assert(subgraph.edges.count() == 4)
       }
     }
-  }*/
+  }
 }
