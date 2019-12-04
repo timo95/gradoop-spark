@@ -3,12 +3,12 @@ package org.gradoop.spark
 import org.apache.spark.sql.SparkSession
 import org.gradoop.common.GradoopTestUtils
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.impl.types.GveLayoutType
+import org.gradoop.spark.model.impl.types.Gve
 import org.gradoop.spark.util.SparkAsciiGraphLoader
 import org.scalatest.FunSpec
 
 
-trait GradoopSparkTestBase[L <: GveLayoutType[L]] extends FunSpec {
+trait GradoopSparkTestBase[L <: Gve[L]] extends FunSpec {
 
   protected implicit val session: SparkSession = SparkSession.builder
     .appName("Simple Application")

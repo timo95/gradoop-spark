@@ -1,12 +1,11 @@
 package org.gradoop.spark.io.impl.metadata
 
 import org.apache.spark.sql.{Dataset, SparkSession}
-import org.gradoop.common.model.api.gve.Element
-import org.gradoop.common.properties.{PropertyValue, Type}
+import org.gradoop.common.model.api.gve.GveElement
+import org.gradoop.common.properties.Type
 import org.gradoop.common.util.ColumnNames
-import org.gradoop.spark.functions.filter.FilterStrings
-import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
-import org.gradoop.spark.model.impl.types.GveLayoutType
+import org.gradoop.spark.expressions.filter.FilterStrings
+import org.gradoop.spark.model.impl.types.Gve
 
 class MetaData(val graphHeadMetaData: Dataset[ElementMetaData],
                val vertexMetaData: Dataset[ElementMetaData],
@@ -27,21 +26,21 @@ class MetaData(val graphHeadMetaData: Dataset[ElementMetaData],
 
 object MetaData {
 
-  def apply[L <: GveLayoutType[L]](logicalGraph: LogicalGraph[L]): MetaData = {
+  def apply[L <: Gve[L]](logicalGraph: L#LG): MetaData = {
     import logicalGraph.config.implicits._
     new MetaData(fromElements(logicalGraph.graphHead),
       fromElements(logicalGraph.vertices),
       fromElements(logicalGraph.edges))
   }
 
-  def apply[L <: GveLayoutType[L]](graphCollection: GraphCollection[L]): MetaData = {
+  def apply[L <: Gve[L]](graphCollection: L#GC): MetaData = {
     import graphCollection.config.implicits._
     new MetaData(fromElements(graphCollection.graphHeads),
       fromElements(graphCollection.vertices),
       fromElements(graphCollection.edges))
   }
 
-  private def fromElements[EL <: Element]
+  private def fromElements[EL <: GveElement]
   (dataset: Dataset[EL])(implicit session: SparkSession): Dataset[ElementMetaData] = {
     import ColumnNames._
     import org.apache.spark.sql.functions._

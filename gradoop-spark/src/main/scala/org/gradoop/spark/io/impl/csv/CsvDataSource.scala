@@ -4,13 +4,12 @@ import org.apache.spark.sql.{Dataset, Row}
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.spark.io.api.DataSource
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
-import org.gradoop.spark.model.impl.types.GveLayoutType
+import org.gradoop.spark.model.impl.types.Gve
 
-class CsvDataSource[L <: GveLayoutType[L]](csvPath: String, config: GradoopSparkConfig[L])
+class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
   extends CsvParser[L] with DataSource[L] {
   import config.implicits._
-  val factory = config.logicalGraphFactory
+  private val factory = config.logicalGraphFactory
   import factory.implicits._
 
   private val options: Map[String, String] = Map(
@@ -23,11 +22,11 @@ class CsvDataSource[L <: GveLayoutType[L]](csvPath: String, config: GradoopSpark
   private val vertexMetaData = metaData.vertexMetaData.collect() // TODO: property parsing with sql - join metadata and transform
   private val edgeMetaData = metaData.edgeMetaData.collect()
 
-  override def readLogicalGraph: LogicalGraph[L] = {
+  override def readLogicalGraph: L#LG = {
     config.logicalGraphFactory.init(readGraphHeads, readVertices, readEdges)
   }
 
-  override def readGraphCollection: GraphCollection[L] = {
+  override def readGraphCollection: L#GC = {
     config.graphCollectionFactory.init(readGraphHeads, readVertices, readEdges)
   }
 
@@ -58,7 +57,8 @@ class CsvDataSource[L <: GveLayoutType[L]](csvPath: String, config: GradoopSpark
     config.logicalGraphFactory.graphHeadFactory(
       parseId(row.getString(0)),
       label,
-      if(elementMetaData.isEmpty) Map.empty[String, PropertyValue] else parseProperties(row.getString(2), elementMetaData(0)))
+      if(elementMetaData.isEmpty) Map.empty[String, PropertyValue]
+      else parseProperties(row.getString(2), elementMetaData(0)))
   }
 
   def rowToVertex(row: Row): L#V = {
@@ -67,8 +67,8 @@ class CsvDataSource[L <: GveLayoutType[L]](csvPath: String, config: GradoopSpark
     config.logicalGraphFactory.vertexFactory(
       parseId(row.getString(0)),
       label,
-      if(elementMetaData.isEmpty) Map.empty[String, PropertyValue] else parseProperties(row.getString(3), elementMetaData(0)),
-      parseGraphIds(row.getString(1)))
+      if(elementMetaData.isEmpty) Map.empty[String, PropertyValue]
+      else parseProperties(row.getString(3), elementMetaData(0)), parseGraphIds(row.getString(1)))
   }
 
   def rowToEdge(row: Row): L#E = {
@@ -79,12 +79,12 @@ class CsvDataSource[L <: GveLayoutType[L]](csvPath: String, config: GradoopSpark
       label,
       parseId(row.getString(2)), // sourceId
       parseId(row.getString(3)), // targetId
-      if(elementMetaData.isEmpty) Map.empty[String, PropertyValue] else parseProperties(row.getString(5), elementMetaData(0)),
-      parseGraphIds(row.getString(1)))
+      if(elementMetaData.isEmpty) Map.empty[String, PropertyValue]
+      else parseProperties(row.getString(5), elementMetaData(0)), parseGraphIds(row.getString(1)))
   }
 }
 
 object CsvDataSource {
 
-  def apply[L <: GveLayoutType[L]](csvPath: String, config: GradoopSparkConfig[L]): CsvDataSource[L] = new CsvDataSource(csvPath, config)
+  def apply[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L]): CsvDataSource[L] = new CsvDataSource(csvPath, config)
 }

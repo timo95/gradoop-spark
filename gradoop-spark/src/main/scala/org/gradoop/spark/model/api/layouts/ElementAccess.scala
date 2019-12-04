@@ -1,10 +1,10 @@
 package org.gradoop.spark.model.api.layouts
 
 import org.apache.spark.sql.Dataset
-import org.gradoop.common.model.api.gve.{Edge, Vertex}
-import org.gradoop.spark.functions.filter.HasLabel
+import org.gradoop.common.model.api.gve.{GveEdge, GveVertex}
+import org.gradoop.spark.expressions.filter.FilterStrings
 
-trait ElementAccess[V <: Vertex, E <: Edge] {
+trait ElementAccess[V <: GveVertex, E <: GveEdge] {
 
   /** Returns all vertices.
    *
@@ -17,7 +17,7 @@ trait ElementAccess[V <: Vertex, E <: Edge] {
    * @param label vertex label
    * @return filtered vertices
    */
-  def verticesByLabel(label: String): Dataset[V] = vertices.filter(new HasLabel[V](label))
+  def verticesByLabel(label: String): Dataset[V] = vertices.filter(FilterStrings.hasLabel(label))
 
   /** Returns all edges.
    *
@@ -30,5 +30,5 @@ trait ElementAccess[V <: Vertex, E <: Edge] {
    * @param label edge label
    * @return filtered edges
    */
-  def edgesByLabel(label: String): Dataset[E] = edges.filter(new HasLabel[E](label))
+  def edgesByLabel(label: String): Dataset[E] = edges.filter(FilterStrings.hasLabel(label))
 }

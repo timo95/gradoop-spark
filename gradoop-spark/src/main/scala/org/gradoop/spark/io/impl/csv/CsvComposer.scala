@@ -1,13 +1,13 @@
 package org.gradoop.spark.io.impl.csv
 
 import org.gradoop.common.model.api.components._
-import org.gradoop.common.model.api.gve.GraphElement
+import org.gradoop.common.model.api.gve.GveGraphElement
 import org.gradoop.spark.io.impl.csv.CsvConstants.ComposeFunction
 import org.gradoop.spark.io.impl.metadata.MetaData
-import org.gradoop.spark.model.impl.types.GveLayoutType
+import org.gradoop.spark.model.impl.types.Gve
 import org.gradoop.spark.util.StringEscaper
 
-abstract class CsvComposer[L <: GveLayoutType[L]](var metadata: Option[MetaData]) extends Serializable {
+abstract class CsvComposer[L <: Gve[L]](var metadata: Option[MetaData]) extends Serializable {
 
   def graphHeadComposeFunctions: Array[ComposeFunction[L#G]]
 
@@ -19,7 +19,7 @@ abstract class CsvComposer[L <: GveLayoutType[L]](var metadata: Option[MetaData]
 
   def composeId[T <: Identifiable](obj: T): String = obj.id.toString
 
-  def composeGraphIds[GE <: GraphElement](element: GE): String = {
+  def composeGraphIds[GE <: GveGraphElement](element: GE): String = {
     element.graphIds.mkString("[", CsvConstants.LIST_DELIMITER, "]")
   }
 

@@ -8,7 +8,7 @@ class VerifyTest extends EpgmGradoopSparkTestBase {
 
   describe("verify") {
     val loader = getSocialNetworkLoader
-    val graph = loader.logicalGraph
+    val graph = loader.getLogicalGraph
 
     val graph2 = graph.verify
   }

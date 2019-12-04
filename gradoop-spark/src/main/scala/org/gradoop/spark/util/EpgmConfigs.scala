@@ -3,10 +3,10 @@ package org.gradoop.spark.util
 import org.apache.spark.sql.SparkSession
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.impl.gve.{EpgmGveGraphCollectionFactory, EpgmGveLogicalGraphFactory}
-import org.gradoop.spark.model.impl.types.EpgmGveLayoutType
+import org.gradoop.spark.model.impl.types.EpgmGve
 
 trait EpgmConfigs {
-  type L = EpgmGveLayoutType // default layout
+  type L = EpgmGve // default layout
 
   private var _gveConfig: Option[GradoopSparkConfig[L]] = None
 

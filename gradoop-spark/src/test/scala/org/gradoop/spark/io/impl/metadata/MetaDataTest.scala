@@ -7,7 +7,7 @@ class MetaDataTest extends EpgmGradoopSparkTestBase {
   describe("MetaData") {
     it("can be created from a graph") {
       val loader = getSocialNetworkLoader
-      val graph = loader.logicalGraph
+      val graph = loader.getLogicalGraph
 
       MetaData(graph)
     }

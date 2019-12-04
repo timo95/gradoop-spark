@@ -6,10 +6,9 @@ import org.gradoop.spark.io.api.DataSink
 import org.gradoop.spark.io.impl.csv.CsvConstants.ComposeFunction
 import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
-import org.gradoop.spark.model.impl.types.GveLayoutType
+import org.gradoop.spark.model.impl.types.Gve
 
-class CsvDataSink[L <: GveLayoutType[L]](csvPath: String, config: GradoopSparkConfig[L], metadata: Option[MetaData])
+class CsvDataSink[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L], metadata: Option[MetaData])
   extends CsvComposer[L](metadata) with DataSink[L] {
   implicit val session: SparkSession = config.sparkSession
   import config.implicits._
@@ -20,13 +19,13 @@ class CsvDataSink[L <: GveLayoutType[L]](csvPath: String, config: GradoopSparkCo
     "escapeQuotes" -> "false",
     "emptyValue" -> "")
 
-  override def write(logicalGraph: LogicalGraph[L], saveMode: SaveMode): Unit = {
+  override def write(logicalGraph: L#LG, saveMode: SaveMode): Unit = {
     writeGraphHeads(logicalGraph.graphHead, saveMode)
     writeVertices(logicalGraph.vertices, saveMode)
     writeEdges(logicalGraph.edges, saveMode)
   }
 
-  override def write(graphCollection: GraphCollection[L], saveMode: SaveMode): Unit = {
+  override def write(graphCollection: L#GC, saveMode: SaveMode): Unit = {
     writeGraphHeads(graphCollection.graphHeads, saveMode)
     writeVertices(graphCollection.vertices, saveMode)
     writeEdges(graphCollection.edges, saveMode)
@@ -74,12 +73,12 @@ class CsvDataSink[L <: GveLayoutType[L]](csvPath: String, config: GradoopSparkCo
 
 object CsvDataSink {
 
-  def apply[L <: GveLayoutType[L]]
+  def apply[L <: Gve[L]]
   (csvPath: String, config: GradoopSparkConfig[L]): CsvDataSink[L] = {
     new CsvDataSink(csvPath, config, None)
   }
 
-  def apply[L <: GveLayoutType[L]]
+  def apply[L <: Gve[L]]
   (csvPath: String, config: GradoopSparkConfig[L], metadata: MetaData): CsvDataSink[L] = {
     new CsvDataSink(csvPath, config, Some(metadata))
   }

@@ -2,16 +2,15 @@ package org.gradoop.common.util
 
 import java.io.InputStream
 
-import org.gradoop.common.model.api.components._
-import org.gradoop.common.model.api.gve.{Edge, EdgeFactory, ElementFactoryProvider, GraphHead, GraphHeadFactory, Vertex, VertexFactory}
+import org.gradoop.common.model.api.gve._
 import org.gradoop.common.properties.PropertyValue
 import org.s1ck.gdl.GDLHandler
 
 import scala.collection.mutable
 
-class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
-(gdlHandler: GDLHandler, graphHeadFactory: GraphHeadFactory[G],
- vertexFactory: VertexFactory[V], edgeFactory: EdgeFactory[E]) {
+class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
+(gdlHandler: GDLHandler, graphHeadFactory: GveGraphHeadFactoryGve[G],
+ vertexFactory: GveVertexFactory[V], edgeFactory: GveEdgeFactory[E]) {
 
   /** Stores all graphs contained in the GDL script. */
   private val idToGraphHead: mutable.Map[Id, G] = mutable.HashMap.empty
@@ -349,8 +348,8 @@ class AsciiGraphLoader[G <: GraphHead, V <: Vertex, E <: Edge]
 
 object AsciiGraphLoader {
 
-  def fromString[G <: GraphHead, V <: Vertex, E <: Edge]
-  (elementFactoryProvider: ElementFactoryProvider[G, V, E], asciiGraph: String): AsciiGraphLoader[G, V, E] = {
+  def fromString[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
+  (elementFactoryProvider: GveElementFactoryProvider[G, V, E], asciiGraph: String): AsciiGraphLoader[G, V, E] = {
     new AsciiGraphLoader[G, V, E](new GDLHandler.Builder()
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
@@ -361,8 +360,8 @@ object AsciiGraphLoader {
       elementFactoryProvider.edgeFactory)
   }
 
-  def fromFile[G <: GraphHead, V <: Vertex, E <: Edge]
-  (elementFactoryProvider: ElementFactoryProvider[G, V, E], fileName: String): AsciiGraphLoader[G, V, E] = {
+  def fromFile[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
+  (elementFactoryProvider: GveElementFactoryProvider[G, V, E], fileName: String): AsciiGraphLoader[G, V, E] = {
     new AsciiGraphLoader[G, V, E](new GDLHandler.Builder()
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
@@ -373,8 +372,8 @@ object AsciiGraphLoader {
       elementFactoryProvider.edgeFactory)
   }
 
-  def fromStream[G <: GraphHead, V <: Vertex, E <: Edge]
-  (elementFactoryProvider: ElementFactoryProvider[G, V, E], inputStream: InputStream): AsciiGraphLoader[G, V, E] = {
+  def fromStream[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
+  (elementFactoryProvider: GveElementFactoryProvider[G, V, E], inputStream: InputStream): AsciiGraphLoader[G, V, E] = {
     new AsciiGraphLoader[G, V, E](new GDLHandler.Builder()
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)

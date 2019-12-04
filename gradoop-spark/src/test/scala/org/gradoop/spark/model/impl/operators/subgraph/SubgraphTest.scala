@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.impl.operators.subgraph
 
 import org.gradoop.spark.EpgmGradoopSparkTestBase
-import org.gradoop.spark.functions.filter.HasLabel
+import org.gradoop.spark.expressions.filter.FilterStrings
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 
 class SubgraphTest extends EpgmGradoopSparkTestBase {
@@ -10,12 +10,13 @@ class SubgraphTest extends EpgmGradoopSparkTestBase {
 
   describe("SocialNetworkGraph") {
     val loader = getSocialNetworkLoader
-    val graph = loader.logicalGraph
+    val graph = loader.getLogicalGraph
 
     describe("Strategy both") {
 
       describe("vertexFilter = Person, edgeFilter = true") {
-        val subgraph = graph.subgraph(new HasLabel("Person").call, _ => true)
+        val subgraph = graph
+          .subgraph(FilterStrings.hasLabel("Person"), FilterStrings.any)
 
         it("should have 6 vertices") {
           assert(subgraph.vertices.count() == 6)
@@ -24,7 +25,8 @@ class SubgraphTest extends EpgmGradoopSparkTestBase {
     }
 
     describe("Strategy vertex induced") {
-      val subgraph = graph.vertexInducedSubgraph(e => e.label.contains("Person"))
+      val subgraph = graph
+        .vertexInducedSubgraph(FilterStrings.hasLabel("Person"))
 
       it("should have 6 vertices") {
         assert(subgraph.vertices.count() == 6)
@@ -35,7 +37,8 @@ class SubgraphTest extends EpgmGradoopSparkTestBase {
     }
 
     describe("Strategy edge induced") {
-      val subgraph = graph.edgeInducedSubgraph(e => e.label.contains("hasMember"))
+      val subgraph = graph
+        .edgeInducedSubgraph(FilterStrings.hasLabel("hasMember"))
 
       it("should have 6 vertices") {
         assert(subgraph.vertices.count() == 6)

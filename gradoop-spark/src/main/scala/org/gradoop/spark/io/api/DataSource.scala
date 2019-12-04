@@ -1,19 +1,18 @@
 package org.gradoop.spark.io.api
 
-import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
-import org.gradoop.spark.model.impl.types.GveLayoutType
+import org.gradoop.spark.model.impl.types.Gve
 
-trait DataSource[L <: GveLayoutType[L]] {
+trait DataSource[L <: Gve[L]] {
 
   /** Reads the input as logical graph.
    *
    * @return logical graph
    */
-  def readLogicalGraph: LogicalGraph[L]
+  def readLogicalGraph: L#LG
 
   /** Reads the input as graph collection.
    *
    * @return graph collection
    */
-  def readGraphCollection: GraphCollection[L]
+  def readGraphCollection: L#GC
 }

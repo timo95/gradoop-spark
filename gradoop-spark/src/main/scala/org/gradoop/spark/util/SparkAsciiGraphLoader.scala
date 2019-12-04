@@ -4,11 +4,10 @@ import java.io.InputStream
 
 import org.gradoop.common.util.{AsciiGraphLoader, GradoopConstants}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
-import org.gradoop.spark.model.impl.types.GveLayoutType
+import org.gradoop.spark.model.impl.types.Gve
 
 
-class SparkAsciiGraphLoader[L <: GveLayoutType[L]](config: GradoopSparkConfig[L], loader: AsciiGraphLoader[L#G, L#V, L#E]) {
+class SparkAsciiGraphLoader[L <: Gve[L]](config: GradoopSparkConfig[L], loader: AsciiGraphLoader[L#G, L#V, L#E]) {
 
   /** Appends the given ASCII GDL String to the database.
    *
@@ -26,7 +25,7 @@ class SparkAsciiGraphLoader[L <: GveLayoutType[L]](config: GradoopSparkConfig[L]
    *
    * @return logical graph of vertex and edge space
    */
-  def logicalGraph: LogicalGraph[L] = logicalGraph(true)
+  def getLogicalGraph: L#LG = getLogicalGraph(true)
 
   /** Returns a logical graph containing the complete vertex and edge space of the database.
    *
@@ -34,7 +33,7 @@ class SparkAsciiGraphLoader[L <: GveLayoutType[L]](config: GradoopSparkConfig[L]
    *                             representing the database
    * @return logical graph of vertex and edge space
    */
-  def logicalGraph(withGraphContainment: Boolean): LogicalGraph[L] = {
+  def getLogicalGraph(withGraphContainment: Boolean): L#LG = {
     val factory = config.logicalGraphFactory
     if (withGraphContainment) factory.init(vertices, edges)
       // TODO .transformGraphHead(new RenameLabel[G](GradoopConstants.DEFAULT_GRAPH_LABEL, GradoopConstants.DB_GRAPH_LABEL))
@@ -49,7 +48,7 @@ class SparkAsciiGraphLoader[L <: GveLayoutType[L]](config: GradoopSparkConfig[L]
    * @param variable graph variable used in GDL script
    * @return LogicalGraph
    */
-  def logicalGraphByVariable(variable: String): LogicalGraph[L] = {
+  def getLogicalGraphByVariable(variable: String): L#LG = {
     val graphHead = graphHeadByVariable(variable)
 
     graphHead match {
@@ -64,7 +63,7 @@ class SparkAsciiGraphLoader[L <: GveLayoutType[L]](config: GradoopSparkConfig[L]
    *
    * @return collection of all logical graphs
    */
-  def graphCollection: GraphCollection[L] = {
+  def getGraphCollection: L#GC = {
     config.graphCollectionFactory.init(graphHeads,
       vertices.filter(v => v.graphCount > 0),
       edges.filter(e => e.graphCount > 0))
@@ -75,7 +74,7 @@ class SparkAsciiGraphLoader[L <: GveLayoutType[L]](config: GradoopSparkConfig[L]
    * @param variables graph variables used in GDL script
    * @return GraphCollection
    */
-  def graphCollectionByVariables(variables: String*): GraphCollection[L] = {
+  def getGraphCollectionByVariables(variables: String*): L#GC = {
     val graphHeads = graphHeadsByVariables(variables: _*)
     val vertices = verticesByGraphVariables(variables: _*)
     val edges = edgesByGraphVariables(variables: _*)
@@ -153,7 +152,7 @@ object SparkAsciiGraphLoader {
    *
    * @param asciiGraphs GDL string
    */
-  def fromString[L <: GveLayoutType[L]]
+  def fromString[L <: Gve[L]]
   (config: GradoopSparkConfig[L], asciiGraphs: String): SparkAsciiGraphLoader[L] = {
     val loader = AsciiGraphLoader.fromString(config.logicalGraphFactory, asciiGraphs)
     new SparkAsciiGraphLoader(config, loader)
@@ -163,7 +162,7 @@ object SparkAsciiGraphLoader {
    *
    * @param fileName GDL file name
    */
-  def fromFile[L <: GveLayoutType[L]]
+  def fromFile[L <: Gve[L]]
   (config: GradoopSparkConfig[L], fileName: String): SparkAsciiGraphLoader[L] = {
     val loader = AsciiGraphLoader.fromFile(config.logicalGraphFactory, fileName)
     new SparkAsciiGraphLoader(config, loader)
@@ -173,7 +172,7 @@ object SparkAsciiGraphLoader {
    *
    * @param stream GDL stream
    */
-  def fromStream[L <: GveLayoutType[L]]
+  def fromStream[L <: Gve[L]]
   (config: GradoopSparkConfig[L], stream: InputStream): SparkAsciiGraphLoader[L] = {
     val loader = AsciiGraphLoader.fromStream(config.logicalGraphFactory, stream)
     new SparkAsciiGraphLoader(config, loader)
