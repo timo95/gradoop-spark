@@ -9,7 +9,7 @@ trait GveElementFactoryProvider[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
    *
    * @return a factory that creates graph heads
    */
-  def graphHeadFactory: GveGraphHeadFactoryGve[G]
+  def graphHeadFactory: GveGraphHeadFactory[G]
 
   /** Get the factory that is responsible for creating vertex instances.
    *

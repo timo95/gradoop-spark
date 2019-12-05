@@ -9,7 +9,7 @@ import org.s1ck.gdl.GDLHandler
 import scala.collection.mutable
 
 class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
-(gdlHandler: GDLHandler, graphHeadFactory: GveGraphHeadFactoryGve[G],
+(gdlHandler: GDLHandler, graphHeadFactory: GveGraphHeadFactory[G],
  vertexFactory: GveVertexFactory[V], edgeFactory: GveEdgeFactory[E]) {
 
   /** Stores all graphs contained in the GDL script. */

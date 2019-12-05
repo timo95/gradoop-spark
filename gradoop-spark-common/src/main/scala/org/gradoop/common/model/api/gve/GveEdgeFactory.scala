@@ -1,16 +1,8 @@
 package org.gradoop.common.model.api.gve
 
-import org.gradoop.common.model.api.components._
-import org.gradoop.common.model.impl.id.GradoopId
+import org.gradoop.common.model.api.elements.ElementFactory
 
-trait GveEdgeFactory[E <: GveEdge] extends GveElementFactory[E] {
-
-  /** Initializes an edge based on the given parameters.
-   *
-   * @param id             edge identifier
-   * @return edge data
-   */
-  def apply(id: Id): E = apply(id, new Label(""), GradoopId.NULL_VALUE, GradoopId.NULL_VALUE)
+trait GveEdgeFactory[E <: GveEdge] extends ElementFactory[E] {
 
   /** Creates a new edge based on the given parameters.
    *

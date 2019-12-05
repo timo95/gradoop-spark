@@ -1,7 +1,7 @@
 package org.gradoop.spark.io.impl.metadata
 
 import org.apache.spark.sql.{Dataset, SparkSession}
-import org.gradoop.common.model.api.gve.GveElement
+import org.gradoop.common.model.api.elements.AttributedElement
 import org.gradoop.common.properties.Type
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.expressions.filter.FilterStrings
@@ -40,7 +40,7 @@ object MetaData {
       fromElements(graphCollection.edges))
   }
 
-  private def fromElements[EL <: GveElement]
+  private def fromElements[EL <: AttributedElement]
   (dataset: Dataset[EL])(implicit session: SparkSession): Dataset[ElementMetaData] = {
     import ColumnNames._
     import org.apache.spark.sql.functions._

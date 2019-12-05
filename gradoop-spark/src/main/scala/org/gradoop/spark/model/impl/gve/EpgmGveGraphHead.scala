@@ -2,12 +2,13 @@ package org.gradoop.spark.model.impl.gve
 
 import org.apache.spark.sql.Encoder
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
-import org.gradoop.common.model.api.gve.{GveGraphHead, GveGraphHeadFactoryGve}
+import org.gradoop.common.model.api.gve.{GveGraphHead, GveGraphHeadFactory}
 import org.gradoop.common.model.impl.id.GradoopId
+import org.gradoop.common.properties.PropertyValue
 
 final case class EpgmGveGraphHead(var id: Id, var label: Label, var properties: Properties) extends GveGraphHead
 
-object EpgmGveGraphHead extends GveGraphHeadFactoryGve[L#G] {
+object EpgmGveGraphHead extends GveGraphHeadFactory[L#G] {
 
   def encoder: Encoder[L#G] = ExpressionEncoder[L#G]
 
@@ -19,7 +20,7 @@ object EpgmGveGraphHead extends GveGraphHeadFactoryGve[L#G] {
 
   override def create(labels: Label): L#G = apply(GradoopId.get, labels)
 
-  override def apply(id: Id, labels: Label): L#G = apply(id, labels, Map[String, PV]())
+  override def apply(id: Id, labels: Label): L#G = apply(id, labels, Map[String, PropertyValue]())
 
   override def create(labels: Label, properties: Properties): L#G = apply(GradoopId.get, labels, properties)
 

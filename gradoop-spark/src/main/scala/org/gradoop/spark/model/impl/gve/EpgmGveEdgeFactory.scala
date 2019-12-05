@@ -14,8 +14,6 @@ object EpgmGveEdgeFactory extends GveEdgeFactory[L#E] {
 
   override def producedType: Class[L#E] = classOf[L#E]
 
-  override def apply(id: Id): L#E = apply(id, new Label(""), GradoopId.NULL_VALUE, GradoopId.NULL_VALUE)
-
   override def create(sourceId: Id, targetId: Id): L#E = apply(GradoopId.get, sourceId, targetId)
 
   override def apply(id: Id, sourceId: Id, targetId: Id): L#E = apply(id, new Label(""), sourceId, targetId)

@@ -1,7 +1,7 @@
 package org.gradoop.spark.util
 
 import org.apache.spark.sql.SparkSession
-import org.gradoop.common.model.api.ComponentTypes
+import org.gradoop.common.model.api.components.ComponentTypes
 
 trait EpgmApp extends ComponentTypes with EpgmConfigs {
   implicit val session: SparkSession = SparkSession.builder

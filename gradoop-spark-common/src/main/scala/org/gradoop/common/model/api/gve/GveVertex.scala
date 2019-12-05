@@ -1,5 +1,7 @@
 package org.gradoop.common.model.api.gve
 
-trait GveVertex extends GveGraphElement {
+import org.gradoop.common.model.api.elements.AttributedGraphElement
+
+trait GveVertex extends GveElement with AttributedGraphElement {
 
 }

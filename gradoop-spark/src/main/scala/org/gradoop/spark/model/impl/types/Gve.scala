@@ -6,6 +6,7 @@ import org.gradoop.spark.model.api.layouts.gve.{GveBaseLayoutFactory, GveGraphCo
 
 class Gve[T <: Gve[T]] extends LayoutType[T] {
   type L <: GveLayout[T]
+
   type G <: GveGraphHead
   type V <: GveVertex
   type E <: GveEdge

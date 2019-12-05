@@ -5,7 +5,7 @@ import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.GraphCollection
 import org.gradoop.spark.model.api.layouts.gve.GveGraphCollectionOperators
 
-class EpgmGveGraphCollectionFactory(config: GradoopSparkConfig[L])(implicit session: SparkSession)
+class EpgmGveGraphCollectionFactory(var config: GradoopSparkConfig[L])(implicit session: SparkSession)
   extends EpgmGveLayoutFactory[L#GC] {
 
   override def init(graphHead: Dataset[L#G], vertices: Dataset[L#V], edges: Dataset[L#E]): L#GC = {

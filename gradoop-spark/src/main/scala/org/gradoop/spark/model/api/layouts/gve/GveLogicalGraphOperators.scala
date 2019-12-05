@@ -9,13 +9,13 @@ trait GveLogicalGraphOperators[L <: Gve[L]] extends LogicalGraphOperators[L] {
   this: L#LG =>
 
   def subgraph(vertexFilterExpression: String, edgeFilterExpression: String): L#LG =
-    GveSubgraph.both[L](vertexFilterExpression, edgeFilterExpression).execute(this)
+    callForGraph(GveSubgraph.both[L](vertexFilterExpression, edgeFilterExpression))
 
   def vertexInducedSubgraph(vertexFilterExpression: String): L#LG =
-    GveSubgraph.vertexInduced[L](vertexFilterExpression).execute(this)
+    callForGraph(GveSubgraph.vertexInduced[L](vertexFilterExpression))
 
   def edgeInducedSubgraph(edgeFilterExpression: String): L#LG =
-    GveSubgraph.edgeIncuded[L](edgeFilterExpression).execute(this)
+    callForGraph(GveSubgraph.edgeIncuded[L](edgeFilterExpression))
 
-  def verify: L#LG = new GveVerify[L]().execute(this)
+  def verify: L#LG = callForGraph(new GveVerify[L])
 }

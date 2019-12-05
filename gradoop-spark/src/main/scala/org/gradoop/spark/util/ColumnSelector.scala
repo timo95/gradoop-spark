@@ -12,7 +12,7 @@ class ColumnSelector[T](val dataset: Dataset[T]) extends AnyVal {
   def label(implicit ev: T <:< Labeled, encoder: Encoder[String]): TypedColumn[Any, String] = dataset(LABEL).as[String]
   def properties(implicit ev: T <:< Attributed, encoder: Encoder[Properties]): Column = dataset(PROPERTIES).as[Properties]
   def propertyKeys(implicit ev: T <:< Attributed, encoder: Encoder[Array[String]]): Column = map_keys(dataset(PROPERTIES)).as[Array[String]]
-  def graphIds(implicit ev: T <:< GraphElement, encoder: Encoder[IdSet]): Column = dataset(GRAPH_IDS).as[IdSet]
+  def graphIds(implicit ev: T <:< Contained, encoder: Encoder[IdSet]): Column = dataset(GRAPH_IDS).as[IdSet]
   def sourceId(implicit ev: T <:< Edge, encoder: Encoder[GradoopId]): Column = dataset(SOURCE_ID).as[GradoopId]
   def targetId(implicit ev: T <:< Edge, encoder: Encoder[GradoopId]): Column = dataset(TARGET_ID).as[GradoopId]
 }

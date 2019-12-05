@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.api.layouts.gve
 
 import org.apache.spark.sql.{Dataset, Encoder}
-import org.gradoop.common.model.api.ComponentTypes
+import org.gradoop.common.model.api.components.ComponentTypes
 import org.gradoop.common.model.api.gve.GveElementFactoryProvider
 import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.spark.model.api.graph.BaseGraph

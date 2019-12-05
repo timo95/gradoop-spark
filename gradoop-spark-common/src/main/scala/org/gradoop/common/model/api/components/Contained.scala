@@ -1,6 +1,6 @@
 package org.gradoop.common.model.api.components
 
-trait GraphElement {
+trait Contained {
 
   def graphIds: IdSet
 

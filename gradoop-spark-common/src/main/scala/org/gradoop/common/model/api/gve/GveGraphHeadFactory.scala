@@ -1,8 +1,8 @@
 package org.gradoop.common.model.api.gve
 
-import org.gradoop.common.model.api.components.{Id, Label, Properties}
+import org.gradoop.common.model.api.elements.ElementFactory
 
-trait GveGraphHeadFactoryGve[G <: GveGraphHead] extends GveElementFactory[G] {
+trait GveGraphHeadFactory[G <: GveGraphHead] extends ElementFactory[G] {
 
   /** Creates a new graph head based.
    *

@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.api.config
 
 import org.apache.spark.sql.SparkSession
-import org.gradoop.common.model.api.ComponentTypes
+import org.gradoop.common.model.api.components.ComponentTypes
 import org.gradoop.spark.model.impl.types.LayoutType
 import org.gradoop.spark.util.Implicits
 

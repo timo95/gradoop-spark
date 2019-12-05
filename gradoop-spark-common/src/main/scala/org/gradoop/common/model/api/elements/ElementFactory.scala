@@ -1,6 +1,6 @@
-package org.gradoop.common.model.api.gve
+package org.gradoop.common.model.api.elements
 
-trait GveElementFactory[EL <: GveElement] {
+trait ElementFactory[EL] {
 
   /** Returns the type of the instances produced by that factory.
    *

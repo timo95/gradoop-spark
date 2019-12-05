@@ -25,7 +25,7 @@ abstract protected class CsvParser[L <: Gve[L]] extends Serializable {
   }
 
   protected def parseProperties(propertiesString: String, metaData: ElementMetaData): Properties = {
-    if(propertiesString == null) Map.empty[String, PV]
+    if(propertiesString == null) Map.empty[String, PropertyValue]
     else {
       val properties = metaData.properties
       val propertyStrings = StringEscaper.split(propertiesString, CsvConstants.VALUE_DELIMITER)
