@@ -41,9 +41,9 @@ object SubgraphBenchmark extends BaseBenchmark {
       FilterStrings.hasLabel(cmdConf.vertexLabel()) else FilterStrings.any
     val edgeFilterString: String = if(cmdConf.edgeLabel.isDefined)
       FilterStrings.hasLabel(cmdConf.edgeLabel()) else FilterStrings.any
-    //graph = graph.subgraph(vertexFilterString, edgeFilterString)
+    graph = graph.subgraph(vertexFilterString, edgeFilterString)
 
-    //if(cmdConf.verification()) graph = graph.verify
+    if(cmdConf.verification()) graph = graph.verify
 
     val sink = CsvDataSink(cmdConf.output(), config)
     sink.write(graph, SaveMode.Overwrite)
