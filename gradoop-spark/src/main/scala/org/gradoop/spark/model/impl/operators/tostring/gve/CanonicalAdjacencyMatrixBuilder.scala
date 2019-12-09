@@ -73,23 +73,42 @@ class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => Gra
         .joinWith(outgoingAdjacencyListStrings,
           vertexStrings("graphId") === outgoingAdjacencyListStrings("graphId") and
           vertexStrings("id") === outgoingAdjacencyListStrings("id"),
-          "left_outer")
+          "left")
         .map(combineElementStrings)
       vertexStrings = vertexStrings
         .joinWith(incomingAdjacencyListStrings,
           vertexStrings("graphId") === incomingAdjacencyListStrings("graphId") and
             vertexStrings("id") === incomingAdjacencyListStrings("id"),
-          "left_outer")
+          "left")
         .map(combineElementStrings)
 
     } else {
 
       // 2. union edges with flipped edges and combine strings of parallel edges
-      // 3. extend edge strings by vertex strings
-      // 4/5. extend vertex strings by vertex+edge strings
-      // 6. combine vertex strings
-      // TODO ...
+      edgeStrings = edgeStrings
+        .union(edgeStrings.map(switchSourceTargetIds))
+        .groupByKey(e => e.graphId.toString + e.sourceId.toString + e.targetId.toString)
+        .flatMapGroups((_, e) => concatElementStrings(e, "&"))
 
+      // 3. extend edge strings by vertex strings
+      edgeStrings = edgeStrings
+        .joinWith(vertexStrings,
+          edgeStrings("graphId") === vertexStrings("graphId") and
+          edgeStrings("targetId") === vertexStrings("id"))
+        .map(updateTargetString)
+
+      // 4/5. extend vertex strings by vertex+edge strings
+      val adjacencyListStrings = edgeStrings
+        .groupByKey(e => e.graphId.toString + e.sourceId.toString)
+        .flatMapGroups(undirectedAdjacencyList)
+
+      // 6. combine vertex strings
+      vertexStrings = vertexStrings
+        .joinWith(adjacencyListStrings,
+          vertexStrings("graphId") === adjacencyListStrings("graphId") and
+          vertexStrings("id") === adjacencyListStrings("id"),
+          "left")
+        .map(combineElementStrings)
     }
 
     // 7. create adjacency matrix strings
@@ -101,12 +120,19 @@ class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => Gra
     graphHeadStrings
       .joinWith(adjacencyMatrixStrings,
         graphHeadStrings("id") === adjacencyMatrixStrings("id"),
-        "left_outer")
+        "left")
       .map(combineElementStrings)
   }
 }
 
 object CanonicalAdjacencyMatrixBuilder {
+  private def switchSourceTargetIds(edgeString: EdgeString): EdgeString = {
+    val sourceId = edgeString.sourceId
+    edgeString.sourceId = edgeString.targetId
+    edgeString.targetId = sourceId
+    edgeString
+  }
+
   private def updateSourceString(tuple: Tuple2[EdgeString, VertexString]): EdgeString = {
     tuple._1.sourceString = tuple._2.string
     tuple._1
@@ -145,6 +171,14 @@ object CanonicalAdjacencyMatrixBuilder {
     Traversable(VertexString(first.graphId, first.targetId, string))
   }
 
+  private def undirectedAdjacencyList(key: String, edgeStrings: Iterator[EdgeString]): TraversableOnce[VertexString] = {
+    val strings = edgeStrings.toSeq
+    val first = strings.head
+    val string = strings.map(edgeString => "\n  -" + edgeString.string + "-" + edgeString.targetString)
+      .sorted.mkString
+    Traversable(VertexString(first.graphId, first.sourceId, string))
+  }
+
   private def adjacencyMatrix(key: String, vertexStrings: Iterator[VertexString]): TraversableOnce[GraphHeadString] = {
     val strings = vertexStrings.toSeq
     val first = strings.head
@@ -161,8 +195,8 @@ sealed trait ElementString {
 final case class GraphHeadString(id: GradoopId, var string: String) extends ElementString
 final case class VertexString(graphId: GradoopId, id: GradoopId, var string: String) extends ElementString
 final case class EdgeString(graphId: GradoopId,
-                            sourceId: GradoopId,
-                            targetId: GradoopId,
+                            var sourceId: GradoopId,
+                            var targetId: GradoopId,
                             var sourceString: String,
                             var string: String,
                             var targetString: String) extends ElementString
