@@ -35,62 +35,91 @@ class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => Gra
     implicit val session: SparkSession = config.sparkSession
     import session.implicits._
 
-    // 1. extract strings representations of the elements
+    // 1. extract strings representations of elements
     val graphHeadStrings = gveLayout.graphHeads.map(graphHeadToString)
-    val vertexStrings = gveLayout.vertices.flatMap(vertexToString)
+    var vertexStrings = gveLayout.vertices.flatMap(vertexToString)
     var edgeStrings = gveLayout.edges.flatMap(edgeToString)
 
     if(directed) {
-      // 2. combine labels of parallel edges
+      // 2. combine strings of parallel edges
       edgeStrings = edgeStrings
         .groupByKey(e => e.graphId.toString + e.sourceId.toString + e.targetId.toString)
         .flatMapGroups((_, e) => concatElementStrings(e, "&"))
 
-      // 3. extend edge labels by vertex labels
+      // 3. extend edge strings by vertex strings
       edgeStrings = edgeStrings
         .joinWith(vertexStrings,
           edgeStrings("graphId") === vertexStrings("graphId") and
           edgeStrings("sourceId") === vertexStrings("id"))
         .map(updateSourceString)
+      edgeStrings = edgeStrings
         .joinWith(vertexStrings,
           edgeStrings("graphId") === vertexStrings("graphId") and
           edgeStrings("targetId") === vertexStrings("id"))
         .map(updateTargetString)
 
-      // 4. extend vertex labels by outgoing vertex+edge labels
-      // 5. extend vertex labels by outgoing vertex+edge labels
-      // 6. combine vertex labels
-      // TODO ...
+      // 4. extend vertex strings by outgoing vertex+edge strings
+      val outgoingAdjacencyListStrings = edgeStrings
+        .groupByKey(e => e.graphId.toString + e.sourceId.toString)
+        .flatMapGroups(outgoingAdjacencyList)
+
+      // 5. extend vertex strings by outgoing vertex+edge strings
+      val incomingAdjacencyListStrings = edgeStrings
+        .groupByKey(e => e.graphId.toString + e.sourceId.toString)
+        .flatMapGroups(incomingAdjacencyList)
+
+      // 6. combine vertex strings
+      vertexStrings = vertexStrings
+        .joinWith(outgoingAdjacencyListStrings,
+          vertexStrings("graphId") === outgoingAdjacencyListStrings("graphId") and
+          vertexStrings("id") === outgoingAdjacencyListStrings("id"),
+          "left_outer")
+        .map(combineElementStrings)
+      vertexStrings = vertexStrings
+        .joinWith(incomingAdjacencyListStrings,
+          vertexStrings("graphId") === incomingAdjacencyListStrings("graphId") and
+            vertexStrings("id") === incomingAdjacencyListStrings("id"),
+          "left_outer")
+        .map(combineElementStrings)
 
     } else {
 
-      // 2. union edges with flipped edges and combine labels of parallel edges
-      // 3. extend edge labels by vertex labels
-      // 4/5. extend vertex labels by vertex+edge labels
-      // 6. combine vertex labels
+      // 2. union edges with flipped edges and combine strings of parallel edges
+      // 3. extend edge strings by vertex strings
+      // 4/5. extend vertex strings by vertex+edge strings
+      // 6. combine vertex strings
       // TODO ...
 
     }
 
-    // 7. create adjacency matrix labels
-    // 8. combine graph labels
-    // TODO ...
+    // 7. create adjacency matrix strings
+    val adjacencyMatrixStrings = vertexStrings
+      .groupByKey(_.string)
+      .flatMapGroups(adjacencyMatrix)
 
+    // 8. combine graph strings
     graphHeadStrings
+      .joinWith(adjacencyMatrixStrings,
+        graphHeadStrings("id") === adjacencyMatrixStrings("id"),
+        "left_outer")
+      .map(combineElementStrings)
   }
 }
 
 object CanonicalAdjacencyMatrixBuilder {
   private def updateSourceString(tuple: Tuple2[EdgeString, VertexString]): EdgeString = {
-    val edgeString = tuple._1
-    edgeString.sourceString = tuple._2.string
-    edgeString
+    tuple._1.sourceString = tuple._2.string
+    tuple._1
   }
 
   private def updateTargetString(tuple: Tuple2[EdgeString, VertexString]): EdgeString = {
-    val edgeString = tuple._1
-    edgeString.targetString = tuple._2.string
-    edgeString
+    tuple._1.targetString = tuple._2.string
+    tuple._1
+  }
+
+  private def combineElementStrings[A <: ElementString](tuple: Tuple2[A, A]): A = {
+    if (tuple._2 != null) tuple._1.string = tuple._1.string + tuple._2.string
+    tuple._1
   }
 
   private def concatElementStrings[A <: ElementString](values: Iterator[A], sep: String): TraversableOnce[A] = {
@@ -98,6 +127,29 @@ object CanonicalAdjacencyMatrixBuilder {
     val result = strings.head
     result.string = strings.map(_.string).sorted.mkString(sep)
     Traversable(result)
+  }
+
+  private def outgoingAdjacencyList(key: String, edgeStrings: Iterator[EdgeString]): TraversableOnce[VertexString] = {
+    val strings = edgeStrings.toSeq
+    val first = strings.head
+    val string = strings.map(edgeString => "\n  -" + edgeString.string + "->" + edgeString.targetString)
+      .sorted.mkString
+    Traversable(VertexString(first.graphId, first.sourceId, string))
+  }
+
+  private def incomingAdjacencyList(key: String, edgeStrings: Iterator[EdgeString]): TraversableOnce[VertexString] = {
+    val strings = edgeStrings.toSeq
+    val first = strings.head
+    val string = strings.map(edgeString => "\n  <-" + edgeString.string + "-" + edgeString.targetString)
+      .sorted.mkString
+    Traversable(VertexString(first.graphId, first.targetId, string))
+  }
+
+  private def adjacencyMatrix(key: String, vertexStrings: Iterator[VertexString]): TraversableOnce[GraphHeadString] = {
+    val strings = vertexStrings.toSeq
+    val first = strings.head
+    val string = strings.map("\n " + _.string).sorted.mkString
+    Traversable(GraphHeadString(first.graphId, string))
   }
 }
 
