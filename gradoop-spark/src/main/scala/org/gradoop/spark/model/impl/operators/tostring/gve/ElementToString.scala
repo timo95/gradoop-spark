@@ -5,10 +5,7 @@ import org.gradoop.common.model.api.gve.{GveEdge, GveGraphHead, GveVertex}
 
 object ElementToString {
 
-  private def labelWithProperties(element: AttributedElement): String = {
-    if (element.label == null) ""
-    else "{" + element.properties.map(_.toString).toSeq.sorted.mkString(",") + "}"
-  }
+  // Data String
 
   def graphHeadToDataString[G <: GveGraphHead](graphHead: G): GraphHeadString = {
     GraphHeadString(graphHead.id, "|" + labelWithProperties(graphHead) + "|")
@@ -22,5 +19,13 @@ object ElementToString {
   def edgeToDataString[E <: GveEdge](edge: E): TraversableOnce[EdgeString] = {
     val edgeString = "[" + labelWithProperties(edge) + "]"
     edge.graphIds.map(graphId => EdgeString(graphId, edge.sourceId, edge.targetId, "", edgeString, ""))
+  }
+
+
+  // Helper functions
+
+  private def labelWithProperties(element: AttributedElement): String = {
+    if (element.label == null) ""
+    else "{" + element.properties.map(entry => entry._1 + "=" + entry._2).toSeq.sorted.mkString(",") + "}"
   }
 }

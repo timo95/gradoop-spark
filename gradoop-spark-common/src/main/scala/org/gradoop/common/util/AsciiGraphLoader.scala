@@ -72,7 +72,6 @@ class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
    */
   def graphHeadsByVariables(variables: String*): Set[G] = {
     val result: mutable.Set[G] = mutable.Set[G]()
-
     variables.map(graphHeadsByVariable).filter(g => g.isDefined).map(g => g.get).foreach(result.add)
 
     result.toSet
@@ -112,7 +111,6 @@ class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
    */
   def verticesByGraphIds(graphIds: IdSet): Set[V] = {
     val result: mutable.Set[V] = mutable.Set[V]()
-
     for (vertex <- idToVertex.values) {
       if (graphIds.exists(vertex.graphIds)) result.add(vertex)
     }
@@ -221,11 +219,9 @@ class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
   /** Initializes GraphHeads and their cache. */
   private def initGraphHeads(): Unit = {
     import scala.collection.JavaConverters._
-
     for (graph <- gdlHandler.getGraphs.asScala) {
       if (!graphHeadIdMapping.contains(graph.getId)) initGraphHead(graph)
     }
-
     for ((key, value) <- gdlHandler.getGraphCache().asScala) {
       updateGraphCache(key, value)
     }
@@ -234,9 +230,7 @@ class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
   /** Initializes vertices and their cache. */
   private def initVertices(): Unit = {
     import scala.collection.JavaConverters._
-
     gdlHandler.getVertices.asScala.foreach(initVertex)
-
     for ((key, value) <- gdlHandler.getVertexCache.asScala) {
       updateVertexCache(key, value)
     }
@@ -245,9 +239,7 @@ class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
   /** Initializes edges and their cache. */
   private def initEdges(): Unit = {
     import scala.collection.JavaConverters._
-
     gdlHandler.getEdges.asScala.foreach(initEdge)
-
     for ((key, value) <- gdlHandler.getEdgeCache.asScala) {
       updateEdgeCache(key, value)
     }
@@ -259,7 +251,8 @@ class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
    * @return graph head
    */
   private def initGraphHead(g: org.s1ck.gdl.model.Graph): G = {
-    val properties: Properties = Map("all" -> PropertyValue("")) //Properties.createFromMap(g.getProperties)
+    import collection.JavaConverters._
+    val properties: Properties = g.getProperties.asScala.mapValues(PropertyValue.apply).toMap
     val graphHead: G = graphHeadFactory.create(g.getLabel/*.split(GradoopConstants.LABEL_DELIMITER)*/, properties)
     graphHeadIdMapping.put(g.getId, graphHead.id)
     idToGraphHead.put(graphHead.id, graphHead)
@@ -273,8 +266,9 @@ class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
    */
   private def initVertex(v: org.s1ck.gdl.model.Vertex): V = {
     if (!vertexIdMapping.contains(v.getId)) {
-      val properties: Properties = Map("all" -> PropertyValue("")) //Properties.createFromMap(v.getProperties)
-      val vertex: V = vertexFactory.create(v.getLabel/*.split(GradoopConstants.LABEL_DELIMITER)*/, properties, createGradoopIdSet(v))
+      import collection.JavaConverters._
+      val properties: Properties = v.getProperties.asScala.mapValues(PropertyValue.apply).toMap
+      val vertex: V = vertexFactory.create(v.getLabel, properties, createGradoopIdSet(v))
       vertexIdMapping.put(v.getId, vertex.id)
       idToVertex.put(vertex.id, vertex)
       vertex
@@ -293,8 +287,9 @@ class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
    */
   private def initEdge(e: org.s1ck.gdl.model.Edge): E = {
     if (!edgeIdMapping.contains(e.getId)) {
-      val properties: Properties = Map("all" -> PropertyValue("")) //Properties.createFromMap(e.getProperties)
-      val edge: E = edgeFactory.create(e.getLabel/*.split(GradoopConstants.LABEL_DELIMITER)*/, vertexIdMapping(e.getSourceVertexId),
+      import collection.JavaConverters._
+      val properties: Properties = e.getProperties.asScala.mapValues(PropertyValue.apply).toMap
+      val edge: E = edgeFactory.create(e.getLabel, vertexIdMapping(e.getSourceVertexId),
         vertexIdMapping(e.getTargetVertexId), properties, createGradoopIdSet(e))
       edgeIdMapping.put(e.getId, edge.id)
       idToEdge.put(edge.id, edge)
