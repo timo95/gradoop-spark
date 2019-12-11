@@ -12,6 +12,9 @@ plugins {
     // Fix for gradle + Windows bug
     id("com.github.ManifestClasspath") version "0.1.0-RELEASE"
 
+    // Scala style
+    id("com.github.alisiikh.scalastyle") version "3.1.1" apply false
+
     // Run scalatest tests with gradle build
     id("com.github.maiflai.scalatest") version "0.25" apply false
 
@@ -30,6 +33,12 @@ subprojects {
 
     // Run scalatest tests
     apply(plugin = "com.github.maiflai.scalatest")
+
+    // Scala style
+    apply(plugin = "com.github.alisiikh.scalastyle")
+    configure<com.github.alisiikh.scalastyle.ScalastyleExtension> {
+        setConfig(file("${rootDir}/scalastyle_config.xml"))
+    }
 
     repositories {
         mavenLocal()

@@ -96,7 +96,8 @@ object StringEscaper {
    */
   @throws[IllegalArgumentException]
   def split(escapedString: String, delimiter: String, limit: Int): Array[String] = {
-    if (delimiter.contains(Character.toString(ESCAPE_CHARACTER))) throw new IllegalArgumentException(s"Delimiter must not contain the escape character: '${ESCAPE_CHARACTER}'")
+    if (delimiter.contains(Character.toString(ESCAPE_CHARACTER)))
+      throw new IllegalArgumentException(s"Delimiter must not contain the escape character: '${ESCAPE_CHARACTER}'")
     val realLimit = if (limit <= 0) escapedString.length + 1 else limit
     val tokens = new util.ArrayList[String]
     val sb = new StringBuilder

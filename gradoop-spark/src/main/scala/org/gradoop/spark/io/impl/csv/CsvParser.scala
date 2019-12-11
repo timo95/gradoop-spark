@@ -29,7 +29,9 @@ abstract protected class CsvParser[L <: Gve[L]] extends Serializable {
     else {
       val properties = metaData.properties
       val propertyStrings = StringEscaper.split(propertiesString, CsvConstants.VALUE_DELIMITER)
-      if(propertyStrings.length != properties.length) println(s"Number of Properties for '${metaData.label}' does not fit metadata. Parsed Properties might be corrupt.") //TODO: Add logging
+      if(propertyStrings.length != properties.length)
+        println(s"Number of Properties for '${metaData.label}' does not fit metadata." +
+          s"Parsed Properties might be corrupt.") //TODO: Add logging
       val length = propertyStrings.length min properties.length // only parse when metadata exists for it
       (0 until length)
         .filter(i => !propertyStrings(i).equals("")) // empty value => no property value

@@ -1,6 +1,7 @@
 package org.gradoop.spark.model.api.graph
 
-import org.gradoop.spark.model.api.operators.{BinaryLogicalGraphToLogicalGraphOperator, BinaryLogicalGraphToValueOperator, UnaryLogicalGraphToLogicalGraphOperator, UnaryLogicalGraphToValueOperator}
+import org.gradoop.spark.model.api.operators.{BinaryLogicalGraphToLogicalGraphOperator,
+  BinaryLogicalGraphToValueOperator, UnaryLogicalGraphToLogicalGraphOperator, UnaryLogicalGraphToValueOperator}
 import org.gradoop.spark.model.impl.types.LayoutType
 
 trait LogicalGraphOperators[L <: LayoutType[L]] {
