@@ -25,7 +25,7 @@ object ElementToString {
   // Helper functions
 
   private def labelWithProperties(element: AttributedElement): String = {
-    if (element.label == null) ""
-    else "{" + element.properties.map(entry => entry._1 + "=" + entry._2).toSeq.sorted.mkString(",") + "}"
+    val label = if (element.label == null) "" else element.label
+    label + "{" + element.properties.map(entry => entry._1 + "=" + entry._2).toSeq.sorted.mkString(",") + "}"
   }
 }

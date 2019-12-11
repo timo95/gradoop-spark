@@ -8,7 +8,7 @@ case class PropertyValue(value: Array[Byte], typeByte: Byte) {
 
   def get: Any = getString
 
-  override def toString: Label = s"${get.toString}:${Type(typeByte).string}"
+  override def toString: Label = s"${get.toString}:${Type(typeByte).getTypeClass.getSimpleName}"
 }
 
 object PropertyValue {

@@ -1,11 +1,15 @@
 package org.gradoop.common.properties
 
+import java.time.{LocalDate, LocalDateTime, LocalTime}
+
+import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.common.properties.CompoundType.TYPE_TOKEN_DELIMITER
 import org.gradoop.common.properties.Type._
 
 sealed abstract class Type {
   def string: String
   def byte: Byte
+  def getTypeClass: Class[_] = classFromType(this)
 }
 
 sealed abstract class PrimitiveType(val string: String, val byte: Byte) extends Type
@@ -41,6 +45,7 @@ object Type {
   case class TYPED_MAP(keyType: Type, valueType: Type)
     extends CompoundType(MAP.string + TYPE_TOKEN_DELIMITER + keyType.string + TYPE_TOKEN_DELIMITER + valueType.string, MAP)
 
+  /** Type from type string */
   def apply(typeString: String): Type = {
     typeString.toLowerCase match {
       case Type.NULL.string => Type.NULL
@@ -63,6 +68,7 @@ object Type {
     }
   }
 
+  /** Type from type byte */
   def apply(typeByte: Byte): Type = {
     typeByte match {
       case Type.NULL.byte => Type.NULL
@@ -82,6 +88,29 @@ object Type {
       case Type.SHORT.byte => Type.SHORT
       case Type.SET.byte => Type.SET
       case _ => throw new IllegalArgumentException("Type could not be found: " + typeByte)
+    }
+  }
+
+  /** Class from Type */
+  def classFromType(typ: Type): Class[_] = {
+    typ match {
+      case NULL => null
+      case BOOLEAN => classOf[Boolean]
+      case INTEGER => classOf[Int]
+      case LONG => classOf[Long]
+      case FLOAT => classOf[Float]
+      case DOUBLE => classOf[Double]
+      case STRING => classOf[String]
+      case BIG_DECIMAL => classOf[BigDecimal]
+      case GRADOOP_ID => classOf[GradoopId]
+      case MAP => classOf[Map[_, _]]
+      case LIST => classOf[List[_]]
+      case DATE => classOf[LocalDate]
+      case TIME => classOf[LocalTime]
+      case DATE_TIME => classOf[LocalDateTime]
+      case SHORT => classOf[Short]
+      case SET => classOf[Set[_]]
+      case _ => throw new IllegalArgumentException("Type could not be found: " + typ)
     }
   }
 }

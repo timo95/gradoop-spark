@@ -61,12 +61,12 @@ class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => Gra
       // 4. extend vertex strings by outgoing vertex+edge strings
       val outgoingAdjacencyListStrings = edgeStrings
         .groupByKey(e => e.graphId.toString + e.sourceId.toString)
-        .flatMapGroups((_, it) => adjacencyList(it, _.sourceId, e => s"\n -${e.string}->${e.sourceString}"))
+        .flatMapGroups((_, it) => adjacencyList(it, _.sourceId, e => s"\n  -${e.string}->${e.sourceString}"))
 
       // 5. extend vertex strings by outgoing vertex+edge strings
       val incomingAdjacencyListStrings = edgeStrings
         .groupByKey(e => e.graphId.toString + e.sourceId.toString)
-        .flatMapGroups((_, it) => adjacencyList(it, _.targetId, e => s"\n <-${e.string}-${e.targetString}"))
+        .flatMapGroups((_, it) => adjacencyList(it, _.targetId, e => s"\n  <-${e.string}-${e.targetString}"))
 
       // 6. combine vertex strings
       vertexStrings = vertexStrings
@@ -100,7 +100,7 @@ class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => Gra
       // 4/5. extend vertex strings by vertex+edge strings
       val adjacencyListStrings = edgeStrings
         .groupByKey(e => e.graphId.toString + e.sourceId.toString)
-        .flatMapGroups((_, it) => adjacencyList(it, _.sourceId, e => s"\n -${e.string}-${e.targetString}"))
+        .flatMapGroups((_, it) => adjacencyList(it, _.sourceId, e => s"\n  -${e.string}-${e.targetString}"))
 
       // 6. combine vertex strings
       vertexStrings = vertexStrings
@@ -113,7 +113,7 @@ class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => Gra
 
     // 7. create adjacency matrix strings
     val adjacencyMatrixStrings = vertexStrings
-      .groupByKey(_.string)
+      .groupByKey(_.graphId)
       .flatMapGroups(adjacencyMatrix)
 
     // 8. combine graph strings
@@ -164,7 +164,7 @@ object CanonicalAdjacencyMatrixBuilder {
     Traversable(VertexString(first.graphId, idSelector(first), string))
   }
 
-  private def adjacencyMatrix(key: String, vertexStrings: Iterator[VertexString]): TraversableOnce[GraphHeadString] = {
+  private def adjacencyMatrix(key: GradoopId, vertexStrings: Iterator[VertexString]): TraversableOnce[GraphHeadString] = {
     val strings = vertexStrings.toSeq
     val first = strings.head
     val string = strings.map("\n " + _.string).sorted.mkString
