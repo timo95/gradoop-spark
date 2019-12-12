@@ -29,9 +29,10 @@ abstract protected class CsvParser[L <: Gve[L]] extends Serializable {
     else {
       val properties = metaData.properties
       val propertyStrings = StringEscaper.split(propertiesString, CsvConstants.VALUE_DELIMITER)
-      if(propertyStrings.length != properties.length)
+      if(propertyStrings.length != properties.length) {
         println(s"Number of Properties for '${metaData.label}' does not fit metadata." +
           s"Parsed Properties might be corrupt.") //TODO: Add logging
+      }
       val length = propertyStrings.length min properties.length // only parse when metadata exists for it
       (0 until length)
         .filter(i => !propertyStrings(i).equals("")) // empty value => no property value
@@ -55,7 +56,7 @@ abstract protected class CsvParser[L <: Gve[L]] extends Serializable {
       case Type.TIME.string => LocalTime.parse(valueString)
       case Type.DATE_TIME.string => LocalDateTime.parse(valueString)
       case Type.SHORT.string => java.lang.Short.parseShort(valueString)
-      case compound if compound.contains(CompoundType.TYPE_TOKEN_DELIMITER) => compoundParser(CompoundType(compound))(valueString)
+      case compound: String if compound.contains(CompoundType.TYPE_TOKEN_DELIMITER) => compoundParser(CompoundType(compound))(valueString)
       case _ => throw new IllegalArgumentException("Type not yet supported: " + typeString)
     })
   }

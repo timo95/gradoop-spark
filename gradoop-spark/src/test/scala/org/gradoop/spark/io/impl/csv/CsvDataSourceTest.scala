@@ -4,7 +4,7 @@ import org.gradoop.spark.EpgmGradoopSparkTestBase
 
 class CsvDataSourceTest extends EpgmGradoopSparkTestBase {
   private val config = getConfig
-  import config.implicits._
+  import config.Implicits._
 
   describe("logical graph with extended properties") {
     val path = getClass.getResource("/data/csv/input_extended_properties").getFile

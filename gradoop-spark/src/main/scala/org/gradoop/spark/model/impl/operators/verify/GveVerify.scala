@@ -7,7 +7,7 @@ class GveVerify[L <: Gve[L]] extends UnaryLogicalGraphToLogicalGraphOperator[L#L
 
   override def execute(graph: L#LG): L#LG = {
     val factory = graph.factory
-    import factory.implicits._
+    import factory.Implicits._
     import graph.config.sparkSession.implicits._
     val verifiedEdgesSource = graph.edges
       .joinWith(graph.vertices, graph.edges.sourceId === graph.vertices.id)

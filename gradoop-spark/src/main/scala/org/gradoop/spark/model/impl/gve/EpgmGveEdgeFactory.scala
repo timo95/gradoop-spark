@@ -30,8 +30,9 @@ object EpgmGveEdgeFactory extends GveEdgeFactory[L#E] {
 
   override def apply(id: Id, labels: Label, sourceId: Id, targetId: Id, graphIds: IdSet): L#E = apply(id, labels, sourceId, targetId, null, graphIds)
 
-  override def create(labels: Label, sourceId: Id, targetId: Id, properties: Properties, graphIds: IdSet): L#E =
+  override def create(labels: Label, sourceId: Id, targetId: Id, properties: Properties, graphIds: IdSet): L#E = {
     apply(GradoopId.get, labels, sourceId, targetId, properties, graphIds)
+  }
 
   override def apply(id: Id, labels: Label, sourceId: Id, targetId: Id, properties: Properties, graphIds: IdSet):
   EpgmGveEdgeFactory = new EpgmGveEdgeFactory(id, labels, sourceId, targetId, properties, graphIds)

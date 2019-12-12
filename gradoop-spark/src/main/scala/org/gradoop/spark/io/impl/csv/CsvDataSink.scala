@@ -11,7 +11,7 @@ import org.gradoop.spark.model.impl.types.Gve
 class CsvDataSink[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L], metadata: Option[MetaData])
   extends CsvComposer[L](metadata) with DataSink[L] {
   implicit val session: SparkSession = config.sparkSession
-  import config.implicits._
+  import config.Implicits._
 
   private val options: Map[String, String] = Map(
     "sep" -> CsvConstants.TOKEN_DELIMITER,

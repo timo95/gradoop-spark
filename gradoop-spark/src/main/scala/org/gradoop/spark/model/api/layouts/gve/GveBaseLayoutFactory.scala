@@ -13,7 +13,7 @@ trait GveBaseLayoutFactory[L <: Gve[L], BG <: BaseGraph[L]] extends LogicalGraph
   with GraphCollectionLayoutFactory[L]
   with GveElementFactoryProvider[L#G, L#V, L#E] {
 
-  object implicits extends Implicits with ComponentTypes {
+  object Implicits extends Implicits with ComponentTypes {
     // Encoder
     implicit def implicitGraphHeadEncoder: Encoder[L#G] = graphHeadEncoder
     implicit def impliticVertexEncoder: Encoder[L#V] = vertexEncoder

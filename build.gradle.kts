@@ -46,14 +46,14 @@ subprojects {
     }
 
     dependencies {
-        // Needed by scalatest plugin "com.github.maiflai.scalatest"
-        "testRuntime"("org.pegdown:pegdown:1.4.2")
-
         // Scala
         "implementation"("org.scala-lang:scala-library:${Versions.scalaFull}")
 
         // Testing framework
         "testImplementation"("org.scalatest:scalatest_${Versions.scalaMajor}:${Versions.scalatest}")
+
+        // Needed by scalatest plugin "com.github.maiflai.scalatest"
+        "testRuntime"("org.pegdown:pegdown:${Versions.pegdown}")
     }
 
     // make tests available in a test jar

@@ -13,7 +13,7 @@ class GveSubgraph[L <: Gve[L]] private
 
   override def execute(graph: L#LG): L#LG = {
     val factory = graph.factory
-    import factory.implicits._
+    import factory.Implicits._
     import graph.config.sparkSession.implicits._
     strategy match {
       case Strategy.BOTH =>

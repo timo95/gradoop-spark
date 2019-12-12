@@ -6,7 +6,7 @@ import org.gradoop.spark.model.api.config.GradoopSparkConfig
 
 class SubgraphTest extends EpgmGradoopSparkTestBase {
   private val config: GradoopSparkConfig[L] = getConfig
-  import config.implicits._
+  import config.Implicits._
 
   describe("SocialNetworkGraph") {
     val loader = getSocialNetworkLoader

@@ -177,5 +177,4 @@ object SparkAsciiGraphLoader {
     val loader = AsciiGraphLoader.fromStream(config.logicalGraphFactory, stream)
     new SparkAsciiGraphLoader(config, loader)
   }
-
 }

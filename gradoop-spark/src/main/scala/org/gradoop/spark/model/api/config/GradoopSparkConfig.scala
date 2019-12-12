@@ -8,7 +8,7 @@ import org.gradoop.spark.util.Implicits
 class GradoopSparkConfig[L <: LayoutType[L]](val logicalGraphFactory: L#LGF, val graphCollectionFactory: L#GCF)
 (implicit val sparkSession: SparkSession) extends Serializable {
 
-  object implicits extends Implicits with ComponentTypes {
+  object Implicits extends Implicits with ComponentTypes {
     // Spark session
     implicit def implicitSparkSession: SparkSession = sparkSession
   }

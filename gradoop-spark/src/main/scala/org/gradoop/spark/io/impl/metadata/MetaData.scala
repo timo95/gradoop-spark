@@ -27,14 +27,14 @@ class MetaData(val graphHeadMetaData: Dataset[ElementMetaData],
 object MetaData {
 
   def apply[L <: Gve[L]](logicalGraph: L#LG): MetaData = {
-    import logicalGraph.config.implicits._
+    import logicalGraph.config.Implicits._
     new MetaData(fromElements(logicalGraph.graphHead),
       fromElements(logicalGraph.vertices),
       fromElements(logicalGraph.edges))
   }
 
   def apply[L <: Gve[L]](graphCollection: L#GC): MetaData = {
-    import graphCollection.config.implicits._
+    import graphCollection.config.Implicits._
     new MetaData(fromElements(graphCollection.graphHeads),
       fromElements(graphCollection.vertices),
       fromElements(graphCollection.edges))

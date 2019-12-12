@@ -42,9 +42,11 @@ class CsvMetaDataSource(csvPath: String)(implicit session: SparkSession)
     val label: String = if(row.getString(0) == null) "" else StringEscaper.unescape(row.getString(0))
     val propertyMetaData =
       if(row.getString(1) == null) Array.empty[PropertyMetaData]
-      else StringEscaper.split(row.getString(1), CsvConstants.LIST_DELIMITER)
-        .map(string => StringEscaper.split(string, CsvConstants.PROPERTY_TOKEN_DELIMITER, 2))
-        .map(array => PropertyMetaData(StringEscaper.unescape(array(0)), array(1).toLowerCase))
+      else {
+        StringEscaper.split(row.getString(1), CsvConstants.LIST_DELIMITER)
+          .map(string => StringEscaper.split(string, CsvConstants.PROPERTY_TOKEN_DELIMITER, 2))
+          .map(array => PropertyMetaData(StringEscaper.unescape(array(0)), array(1).toLowerCase))
+      }
 
     ElementMetaData(label, propertyMetaData) // TODO: complex types
   }

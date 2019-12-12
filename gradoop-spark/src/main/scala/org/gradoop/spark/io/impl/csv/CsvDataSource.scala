@@ -8,9 +8,9 @@ import org.gradoop.spark.model.impl.types.Gve
 
 class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
   extends CsvParser[L] with DataSource[L] {
-  import config.implicits._
+  import config.Implicits._
   private val factory = config.logicalGraphFactory
-  import factory.implicits._
+  import factory.Implicits._
 
   private val options: Map[String, String] = Map(
     "sep" -> CsvConstants.TOKEN_DELIMITER,

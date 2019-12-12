@@ -5,6 +5,4 @@ import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, Logica
 import org.gradoop.spark.model.impl.types.Tfl
 
 trait TflBaseLayoutFactory[L <: Tfl[L], BG <: BaseGraph[L]] extends LogicalGraphLayoutFactory[L]
-  with GraphCollectionLayoutFactory[L] {
-
-}
+  with GraphCollectionLayoutFactory[L]

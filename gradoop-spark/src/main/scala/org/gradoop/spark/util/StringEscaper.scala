@@ -96,8 +96,9 @@ object StringEscaper {
    */
   @throws[IllegalArgumentException]
   def split(escapedString: String, delimiter: String, limit: Int): Array[String] = {
-    if (delimiter.contains(Character.toString(ESCAPE_CHARACTER)))
+    if (delimiter.contains(Character.toString(ESCAPE_CHARACTER))) {
       throw new IllegalArgumentException(s"Delimiter must not contain the escape character: '${ESCAPE_CHARACTER}'")
+    }
     val realLimit = if (limit <= 0) escapedString.length + 1 else limit
     val tokens = new util.ArrayList[String]
     val sb = new StringBuilder
@@ -135,8 +136,8 @@ object StringEscaper {
    * @return escape sequence
    */
   private def escapeCharacter(character: Char): CharSequence = {
-    if (CUSTOM_ESCAPE_SEQUENCES.containsKey(character)) return CUSTOM_ESCAPE_SEQUENCES.get(character)
-    s"${ESCAPE_CHARACTER}$character"
+    if (CUSTOM_ESCAPE_SEQUENCES.containsKey(character)) CUSTOM_ESCAPE_SEQUENCES.get(character)
+    else s"${ESCAPE_CHARACTER}$character"
   }
 
   /** Returns the character of a given escape sequence.
@@ -145,7 +146,7 @@ object StringEscaper {
    * @return escaped character
    */
   private def unescapeSequence(sequence: CharSequence): Char = {
-    if (CUSTOM_ESCAPE_SEQUENCES.containsValue(sequence)) return CUSTOM_ESCAPE_SEQUENCES.inverse.get(sequence)
-    sequence.charAt(1)
+    if (CUSTOM_ESCAPE_SEQUENCES.containsValue(sequence)) CUSTOM_ESCAPE_SEQUENCES.inverse.get(sequence)
+    else sequence.charAt(1)
   }
 }

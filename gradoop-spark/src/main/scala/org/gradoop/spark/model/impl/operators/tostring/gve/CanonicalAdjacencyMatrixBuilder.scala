@@ -20,11 +20,13 @@ class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => Gra
 
     val graphStrings = getGraphStrings(collection.layout, collection.config)
     if(graphStrings.isEmpty) "" // Collections can be empty
-    else graphStrings
-      .groupByKey(_ => "")
-      .flatMapGroups((_, g) => concatElementStrings(g, System.lineSeparator))
-      .first
-      .string
+    else {
+      graphStrings
+        .groupByKey(_ => "")
+        .flatMapGroups((_, g) => concatElementStrings(g, System.lineSeparator))
+        .first
+        .string
+    }
   }
 
   override def execute(graph: L#LG): String = {

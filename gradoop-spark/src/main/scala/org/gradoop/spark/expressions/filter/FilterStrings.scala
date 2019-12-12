@@ -8,6 +8,6 @@ object FilterStrings {
 
   // TODO use column expressions instead?
 
-  def hasLabel(label: String) = s"${ColumnNames.LABEL}='$label'"
+  def hasLabel(label: String): String = s"${ColumnNames.LABEL}='$label'"
 
 }
