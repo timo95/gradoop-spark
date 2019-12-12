@@ -11,6 +11,7 @@ object Versions {
     var gdl = "0.3"
 
     var guava = "23.0"
+    var slf4j = "1.7.29"
 
     // Testing
     var scalatest = "3.0.8"

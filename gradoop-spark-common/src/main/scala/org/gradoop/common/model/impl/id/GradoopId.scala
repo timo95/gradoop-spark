@@ -6,7 +6,7 @@ import java.security.SecureRandom
 import java.util.Date
 import java.util.concurrent.atomic.AtomicInteger
 
-case class GradoopId(val bytes: Array[Byte]) extends Ordered[GradoopId] {
+case class GradoopId(bytes: Array[Byte]) extends Ordered[GradoopId] {
 
   /** Checks if the specified object is equal to the current id.
    *
@@ -14,14 +14,16 @@ case class GradoopId(val bytes: Array[Byte]) extends Ordered[GradoopId] {
    * @return true, iff the specified id is equal to this id
    */
   override def equals(o: Any): Boolean = {
-    if (super.equals(o)) return true
-    if (o == null || (getClass ne o.getClass)) return false
-    val firstBytes = this.bytes
-    val secondBytes = o.asInstanceOf[GradoopId].bytes
-    for (i <- 0 until GradoopId.ID_SIZE) {
-      if (firstBytes(i) != secondBytes(i)) return false
+    if (super.equals(o)) true
+    else if (o == null || (getClass ne o.getClass)) false
+    else {
+      val firstBytes = this.bytes
+      val secondBytes = o.asInstanceOf[GradoopId].bytes
+      for (i <- 0 until GradoopId.ID_SIZE) {
+        if (firstBytes(i) != secondBytes(i)) return false // scalastyle:ignore
+      }
+      true
     }
-    true
   }
 
   /** Returns the hash code of this GradoopId.
@@ -40,8 +42,10 @@ case class GradoopId(val bytes: Array[Byte]) extends Ordered[GradoopId] {
 
   override def compare(that: GradoopId): Int = {
     for (i <- 0 until GradoopId.ID_SIZE) {
-      if (this.bytes(i) != that.bytes(i)) return if ((this.bytes(i) & 0xff) < (that.bytes(i) & 0xff)) -1
-      else 1
+      if (this.bytes(i) != that.bytes(i)) {
+        if ((this.bytes(i) & 0xff) < (that.bytes(i) & 0xff)) -1
+        else 1
+      }
     }
     0
   }
@@ -179,8 +183,12 @@ object GradoopId {
    * @param checkCounter      if the constructor should test if the counter is between 0 and 16777215
    */
   private def apply(timestamp: Int, machineIdentifier: Int, processIdentifier: Short, counter: Int, checkCounter: Boolean): GradoopId = {
-    if ((machineIdentifier & HIGH_ORDER_ONE_BYTE) != 0) throw new IllegalArgumentException("The machine identifier must be between 0" + " and 16777215 (it must fit in three bytes).")
-    if (checkCounter && ((counter & HIGH_ORDER_ONE_BYTE) != 0)) throw new IllegalArgumentException("The counter must be between 0" + " and 16777215 (it must fit in three bytes).")
+    if ((machineIdentifier & HIGH_ORDER_ONE_BYTE) != 0) {
+      throw new IllegalArgumentException("The machine identifier must be between 0" + " and 16777215 (it must fit in three bytes).")
+    }
+    if (checkCounter && ((counter & HIGH_ORDER_ONE_BYTE) != 0)) {
+      throw new IllegalArgumentException("The counter must be between 0" + " and 16777215 (it must fit in three bytes).")
+    }
 
     val buffer = ByteBuffer.allocate(12)
 
@@ -214,8 +222,9 @@ object GradoopId {
    * @return GradoopId
    */
   def fromString(string: String): GradoopId = {
-    if (!GradoopId.isValid(string))
+    if (!GradoopId.isValid(string)) {
       throw new IllegalArgumentException("invalid hexadecimal representation of a GradoopId: [" + string + "]")
+    }
     val bytes = (0 to string.length-2 by 2)
       .map(i => Integer.parseInt(string.substring(i, i + 2), 16).toByte)
       .toArray
@@ -230,10 +239,12 @@ object GradoopId {
    * @return whether the string could be an object id
    */
   def isValid(hexString: String): Boolean = {
-    if (hexString.length != 2 * ID_SIZE) return false
-    hexString.foreach(c =>
-      if(!(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F')) return false)
-    true
+    if (hexString.length != 2 * ID_SIZE) false
+    else {
+      hexString.foreach(c =>
+        if(!(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F')) return false) // scalastyle:ignore return
+      true
+    }
   }
 
   //------------------------------------------------------------------------------------------------

@@ -7,6 +7,8 @@ import org.gradoop.spark.model.impl.types.LayoutType
 trait LogicalGraphOperators[L <: LayoutType[L]] {
   this: L#LG =>
 
+  def equalsByData(other: L#LG): Boolean
+
   def subgraph(vertexFilterExpression: String, edgeFilterExpression: String): L#LG
 
   def vertexInducedSubgraph(vertexFilterExpression: String): L#LG

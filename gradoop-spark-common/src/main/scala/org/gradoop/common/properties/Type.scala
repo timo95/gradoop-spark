@@ -121,9 +121,9 @@ object CompoundType {
 
   def apply(typeString: String): CompoundType = {
     typeString match {
-      case list if list.startsWith(LIST.string) => TYPED_LIST(Type(list.substring(LIST.string.length + 1)))
-      case set if set.startsWith(SET.string) => TYPED_SET(Type(set.substring(SET.string.length + 1)))
-      case map if map.startsWith(MAP.string) =>
+      case list: String if list.startsWith(LIST.string) => TYPED_LIST(Type(list.substring(LIST.string.length + 1)))
+      case set: String if set.startsWith(SET.string) => TYPED_SET(Type(set.substring(SET.string.length + 1)))
+      case map: String if map.startsWith(MAP.string) =>
         val tokens = map.split(TYPE_TOKEN_DELIMITER)
         TYPED_MAP(Type(tokens(1)), Type(tokens(2)))
       case _ => throw new IllegalArgumentException("Type could not be found: " + typeString)

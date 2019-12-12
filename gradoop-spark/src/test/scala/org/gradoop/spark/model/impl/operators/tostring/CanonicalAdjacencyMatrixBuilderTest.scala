@@ -25,7 +25,7 @@ class CanonicalAdjacencyMatrixBuilderTest extends EpgmGradoopSparkTestBase {
     it("Equals expected") {
       val stringPath = getClass.getResource("/data/string/cam_test_directed").getFile
       val expected = Source.fromFile(stringPath)
-      assert(expected.mkString eq result)
+      assert(expected.mkString equals result)
       expected.close
     }
   }
@@ -39,7 +39,7 @@ class CanonicalAdjacencyMatrixBuilderTest extends EpgmGradoopSparkTestBase {
     it("Equals expected") {
       val stringPath = getClass.getResource("/data/string/cam_test_undirected").getFile
       val expected = Source.fromFile(stringPath)
-      assert(expected.mkString eq result)
+      assert(expected.mkString equals result)
       expected.close
     }
   }

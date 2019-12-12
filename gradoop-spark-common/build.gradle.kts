@@ -12,4 +12,6 @@ dependencies {
     implementation("org.scala-lang:scala-reflect:${Versions.scalaFull}")
 
     implementation("com.github.s1ck:gdl:${Versions.gdl}")
+
+    implementation("org.slf4j:slf4j-api:${Versions.slf4j}")
 }

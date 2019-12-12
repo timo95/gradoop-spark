@@ -63,12 +63,12 @@ class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => Gra
       // 4. extend vertex strings by outgoing vertex+edge strings
       val outgoingAdjacencyListStrings = edgeStrings
         .groupByKey(e => e.graphId.toString + e.sourceId.toString)
-        .flatMapGroups((_, it) => adjacencyList(it, _.sourceId, e => s"\n  -${e.string}->${e.sourceString}"))
+        .flatMapGroups((_, it) => adjacencyList(it, _.sourceId, e => s"\n  -${e.string}->${e.targetString}"))
 
       // 5. extend vertex strings by outgoing vertex+edge strings
       val incomingAdjacencyListStrings = edgeStrings
-        .groupByKey(e => e.graphId.toString + e.sourceId.toString)
-        .flatMapGroups((_, it) => adjacencyList(it, _.targetId, e => s"\n  <-${e.string}-${e.targetString}"))
+        .groupByKey(e => e.graphId.toString + e.targetId.toString)
+        .flatMapGroups((_, it) => adjacencyList(it, _.targetId, e => s"\n  <-${e.string}-${e.sourceString}"))
 
       // 6. combine vertex strings
       vertexStrings = vertexStrings

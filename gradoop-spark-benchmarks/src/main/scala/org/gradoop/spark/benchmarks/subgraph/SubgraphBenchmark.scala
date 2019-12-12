@@ -37,10 +37,16 @@ object SubgraphBenchmark extends BaseBenchmark {
     val source = CsvDataSource(cmdConf.input(), config)
     var graph = source.readLogicalGraph
 
-    val vertexFilterString: String = if(cmdConf.vertexLabel.isDefined)
-      FilterStrings.hasLabel(cmdConf.vertexLabel()) else FilterStrings.any
-    val edgeFilterString: String = if(cmdConf.edgeLabel.isDefined)
-      FilterStrings.hasLabel(cmdConf.edgeLabel()) else FilterStrings.any
+    val vertexFilterString: String = if(cmdConf.vertexLabel.isDefined) {
+      FilterStrings.hasLabel(cmdConf.vertexLabel())
+    } else {
+      FilterStrings.any
+    }
+    val edgeFilterString: String = if(cmdConf.edgeLabel.isDefined) {
+      FilterStrings.hasLabel(cmdConf.edgeLabel())
+    } else {
+      FilterStrings.any
+    }
     graph = graph.subgraph(vertexFilterString, edgeFilterString)
 
     if(cmdConf.verification()) graph = graph.verify

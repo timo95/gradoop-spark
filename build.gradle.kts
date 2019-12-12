@@ -28,7 +28,7 @@ allprojects {
 }
 
 subprojects {
-    //apply(plugin = "java-library")
+    apply(plugin = "java-library")
     apply(plugin = "scala")
 
     // Run scalatest tests
