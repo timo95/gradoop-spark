@@ -8,7 +8,11 @@ import org.gradoop.common.properties.strategies.PropertyValueStrategyFactory
 
 case class PropertyValue(value: Array[Byte]) {
 
+  def copy: PropertyValue = PropertyValue(value)
+
   def getTypeByte: Byte = value(0)
+
+  def getType: Type = Type(getTypeByte)
 
   def getExactType: Type = PropertyValueStrategyFactory.get(getTypeByte).getExactType(value)
 

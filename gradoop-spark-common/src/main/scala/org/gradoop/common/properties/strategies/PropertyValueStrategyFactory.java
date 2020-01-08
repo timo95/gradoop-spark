@@ -22,6 +22,7 @@ import org.gradoop.common.properties.Type;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -99,10 +100,16 @@ public class PropertyValueStrategyFactory {
    * @param value to be serialized.
    * @return byte array representation of the provided object.
    */
+  @SuppressWarnings("unchecked")
   public static byte[] getBytes(Object value) {
     if (value != null) {
       try {
-        return get(PrimitiveType.of(value).getTypeByte()).getBytes(value);
+        PropertyValueStrategy strategy = get(PrimitiveType.of(value).getTypeByte());
+        if (!strategy.is(value)) {
+          throw new IllegalArgumentException(String.format("Type %s is not supported by %s",
+            value.getClass().getSimpleName(), strategy.getClass().getSimpleName()));
+        }
+        return strategy.getBytes(value);
       } catch (IOException e) {
         throw new RuntimeException("Error while serializing object.", e);
       }
@@ -133,6 +140,7 @@ public class PropertyValueStrategyFactory {
    */
   private Map<Byte, PropertyValueStrategy> initStrategyMap() {
     Map<Byte, PropertyValueStrategy> classMapping = new HashMap<>();
+    classMapping.put(Type.NULL$.MODULE$.getTypeByte(), new NullStrategy());
     classMapping.put(Type.BOOLEAN$.MODULE$.getTypeByte(), new BooleanStrategy());
     classMapping.put(Type.SET$.MODULE$.getTypeByte(), new SetStrategy());
     classMapping.put(Type.INTEGER$.MODULE$.getTypeByte(), new IntegerStrategy());

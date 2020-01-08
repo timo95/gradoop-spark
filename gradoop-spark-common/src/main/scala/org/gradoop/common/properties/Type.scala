@@ -12,17 +12,12 @@ sealed abstract class Type {
   def getTypeClass: Class[_] = classFromType(this)
 
   def getTypeByte: Byte = byte // to support java
-  def isPrimitive: Boolean
 }
 
-sealed abstract class PrimitiveType(val string: String, val byte: Byte) extends Type {
-  override def isPrimitive: Boolean = true
-}
+sealed abstract class PrimitiveType(val string: String, val byte: Byte) extends Type
 
 sealed abstract class CompoundType(val string: String, val mainType: PrimitiveType) extends Type {
   override def byte: Byte = mainType.byte
-
-  override def isPrimitive: Boolean = false
 }
 
 object Type {
@@ -101,7 +96,7 @@ object Type {
   /** Class from Type */
   def classFromType(typ: Type): Class[_] = {
     typ match {
-      case NULL => null
+      case NULL => null // TODO exchange for Null/Nothing etc type
       case BOOLEAN => classOf[Boolean]
       case INTEGER => classOf[Int]
       case LONG => classOf[Long]
