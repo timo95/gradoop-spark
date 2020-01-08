@@ -2,7 +2,7 @@ package org.gradoop.spark.io.impl.metadata
 
 import org.apache.spark.sql.{Dataset, SparkSession}
 import org.gradoop.common.model.api.elements.AttributedElement
-import org.gradoop.common.properties.Type
+import org.gradoop.common.properties.{PropertyValue, Type}
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.expressions.filter.FilterStrings
 import org.gradoop.spark.model.impl.types.Gve
@@ -47,13 +47,13 @@ object MetaData {
     import org.gradoop.spark.util.Implicits._
     import session.implicits._
 
-    val byteToString = udf((b: Byte) => Type(b).string)
+    val getTypeString = udf((p: PropertyValue) => p.getExactType.string)
 
     dataset
       // one row for each property per element
       .select(dataset.label, explode(dataset.properties).as(Seq("key","property")))
       // put property key and type in struct
-      .select(col(LABEL), struct(col("key"), byteToString(col(s"property.$PROPERTY_TYPE")).as("typeString")).as("property"))
+      .select(col(LABEL), struct(col("key"), getTypeString(col(s"property")).as("typeString")).as("property"))
       // group by label
       .groupBy(LABEL)
       // aggregate property structs to a set per label

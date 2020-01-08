@@ -10,12 +10,19 @@ sealed abstract class Type {
   def string: String
   def byte: Byte
   def getTypeClass: Class[_] = classFromType(this)
+
+  def getTypeByte: Byte = byte // to support java
+  def isPrimitive: Boolean
 }
 
-sealed abstract class PrimitiveType(val string: String, val byte: Byte) extends Type
+sealed abstract class PrimitiveType(val string: String, val byte: Byte) extends Type {
+  override def isPrimitive: Boolean = true
+}
 
 sealed abstract class CompoundType(val string: String, val mainType: PrimitiveType) extends Type {
   override def byte: Byte = mainType.byte
+
+  override def isPrimitive: Boolean = false
 }
 
 object Type {
@@ -111,6 +118,31 @@ object Type {
       case SHORT => classOf[Short]
       case SET => classOf[Set[_]]
       case _ => throw new IllegalArgumentException("Type could not be found: " + typ)
+    }
+  }
+}
+
+object PrimitiveType {
+
+  def of(obj: Any): Type = {
+    obj match {
+      case null => NULL
+      case _: Boolean => BOOLEAN
+      case _: Int => INTEGER
+      case _: Long => LONG
+      case _: Float => FLOAT
+      case _: Double => DOUBLE
+      case _: String => STRING
+      case _: BigDecimal => BIG_DECIMAL
+      case _: GradoopId => GRADOOP_ID
+      case _: Map[_, _] => MAP
+      case _: List[_] => LIST
+      case _: LocalDate => DATE
+      case _: LocalTime => TIME
+      case _: LocalDateTime => DATE_TIME
+      case _: Short => SHORT
+      case _: Set[_] => SET
+      case _ => throw new IllegalArgumentException("Type is not supported: " + obj.getClass.getSimpleName)
     }
   }
 }
