@@ -52,8 +52,7 @@ class MapStrategy extends AbstractVariableSizedPropertyValueStrategy[Map[Propert
 
   override def is(value: Any): Boolean = {
     value.isInstanceOf[Map[_, _]] && value.asInstanceOf[Map[_, _]]
-      .map(e => e._1.isInstanceOf[PropertyValue] && e._2.isInstanceOf[PropertyValue])
-      .reduce(_&&_)
+      .forall(e => e._1.isInstanceOf[PropertyValue] && e._2.isInstanceOf[PropertyValue])
   }
 
   override def getType: Type = Type.MAP
@@ -68,10 +67,12 @@ class MapStrategy extends AbstractVariableSizedPropertyValueStrategy[Map[Propert
   override def get(bytes: Array[Byte]): Map[PropertyValue, PropertyValue] = {
     val inputStream = createInputStream(bytes)
     try {
-      if (inputStream.skipBytes(PropertyValue.OFFSET) != PropertyValue.OFFSET) throw new IOException("Malformed entry in PropertyValue Map.")
+      if (inputStream.skipBytes(PropertyValue.OFFSET) != PropertyValue.OFFSET) {
+        throw new IOException("Malformed entry in PropertyValue Map.")
+      }
       createMap(inputStream)
     } catch {
-      case e: IOException => throw new IOException("Error while processing DataInputStreamStreamWrapper.", e)
+      case e: IOException => throw new IOException("Error while processing DataInputStream.", e)
     }
   }
 
@@ -115,8 +116,7 @@ class MapStrategy extends AbstractVariableSizedPropertyValueStrategy[Map[Propert
       map.put(PropertyValue.read(inputStream), PropertyValue.read(inputStream))
     }
     catch {
-      case e: IOException =>
-        throw new IOException("Error reading PropertyValue with MapStrategy.", e)
+      case e: IOException => throw new IOException("Error reading PropertyValue with MapStrategy.", e)
     }
     map.toMap
   }

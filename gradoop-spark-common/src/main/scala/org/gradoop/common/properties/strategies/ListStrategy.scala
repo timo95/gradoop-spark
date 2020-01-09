@@ -58,7 +58,7 @@ class ListStrategy extends AbstractVariableSizedPropertyValueStrategy[List[Prope
   }
 
   override def is(value: Any): Boolean = {
-    value.isInstanceOf[List[_]] && value.asInstanceOf[List[_]].map(_.isInstanceOf[PropertyValue]).reduce(_&&_)
+    value.isInstanceOf[List[_]] && value.asInstanceOf[List[_]].forall(_.isInstanceOf[PropertyValue])
   }
 
   override def getType: Type = Type.LIST

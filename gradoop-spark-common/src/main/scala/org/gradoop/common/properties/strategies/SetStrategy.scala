@@ -58,7 +58,7 @@ class SetStrategy extends AbstractVariableSizedPropertyValueStrategy[Set[Propert
   }
 
   override def is(value: Any): Boolean = {
-    value.isInstanceOf[Set[_]] && value.asInstanceOf[Set[_]].map(_.isInstanceOf[PropertyValue]).reduce(_&&_)
+    value.isInstanceOf[Set[_]] && value.asInstanceOf[Set[_]].forall(_.isInstanceOf[PropertyValue])
   }
 
   override def getType: Type = Type.SET

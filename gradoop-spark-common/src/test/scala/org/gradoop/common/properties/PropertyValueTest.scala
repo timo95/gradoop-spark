@@ -1,5 +1,7 @@
 package org.gradoop.common.properties
 
+import java.time.{LocalDate, LocalDateTime, LocalTime}
+
 import org.gradoop.common.GradoopSparkCommonTestBase
 import org.gradoop.common.model.impl.id.GradoopId
 import org.scalatest.prop.TableDrivenPropertyChecks
@@ -17,7 +19,13 @@ class PropertyValueTest extends GradoopSparkCommonTestBase with TableDrivenPrope
     (Type.DOUBLE, 2.3d),
     (Type.STRING, "23"),
     (Type.BIG_DECIMAL, BigDecimal(23)),
-    (Type.GRADOOP_ID, GradoopId.get)
+    (Type.GRADOOP_ID, GradoopId.get),
+    (Type.DATE, LocalDate.now),
+    (Type.TIME, LocalTime.now),
+    (Type.DATE_TIME, LocalDateTime.now),
+    (Type.MAP, Map[PropertyValue, PropertyValue](PropertyValue("key") -> PropertyValue("value"))),
+    (Type.LIST, List[PropertyValue](PropertyValue("element"))),
+    (Type.SET, Set[PropertyValue](PropertyValue(23)))
   )
 
 
@@ -36,7 +44,7 @@ class PropertyValueTest extends GradoopSparkCommonTestBase with TableDrivenPrope
         assert(propertyValue.get == copy.get)
       }
       if (value != null && !typ.getTypeClass.isPrimitive) {
-        it("Returns do not copy reference") {
+        it("Copy has different reference") {
           assert(propertyValue.get.asInstanceOf[AnyRef] ne copy.get.asInstanceOf[AnyRef])
         }
       }
