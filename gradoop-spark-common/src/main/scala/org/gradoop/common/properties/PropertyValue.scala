@@ -1,10 +1,9 @@
 package org.gradoop.common.properties
 
-import java.io.{DataInputStream, OutputStream}
 import java.time.{LocalDate, LocalDateTime, LocalTime}
 
 import org.gradoop.common.model.impl.id.GradoopId
-import org.gradoop.common.properties.strategies.PropertyValueStrategyFactory
+import org.gradoop.common.properties.strategies2.PropertyValueStrategy
 
 case class PropertyValue(value: Array[Byte]) {
 
@@ -14,12 +13,15 @@ case class PropertyValue(value: Array[Byte]) {
 
   def getType: Type = Type(getTypeByte)
 
-  def getExactType: Type = PropertyValueStrategyFactory.get(getTypeByte).getExactType(value)
+  def getExactType: Type = PropertyValueStrategy(getTypeByte).getExactType(value)
 
-  def get: Any = PropertyValueStrategyFactory.get(getTypeByte).get(value)
+  def get: Any = PropertyValueStrategy(getTypeByte).fromBytes(value)
 
-  def write(outputStream: OutputStream): Unit = {
-    outputStream.write(value)
+  override def equals(o: Any): Boolean = {
+    o match {
+      case prop: PropertyValue => value.sameElements(prop.value)
+      case _ => false
+    } // TODO make properly and implement hascode
   }
 
   override def toString: String = s"${get.toString}:${getExactType.string}"
@@ -59,15 +61,11 @@ object PropertyValue {
 
   val NULL_VALUE = new PropertyValue(Array(Type.NULL.byte))
 
-  def apply(value: Any): PropertyValue = new PropertyValue(PropertyValueStrategyFactory.getBytes(value))
-
-  def read(inputStream: DataInputStream): PropertyValue = {
-    val typeByte = inputStream.readByte
-    // Apply bitmask to get the actual type.
-    val strategy = PropertyValueStrategyFactory
-      .get((~PropertyValue.FLAG_LARGE & typeByte).toByte)
-
-    if (strategy == null) throw new IllegalArgumentException("No strategy for type byte from input view found")
-    else new PropertyValue(strategy.readBytes(inputStream, typeByte))
+  def apply[A](value: A): PropertyValue = {
+    val strategy = PropertyValueStrategy(PrimitiveType.of(value).byte)
+      .asInstanceOf[PropertyValueStrategy[A]]
+    val bytes = new Array[Byte](strategy.getSize(value))
+    strategy.putBytes(bytes, 0, value)
+    new PropertyValue(bytes)
   }
 }

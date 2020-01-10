@@ -24,10 +24,9 @@ class PropertyValueTest extends GradoopSparkCommonTestBase with TableDrivenPrope
     (Type.TIME, LocalTime.now),
     (Type.DATE_TIME, LocalDateTime.now),
     (Type.MAP, Map[PropertyValue, PropertyValue](PropertyValue("key") -> PropertyValue("value"))),
-    (Type.LIST, List[PropertyValue](PropertyValue("element"))),
+    (Type.LIST, List[PropertyValue](PropertyValue(true), PropertyValue("element"))),
     (Type.SET, Set[PropertyValue](PropertyValue(23)))
   )
-
 
   forAll(values) { (typ, value) =>
     describe("PropertyValue (%s)".format(typ.string)) {
@@ -36,7 +35,13 @@ class PropertyValueTest extends GradoopSparkCommonTestBase with TableDrivenPrope
         assert(propertyValue.getType equals typ)
       }
       it("Returns correct value") {
-        assert(propertyValue.get == value)
+        val prop = propertyValue.get
+        prop match {
+          case null => assert(value == null)
+          case iterable: Iterable[_] =>
+            assert(iterable.sameElements(value.asInstanceOf[Iterable[_]]))
+          case any: Any => assert(any.equals(value))
+        }
       }
 
       val copy = propertyValue.copy

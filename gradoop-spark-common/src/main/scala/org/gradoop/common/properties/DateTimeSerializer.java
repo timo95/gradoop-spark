@@ -110,19 +110,27 @@ public class DateTimeSerializer {
     return bytes;
   }
 
-  /**
-   * Deserializes a {@code LocalDate} value.
-   *
-   * @param bytes serialized value
-   *
-   * @return {@code LocalDate} value
-   */
   public static LocalDate deserializeDate(byte[] bytes) {
-    int year = Bytes.toInt(bytes, 0, SIZEOF_INT);
-    int month = Bytes.toInt(bytes, SIZEOF_INT, SIZEOF_INT);
-    int day = Bytes.toInt(bytes, 2 * SIZEOF_INT, SIZEOF_INT);
+    return deserializeDate(bytes, 0);
+  }
+
+    /**
+     * Deserializes a {@code LocalDate} value.
+     *
+     * @param bytes serialized value
+     *
+     * @return {@code LocalDate} value
+     */
+  public static LocalDate deserializeDate(byte[] bytes, int offset) {
+    int year = Bytes.toInt(bytes, offset, SIZEOF_INT);
+    int month = Bytes.toInt(bytes, offset + SIZEOF_INT, SIZEOF_INT);
+    int day = Bytes.toInt(bytes, offset + 2 * SIZEOF_INT, SIZEOF_INT);
 
     return LocalDate.of(year, month, day);
+  }
+
+  public static LocalTime deserializeTime(byte[] bytes) {
+    return deserializeTime(bytes, 0);
   }
 
   /**
@@ -132,13 +140,17 @@ public class DateTimeSerializer {
    *
    * @return {@code LocalTime} value
    */
-  public static LocalTime deserializeTime(byte[] bytes) {
-    int hour = Bytes.toInt(bytes, 0, SIZEOF_INT);
-    int minute = Bytes.toInt(bytes, SIZEOF_INT, SIZEOF_INT);
-    int second = Bytes.toInt(bytes, 2 * SIZEOF_INT, SIZEOF_INT);
-    int nano = Bytes.toInt(bytes, 3 * SIZEOF_INT, SIZEOF_INT);
+  public static LocalTime deserializeTime(byte[] bytes, int offset) {
+    int hour = Bytes.toInt(bytes, offset, SIZEOF_INT);
+    int minute = Bytes.toInt(bytes, offset + SIZEOF_INT, SIZEOF_INT);
+    int second = Bytes.toInt(bytes, offset + 2 * SIZEOF_INT, SIZEOF_INT);
+    int nano = Bytes.toInt(bytes, offset + 3 * SIZEOF_INT, SIZEOF_INT);
 
     return LocalTime.of(hour, minute, second, nano);
+  }
+
+  public static LocalDateTime deserializeDateTime(byte[] bytes) {
+    return deserializeDateTime(bytes, 0);
   }
 
   /**
@@ -148,14 +160,14 @@ public class DateTimeSerializer {
    *
    * @return {@code LocalDateTime} value
    */
-  public static LocalDateTime deserializeDateTime(byte[] bytes) {
-    int year = Bytes.toInt(bytes, 0, SIZEOF_INT);
-    int month = Bytes.toInt(bytes, SIZEOF_INT, SIZEOF_INT);
-    int day = Bytes.toInt(bytes, 2 * SIZEOF_INT, SIZEOF_INT);
-    int hour = Bytes.toInt(bytes, 3 * SIZEOF_INT, SIZEOF_INT);
-    int minute = Bytes.toInt(bytes, 4 * SIZEOF_INT, SIZEOF_INT);
-    int second = Bytes.toInt(bytes, 5 * SIZEOF_INT, SIZEOF_INT);
-    int nano = Bytes.toInt(bytes, 6 * SIZEOF_INT, SIZEOF_INT);
+  public static LocalDateTime deserializeDateTime(byte[] bytes, int offset) {
+    int year = Bytes.toInt(bytes, offset, SIZEOF_INT);
+    int month = Bytes.toInt(bytes, offset + SIZEOF_INT, SIZEOF_INT);
+    int day = Bytes.toInt(bytes, offset + 2 * SIZEOF_INT, SIZEOF_INT);
+    int hour = Bytes.toInt(bytes, offset + 3 * SIZEOF_INT, SIZEOF_INT);
+    int minute = Bytes.toInt(bytes, offset + 4 * SIZEOF_INT, SIZEOF_INT);
+    int second = Bytes.toInt(bytes, offset + 5 * SIZEOF_INT, SIZEOF_INT);
+    int nano = Bytes.toInt(bytes, offset + 6 * SIZEOF_INT, SIZEOF_INT);
 
     return LocalDateTime.of(year, month, day, hour, minute, second, nano);
   }

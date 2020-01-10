@@ -252,7 +252,7 @@ class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
    */
   private def initGraphHead(g: org.s1ck.gdl.model.Graph): G = {
     import collection.JavaConverters._
-    val properties: Properties = g.getProperties.asScala.mapValues(PropertyValue.apply).toMap
+    val properties: Properties = g.getProperties.asScala.mapValues(p => PropertyValue(p)).toMap
     val graphHead: G = graphHeadFactory.create(g.getLabel/*.split(GradoopConstants.LABEL_DELIMITER)*/, properties)
     graphHeadIdMapping.put(g.getId, graphHead.id)
     idToGraphHead.put(graphHead.id, graphHead)
@@ -267,7 +267,7 @@ class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
   private def initVertex(v: org.s1ck.gdl.model.Vertex): V = {
     if (!vertexIdMapping.contains(v.getId)) {
       import collection.JavaConverters._
-      val properties: Properties = v.getProperties.asScala.mapValues(PropertyValue.apply).toMap
+      val properties: Properties = v.getProperties.asScala.mapValues(p => PropertyValue(p)).toMap
       val vertex: V = vertexFactory.create(v.getLabel, properties, createGradoopIdSet(v))
       vertexIdMapping.put(v.getId, vertex.id)
       idToVertex.put(vertex.id, vertex)
@@ -288,7 +288,7 @@ class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
   private def initEdge(e: org.s1ck.gdl.model.Edge): E = {
     if (!edgeIdMapping.contains(e.getId)) {
       import collection.JavaConverters._
-      val properties: Properties = e.getProperties.asScala.mapValues(PropertyValue.apply).toMap
+      val properties: Properties = e.getProperties.asScala.mapValues(p => PropertyValue(p)).toMap
       val edge: E = edgeFactory.create(e.getLabel, vertexIdMapping(e.getSourceVertexId),
         vertexIdMapping(e.getTargetVertexId), properties, createGradoopIdSet(e))
       edgeIdMapping.put(e.getId, edge.id)
