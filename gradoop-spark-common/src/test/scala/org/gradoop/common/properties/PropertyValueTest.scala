@@ -9,50 +9,60 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 class PropertyValueTest extends GradoopSparkCommonTestBase with TableDrivenPropertyChecks {
 
   val values = Table(
-    ("type", "value"),
-    (Type.NULL, null),
-    (Type.BOOLEAN, true),
-    (Type.SHORT, 23.asInstanceOf[Short]),
-    (Type.INTEGER, 23),
-    (Type.LONG, 23L),
-    (Type.FLOAT, 2.3f),
-    (Type.DOUBLE, 2.3d),
-    (Type.STRING, "23"),
-    (Type.BIG_DECIMAL, BigDecimal(23)),
-    (Type.GRADOOP_ID, GradoopId.get),
-    (Type.DATE, LocalDate.now),
-    (Type.TIME, LocalTime.now),
-    (Type.DATE_TIME, LocalDateTime.now),
-    (Type.MAP, Map[PropertyValue, PropertyValue](PropertyValue("key") -> PropertyValue("value"))),
-    (Type.LIST, List[PropertyValue](PropertyValue(true), PropertyValue("element"))),
-    (Type.SET, Set[PropertyValue](PropertyValue(23)))
+    ("name", "type", "value"),
+    ("null", Type.NULL, null),
+    ("boolean", Type.BOOLEAN, true),
+    ("short", Type.SHORT, 23.asInstanceOf[Short]),
+    ("int", Type.INTEGER, 23),
+    ("long", Type.LONG, 23L),
+    ("float", Type.FLOAT, 2.3f),
+    ("double", Type.DOUBLE, 2.3d),
+    ("string", Type.STRING, "23"),
+    ("bigdecimal", Type.BIG_DECIMAL, BigDecimal(23)),
+    ("gradoopid", Type.GRADOOP_ID, GradoopId.get),
+    ("date", Type.DATE, LocalDate.now),
+    ("time", Type.TIME, LocalTime.now),
+    ("datetime", Type.DATE_TIME, LocalDateTime.now),
+    ("list", Type.LIST, List[PropertyValue](PropertyValue(23), PropertyValue(22))),
+    ("set", Type.SET, Set[PropertyValue](PropertyValue(23), PropertyValue(22))),
+    ("map", Type.MAP, Map[PropertyValue, PropertyValue](PropertyValue("key") -> PropertyValue("value"))),
+    ("empty list", Type.LIST, List.empty[PropertyValue]),
+    ("empty set", Type.SET, Set.empty[PropertyValue]),
+    ("empty map", Type.MAP, Map.empty[PropertyValue, PropertyValue])
   )
 
-  forAll(values) { (typ, value) =>
-    describe("PropertyValue (%s)".format(typ.string)) {
-      val propertyValue = PropertyValue(value)
-      it("Returns correct type") {
-        assert(propertyValue.getType equals typ)
-      }
-      it("Returns correct value") {
-        val prop = propertyValue.get
-        prop match {
-          case null => assert(value == null)
-          case iterable: Iterable[_] =>
-            assert(iterable.sameElements(value.asInstanceOf[Iterable[_]]))
-          case any: Any => assert(any.equals(value))
-        }
-      }
+  describe("PropertyValue") {
 
-      val copy = propertyValue.copy
-      it("Correctly copy value") {
-        assert(propertyValue.get == copy.get)
-      }
-      if (value != null && !typ.getTypeClass.isPrimitive) {
-        it("Copy has different reference") {
-          assert(propertyValue.get.asInstanceOf[AnyRef] ne copy.get.asInstanceOf[AnyRef])
+    forEvery(values) { (name, typ, value) =>
+      describe(name) {
+        val propertyValue = PropertyValue(value)
+        it("Returns correct type") {
+          assert(propertyValue.getType equals typ)
+        }
+        it("Returns correct value") {
+          assert(propertyValue.get == value)
+        }
+
+        val copy = propertyValue.copy
+        it("Correctly copy value") {
+          assert(propertyValue.get == copy.get)
+        }
+        val nonEmpty = !value.isInstanceOf[Iterable[_]] || value.asInstanceOf[Iterable[_]].nonEmpty
+        if (value != null && !typ.getTypeClass.isPrimitive && nonEmpty) {
+          it("Copy has different reference") {
+            assert(propertyValue.get.asInstanceOf[AnyRef] ne copy.get.asInstanceOf[AnyRef])
+          }
         }
       }
+    }
+
+    it("Exception for unsupported types") {
+      assertThrows[IllegalArgumentException](PropertyValue(PropertyValue.NULL_VALUE))
+    }
+    it("Exception for unsupported inner types") {
+      assertThrows[IllegalArgumentException](PropertyValue(List("el1", "el2")))
+      assertThrows[IllegalArgumentException](PropertyValue(Set("el3", "el4")))
+      assertThrows[IllegalArgumentException](PropertyValue(Map("key" -> "el")))
     }
   }
 }

@@ -130,13 +130,13 @@ object PrimitiveType {
       case _: String => STRING
       case _: BigDecimal => BIG_DECIMAL
       case _: GradoopId => GRADOOP_ID
-      case _: Map[_, _] => MAP
-      case _: List[_] => LIST
       case _: LocalDate => DATE
       case _: LocalTime => TIME
       case _: LocalDateTime => DATE_TIME
       case _: Short => SHORT
+      case _: List[_] => LIST
       case _: Set[_] => SET
+      case _: Map[_, _] => MAP
       case _ => throw new IllegalArgumentException("Type is not supported: " + obj.getClass.getSimpleName)
     }
   }

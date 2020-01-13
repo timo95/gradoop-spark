@@ -1,8 +1,7 @@
 package org.gradoop.common.properties.strategies2
+
 import org.gradoop.common.properties.bytes.Bytes
 import org.gradoop.common.properties.{PropertyValue, Type}
-
-import scala.collection.mutable
 
 object ListStrategy extends VariableSizedPropertyValueStrategy[List[PropertyValue]] {
 
@@ -18,13 +17,13 @@ object ListStrategy extends VariableSizedPropertyValueStrategy[List[PropertyValu
 
   override def fromRawBytes(bytes: Array[Byte], offset: Int, size: Int): List[PropertyValue] = {
     var index = offset
-    var list = mutable.MutableList.empty[PropertyValue]
+    var seq = Seq.empty[PropertyValue]
     while (index < offset + size) {
       val element = PropertyValue(PropertyValueStrategy(bytes(index)).fromBytes(bytes, index))
       index += element.value.length
-      list :+= element
+      seq :+= element
     }
-    list.toList
+    seq.toList
   }
 
   override def compare(value: List[PropertyValue], other: Any): Int = {

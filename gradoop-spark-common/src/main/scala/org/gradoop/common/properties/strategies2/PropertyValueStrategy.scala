@@ -4,7 +4,9 @@ import org.gradoop.common.properties.Type
 
 trait PropertyValueStrategy[A] {
 
-  def putBytes(bytes: Array[Byte], offset: Int, value: A): Unit
+  def getBytes(value: A): Array[Byte]
+
+  protected def putBytes(bytes: Array[Byte], offset: Int, value: A): Unit
 
   def fromBytes(bytes: Array[Byte]): A = fromBytes(bytes, 0)
 
@@ -16,7 +18,7 @@ trait PropertyValueStrategy[A] {
 
   def getRawSize(value: A): Int
 
-  def getSize(value: A): Int
+  def getSize(rawSize: Int): Int
 
   def getType: Type
 

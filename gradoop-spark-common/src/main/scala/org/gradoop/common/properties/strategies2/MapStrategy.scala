@@ -3,7 +3,7 @@ package org.gradoop.common.properties.strategies2
 import org.gradoop.common.properties.bytes.Bytes
 import org.gradoop.common.properties.{PropertyValue, Type}
 
-import scala.collection.mutable
+import scala.collection.{Map, mutable}
 
 object MapStrategy extends VariableSizedPropertyValueStrategy[Map[PropertyValue, PropertyValue]] {
 
@@ -21,15 +21,15 @@ object MapStrategy extends VariableSizedPropertyValueStrategy[Map[PropertyValue,
 
   override def fromRawBytes(bytes: Array[Byte], offset: Int, size: Int): Map[PropertyValue, PropertyValue] = {
     var index = offset
-    val map = mutable.Map.empty[PropertyValue, PropertyValue]
+    var seq = Seq.empty[Tuple2[PropertyValue, PropertyValue]]
     while (index < offset + size) {
       val key = PropertyValue(PropertyValueStrategy(bytes(index)).fromBytes(bytes, index))
       index += key.value.length
       val value = PropertyValue(PropertyValueStrategy(bytes(index)).fromBytes(bytes, index))
       index += value.value.length
-      map.put(key, value)
+      seq :+= (key, value)
     }
-    map.toMap
+    seq.toMap[PropertyValue, PropertyValue]
   }
 
   override def compare(value: Map[PropertyValue, PropertyValue], other: Any): Int = {
