@@ -1,26 +1,25 @@
-package org.gradoop.common.properties
+package org.gradoop.common.util
 
 import java.time.{LocalDate, LocalDateTime, LocalTime}
 
+import org.gradoop.common.util.Type.CompoundType.TYPE_TOKEN_DELIMITER
 import org.gradoop.common.model.impl.id.GradoopId
-import org.gradoop.common.properties.CompoundType.TYPE_TOKEN_DELIMITER
-import org.gradoop.common.properties.Type._
 
 sealed abstract class Type {
   def string: String
   def byte: Byte
-  def getTypeClass: Class[_] = classFromType(this)
+  def getTypeClass: Class[_] = Type.classFromType(this)
 
   def getTypeByte: Byte = byte // to support java
 }
 
-sealed abstract class PrimitiveType(val string: String, val byte: Byte) extends Type
-
-sealed abstract class CompoundType(val string: String, val mainType: PrimitiveType) extends Type {
-  override def byte: Byte = mainType.byte
-}
-
 object Type {
+  sealed abstract class PrimitiveType(val string: String, val byte: Byte) extends Type
+
+  sealed abstract class CompoundType(val string: String, val mainType: PrimitiveType) extends Type {
+    override def byte: Byte = mainType.byte
+  }
+
   // Primitive types
   case object NULL extends PrimitiveType("null", 0x00)
   case object BOOLEAN extends PrimitiveType("boolean", 0x01)
@@ -115,45 +114,44 @@ object Type {
       case _ => throw new IllegalArgumentException("Type could not be found: " + typ)
     }
   }
-}
 
-object PrimitiveType {
-
-  def of(obj: Any): Type = {
-    obj match {
-      case null => NULL
-      case _: Boolean => BOOLEAN
-      case _: Int => INTEGER
-      case _: Long => LONG
-      case _: Float => FLOAT
-      case _: Double => DOUBLE
-      case _: String => STRING
-      case _: BigDecimal => BIG_DECIMAL
-      case _: GradoopId => GRADOOP_ID
-      case _: LocalDate => DATE
-      case _: LocalTime => TIME
-      case _: LocalDateTime => DATE_TIME
-      case _: Short => SHORT
-      case _: List[_] => LIST
-      case _: Set[_] => SET
-      case _: Map[_, _] => MAP
-      case _ => throw new IllegalArgumentException("Type is not supported: " + obj.getClass.getSimpleName)
+  object PrimitiveType {
+    def of(obj: Any): Type = {
+      obj match {
+        case null => NULL
+        case _: Boolean => BOOLEAN
+        case _: Int => INTEGER
+        case _: Long => LONG
+        case _: Float => FLOAT
+        case _: Double => DOUBLE
+        case _: String => STRING
+        case _: BigDecimal => BIG_DECIMAL
+        case _: GradoopId => GRADOOP_ID
+        case _: LocalDate => DATE
+        case _: LocalTime => TIME
+        case _: LocalDateTime => DATE_TIME
+        case _: Short => SHORT
+        case _: List[_] => LIST
+        case _: Set[_] => SET
+        case _: Map[_, _] => MAP
+        case _ => throw new IllegalArgumentException("Type is not supported: " + obj.getClass.getSimpleName)
+      }
     }
   }
-}
 
-object CompoundType {
-  /** Used to separate external type from internal types */
-  val TYPE_TOKEN_DELIMITER = ':'
+  object CompoundType {
+    /** Used to separate external type from internal types */
+    val TYPE_TOKEN_DELIMITER = ':'
 
-  def apply(typeString: String): CompoundType = {
-    typeString match {
-      case list: String if list.startsWith(LIST.string) => TYPED_LIST(Type(list.substring(LIST.string.length + 1)))
-      case set: String if set.startsWith(SET.string) => TYPED_SET(Type(set.substring(SET.string.length + 1)))
-      case map: String if map.startsWith(MAP.string) =>
-        val tokens = map.split(TYPE_TOKEN_DELIMITER)
-        TYPED_MAP(Type(tokens(1)), Type(tokens(2)))
-      case _ => throw new IllegalArgumentException("Type could not be found: " + typeString)
+    def apply(typeString: String): CompoundType = {
+      typeString match {
+        case list: String if list.startsWith(LIST.string) => TYPED_LIST(Type(list.substring(LIST.string.length + 1)))
+        case set: String if set.startsWith(SET.string) => TYPED_SET(Type(set.substring(SET.string.length + 1)))
+        case map: String if map.startsWith(MAP.string) =>
+          val tokens = map.split(TYPE_TOKEN_DELIMITER)
+          TYPED_MAP(Type(tokens(1)), Type(tokens(2)))
+        case _ => throw new IllegalArgumentException("Type could not be found: " + typeString)
+      }
     }
   }
 }

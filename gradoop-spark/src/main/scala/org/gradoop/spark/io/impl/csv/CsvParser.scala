@@ -3,7 +3,9 @@ package org.gradoop.spark.io.impl.csv
 import java.time.{LocalDate, LocalDateTime, LocalTime}
 
 import org.gradoop.common.model.impl.id.GradoopId
-import org.gradoop.common.properties.{CompoundType, PropertyValue, Type}
+import org.gradoop.common.properties.PropertyValue
+import org.gradoop.common.util.Type
+import org.gradoop.common.util.Type.CompoundType
 import org.gradoop.spark.io.impl.metadata.ElementMetaData
 import org.gradoop.spark.model.impl.types.Gve
 import org.gradoop.spark.util.StringEscaper
@@ -20,8 +22,7 @@ abstract protected class CsvParser[L <: Gve[L]] extends Serializable {
 
   protected def parseLabel(labelString: String): Label = {
     if(labelString == null) ""
-    else StringEscaper.unescape(labelString)//StringEscaper.split(labelsString, GradoopConstants.LABEL_DELIMITER)
-      //.map(StringEscaper.unescape)
+    else StringEscaper.unescape(labelString)
   }
 
   protected def parseProperties(propertiesString: String, metaData: ElementMetaData): Properties = {

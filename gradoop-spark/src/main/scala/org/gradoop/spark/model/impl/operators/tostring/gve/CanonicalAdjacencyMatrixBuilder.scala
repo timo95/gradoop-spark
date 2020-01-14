@@ -30,7 +30,9 @@ class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => Gra
   }
 
   override def execute(graph: L#LG): String = {
-    getGraphStrings(graph.layout, graph.config).first.string
+    val graphStrings = getGraphStrings(graph.layout, graph.config)
+    if(graphStrings.isEmpty) ""
+    else graphStrings.first.string
   }
 
   private def getGraphStrings(gveLayout: L#L, config: GradoopSparkConfig[L]): Dataset[GraphHeadString] = {
@@ -173,17 +175,3 @@ object CanonicalAdjacencyMatrixBuilder {
     Traversable(GraphHeadString(first.graphId, string))
   }
 }
-
-sealed trait ElementString {
-  def string: String
-  def string_=(string: String): Unit
-}
-
-final case class GraphHeadString(id: GradoopId, var string: String) extends ElementString
-final case class VertexString(graphId: GradoopId, id: GradoopId, var string: String) extends ElementString
-final case class EdgeString(graphId: GradoopId,
-                            var sourceId: GradoopId,
-                            var targetId: GradoopId,
-                            var sourceString: String,
-                            var string: String,
-                            var targetString: String) extends ElementString

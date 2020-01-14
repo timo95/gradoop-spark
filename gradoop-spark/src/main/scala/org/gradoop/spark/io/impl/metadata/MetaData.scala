@@ -2,7 +2,7 @@ package org.gradoop.spark.io.impl.metadata
 
 import org.apache.spark.sql.{Dataset, SparkSession}
 import org.gradoop.common.model.api.elements.AttributedElement
-import org.gradoop.common.properties.{PropertyValue, Type}
+import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.expressions.filter.FilterStrings
 import org.gradoop.spark.model.impl.types.Gve

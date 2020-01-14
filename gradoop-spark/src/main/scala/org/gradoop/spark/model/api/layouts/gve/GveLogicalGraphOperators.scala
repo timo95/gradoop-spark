@@ -10,6 +10,16 @@ import org.gradoop.spark.model.impl.types.Gve
 trait GveLogicalGraphOperators[L <: Gve[L]] extends LogicalGraphOperators[L] {
   this: L#LG =>
 
+  def equalsByElementIds(other: L#LG): Boolean = {
+    callForValue(new GveEquals(ElementToString.graphHeadToEmptyString, ElementToString.vertexToIdString,
+      ElementToString.edgeToIdString, true), other)
+  }
+
+  def equalsByElementData(other: L#LG): Boolean = {
+    callForValue(new GveEquals(ElementToString.graphHeadToEmptyString, ElementToString.vertexToDataString,
+      ElementToString.edgeToDataString, true), other)
+  }
+
   def equalsByData(other: L#LG): Boolean = {
     callForValue(new GveEquals(ElementToString.graphHeadToDataString, ElementToString.vertexToDataString,
       ElementToString.edgeToDataString, true), other)

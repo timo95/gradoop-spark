@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.common.properties;
-
-import org.gradoop.common.properties.bytes.Bytes;
+package org.gradoop.common.properties.bytes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

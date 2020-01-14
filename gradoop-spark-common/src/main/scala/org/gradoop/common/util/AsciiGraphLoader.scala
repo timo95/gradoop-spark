@@ -308,7 +308,7 @@ class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
    * @param g        graph from GDL loader
    */
   private def updateGraphCache(variable: String, g: org.s1ck.gdl.model.Graph): Unit = {
-    graphHeadCache + (variable -> idToGraphHead(graphHeadIdMapping(g.getId)))
+    graphHeadCache.put(variable, idToGraphHead(graphHeadIdMapping(g.getId)))
   }
 
   /** Updates the vertex cache.
@@ -317,7 +317,7 @@ class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
    * @param v        vertex from GDL loader
    */
   private def updateVertexCache(variable: String, v: org.s1ck.gdl.model.Vertex): Unit = {
-    vertexCache + (variable -> idToVertex(vertexIdMapping(v.getId)))
+    vertexCache.put(variable, idToVertex(vertexIdMapping(v.getId)))
   }
 
   /** Updates the edge cache.
@@ -326,7 +326,7 @@ class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
    * @param e        edge from GDL loader
    */
   private def updateEdgeCache(variable: String, e: org.s1ck.gdl.model.Edge): Unit = {
-    edgeCache + (variable -> idToEdge(edgeIdMapping(e.getId)))
+    edgeCache.put(variable, idToEdge(edgeIdMapping(e.getId)))
   }
 
   /** Creates a {@code GradoopIDSet} from the long identifiers stored at the given graph element.

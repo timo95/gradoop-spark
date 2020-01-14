@@ -4,6 +4,7 @@ import java.time.{LocalDate, LocalDateTime, LocalTime}
 
 import org.gradoop.common.GradoopSparkCommonTestBase
 import org.gradoop.common.model.impl.id.GradoopId
+import org.gradoop.common.util.Type
 import org.scalatest.prop.TableDrivenPropertyChecks
 
 class PropertyValueTest extends GradoopSparkCommonTestBase with TableDrivenPropertyChecks {

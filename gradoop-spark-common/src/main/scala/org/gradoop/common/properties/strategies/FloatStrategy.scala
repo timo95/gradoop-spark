@@ -1,6 +1,7 @@
-package org.gradoop.common.properties.strategies2
-import org.gradoop.common.properties.{PropertyValue, Type}
+package org.gradoop.common.properties.strategies
+import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.properties.bytes.Bytes
+import org.gradoop.common.util.Type
 
 object FloatStrategy extends FixedSizePropertyValueStrategy[Float] {
 

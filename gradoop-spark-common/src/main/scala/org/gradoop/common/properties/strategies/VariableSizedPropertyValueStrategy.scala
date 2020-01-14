@@ -1,4 +1,4 @@
-package org.gradoop.common.properties.strategies2
+package org.gradoop.common.properties.strategies
 
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.properties.bytes.Bytes

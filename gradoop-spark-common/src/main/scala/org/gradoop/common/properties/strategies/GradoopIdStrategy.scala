@@ -1,10 +1,11 @@
-package org.gradoop.common.properties.strategies2
+package org.gradoop.common.properties.strategies
 
 import java.util
 
 import org.gradoop.common.model.impl.id.GradoopId
-import org.gradoop.common.properties.{PropertyValue, Type}
+import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.properties.bytes.Bytes
+import org.gradoop.common.util.Type
 
 object GradoopIdStrategy extends FixedSizePropertyValueStrategy[GradoopId] {
 

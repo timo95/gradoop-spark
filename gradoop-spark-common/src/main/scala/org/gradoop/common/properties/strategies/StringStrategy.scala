@@ -1,9 +1,9 @@
-package org.gradoop.common.properties.strategies2
+package org.gradoop.common.properties.strategies
 
 import java.nio.charset.StandardCharsets
 
-import org.gradoop.common.properties.Type
 import org.gradoop.common.properties.bytes.Bytes
+import org.gradoop.common.util.Type
 
 object StringStrategy extends VariableSizedPropertyValueStrategy[String] {
 

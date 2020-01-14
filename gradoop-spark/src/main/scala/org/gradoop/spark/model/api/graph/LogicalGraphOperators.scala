@@ -1,11 +1,14 @@
 package org.gradoop.spark.model.api.graph
 
-import org.gradoop.spark.model.api.operators.{BinaryLogicalGraphToLogicalGraphOperator,
-  BinaryLogicalGraphToValueOperator, UnaryLogicalGraphToLogicalGraphOperator, UnaryLogicalGraphToValueOperator}
+import org.gradoop.spark.model.api.operators._
 import org.gradoop.spark.model.impl.types.LayoutType
 
 trait LogicalGraphOperators[L <: LayoutType[L]] {
   this: L#LG =>
+
+  def equalsByElementIds(other: L#LG): Boolean
+
+  def equalsByElementData(other: L#LG): Boolean
 
   def equalsByData(other: L#LG): Boolean
 
@@ -16,6 +19,8 @@ trait LogicalGraphOperators[L <: LayoutType[L]] {
   def edgeInducedSubgraph(edgeFilterExpression: String): L#LG
 
   def verify: L#LG
+
+  // Call for operators
 
   def callForValue[V](operator: UnaryLogicalGraphToValueOperator[L#LG, V]): V = {
     operator.execute(this)
