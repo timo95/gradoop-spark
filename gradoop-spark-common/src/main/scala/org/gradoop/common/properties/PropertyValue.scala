@@ -9,7 +9,7 @@ import org.gradoop.common.util.Type.PrimitiveType
 
 case class PropertyValue(value: Array[Byte]) {
 
-  def copy: PropertyValue = PropertyValue(value)
+  def copy: PropertyValue = new PropertyValue(value.clone)
 
   def getTypeByte: Byte = value(0)
 
@@ -56,7 +56,7 @@ case class PropertyValue(value: Array[Byte]) {
 
   def getDateTime: LocalDateTime = get.ensuring(_.isInstanceOf[LocalDateTime]).asInstanceOf[LocalDateTime]
 
-  def getList: List[PropertyValue] = get.ensuring(_.isInstanceOf[List[_]]).asInstanceOf[List[PropertyValue]]
+  def getList: Seq[PropertyValue] = get.ensuring(_.isInstanceOf[Seq[_]]).asInstanceOf[Seq[PropertyValue]]
 
   def getSet: Set[PropertyValue] = get.ensuring(_.isInstanceOf[Set[_]]).asInstanceOf[Set[PropertyValue]]
 

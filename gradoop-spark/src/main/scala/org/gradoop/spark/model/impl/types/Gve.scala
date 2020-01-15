@@ -16,4 +16,8 @@ class Gve[T <: Gve[T]] extends LayoutType[T] {
 
   type LGF <: GveBaseLayoutFactory[T, LG]
   type GCF <: GveBaseLayoutFactory[T, GC]
+
+  type LabeledGraphHead = G
+  type LabeledVertex = V
+  type LabeledEdge = E
 }

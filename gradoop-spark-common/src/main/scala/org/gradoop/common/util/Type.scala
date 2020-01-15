@@ -95,7 +95,7 @@ object Type {
   /** Class from Type */
   def classFromType(typ: Type): Class[_] = {
     typ match {
-      case NULL => null // TODO exchange for Null/Nothing etc type
+      case NULL => classOf[Null]
       case BOOLEAN => classOf[Boolean]
       case INTEGER => classOf[Int]
       case LONG => classOf[Long]
@@ -105,7 +105,7 @@ object Type {
       case BIG_DECIMAL => classOf[BigDecimal]
       case GRADOOP_ID => classOf[GradoopId]
       case MAP => classOf[Map[_, _]]
-      case LIST => classOf[List[_]]
+      case LIST => classOf[Seq[_]]
       case DATE => classOf[LocalDate]
       case TIME => classOf[LocalTime]
       case DATE_TIME => classOf[LocalDateTime]
@@ -131,7 +131,7 @@ object Type {
         case _: LocalTime => TIME
         case _: LocalDateTime => DATE_TIME
         case _: Short => SHORT
-        case _: List[_] => LIST
+        case _: Seq[_] => LIST
         case _: Set[_] => SET
         case _: Map[_, _] => MAP
         case _ => throw new IllegalArgumentException("Type is not supported: " + obj.getClass.getSimpleName)

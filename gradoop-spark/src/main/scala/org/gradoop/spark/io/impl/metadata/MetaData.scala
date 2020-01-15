@@ -4,7 +4,7 @@ import org.apache.spark.sql.{Dataset, SparkSession}
 import org.gradoop.common.model.api.elements.AttributedElement
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.ColumnNames
-import org.gradoop.spark.expressions.filter.FilterStrings
+import org.gradoop.spark.expressions.filter.FilterExpressions
 import org.gradoop.spark.model.impl.types.Gve
 
 class MetaData(val graphHeadMetaData: Dataset[ElementMetaData],
@@ -12,15 +12,15 @@ class MetaData(val graphHeadMetaData: Dataset[ElementMetaData],
                val edgeMetaData: Dataset[ElementMetaData]) extends Serializable {
 
   def getGraphHeadMetaData(label: String): Dataset[ElementMetaData] = {
-    graphHeadMetaData.filter(FilterStrings.hasLabel(label))
+    graphHeadMetaData.filter(FilterExpressions.hasLabel(label))
   }
 
   def getVertexMetaData(label: String): Dataset[ElementMetaData] = {
-    vertexMetaData.filter(FilterStrings.hasLabel(label))
+    vertexMetaData.filter(FilterExpressions.hasLabel(label))
   }
 
   def getEdgeMetaData(label: String): Dataset[ElementMetaData] = {
-    edgeMetaData.filter(FilterStrings.hasLabel(label))
+    edgeMetaData.filter(FilterExpressions.hasLabel(label))
   }
 }
 

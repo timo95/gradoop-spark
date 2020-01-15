@@ -4,9 +4,9 @@ import org.gradoop.common.properties.bytes.Bytes
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.Type
 
-object ListStrategy extends VariableSizedPropertyValueStrategy[List[PropertyValue]] {
+object ListStrategy extends VariableSizedPropertyValueStrategy[Seq[PropertyValue]] {
 
-  override def putRawBytes(bytes: Array[Byte], offset: Int, value: List[PropertyValue]): Unit = {
+  override def putRawBytes(bytes: Array[Byte], offset: Int, value: Seq[PropertyValue]): Unit = {
     val it = value.iterator
     var index = offset
     while (it.nonEmpty) {
@@ -16,7 +16,7 @@ object ListStrategy extends VariableSizedPropertyValueStrategy[List[PropertyValu
     }
   }
 
-  override def fromRawBytes(bytes: Array[Byte], offset: Int, size: Int): List[PropertyValue] = {
+  override def fromRawBytes(bytes: Array[Byte], offset: Int, size: Int): Seq[PropertyValue] = {
     var index = offset
     var seq = Seq.empty[PropertyValue]
     while (index < offset + size) {
@@ -24,22 +24,22 @@ object ListStrategy extends VariableSizedPropertyValueStrategy[List[PropertyValu
       index += element.value.length
       seq :+= element
     }
-    seq.toList
+    seq
   }
 
-  override def compare(value: List[PropertyValue], other: Any): Int = {
-    throw new UnsupportedOperationException("Method compare() is not supported for List.")
+  override def compare(value: Seq[PropertyValue], other: Any): Int = {
+    throw new UnsupportedOperationException("Method compare() is not supported for Seq.")
   }
 
   override def is(value: Any): Boolean = {
-    value.isInstanceOf[List[_]] && value.asInstanceOf[List[_]].forall(_.isInstanceOf[PropertyValue])
+    value.isInstanceOf[Seq[_]] && value.asInstanceOf[Seq[_]].forall(_.isInstanceOf[PropertyValue])
   }
 
-  override def getRawSize(value: List[PropertyValue]): Int = value.map(_.value.length).sum
+  override def getRawSize(value: Seq[PropertyValue]): Int = value.map(_.value.length).sum
 
   override def getType: Type = Type.LIST
 
-  override def getExactType(value: List[PropertyValue]): Type = {
+  override def getExactType(value: Seq[PropertyValue]): Type = {
     val innerType = if(value.isEmpty) Type.NULL else value.head.getExactType
     Type.TYPED_LIST(innerType)
   }

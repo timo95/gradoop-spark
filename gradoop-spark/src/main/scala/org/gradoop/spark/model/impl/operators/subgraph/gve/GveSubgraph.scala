@@ -1,14 +1,15 @@
 package org.gradoop.spark.model.impl.operators.subgraph.gve
 
+import org.apache.spark.sql.Column
 import org.gradoop.common.util.ColumnNames
-import org.gradoop.spark.expressions.filter.FilterStrings
+import org.gradoop.spark.expressions.filter.FilterExpressions
 import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy.Strategy
 import org.gradoop.spark.model.impl.types.Gve
 
 class GveSubgraph[L <: Gve[L]] private
-(vertexFilterExpression: String, edgeFilterExpression: String, strategy: Strategy)
+(vertexFilterExpression: Column, edgeFilterExpression: Column, strategy: Strategy)
   extends UnaryLogicalGraphToLogicalGraphOperator[L#LG] {
 
   override def execute(graph: L#LG): L#LG = {
@@ -38,15 +39,15 @@ class GveSubgraph[L <: Gve[L]] private
 
 object GveSubgraph {
 
-  def both[L <: Gve[L]](vertexFilterExpression: String, edgeFilterExpression: String): GveSubgraph[L] = {
+  def both[L <: Gve[L]](vertexFilterExpression: Column, edgeFilterExpression: Column): GveSubgraph[L] = {
     new GveSubgraph(vertexFilterExpression, edgeFilterExpression, Strategy.BOTH)
   }
 
-  def vertexInduced[L <: Gve[L]](vertexFilterExpression: String): GveSubgraph[L] = {
-    new GveSubgraph(vertexFilterExpression, FilterStrings.any, Strategy.VERTEX_INDUCED)
+  def vertexInduced[L <: Gve[L]](vertexFilterExpression: Column): GveSubgraph[L] = {
+    new GveSubgraph(vertexFilterExpression, FilterExpressions.any, Strategy.VERTEX_INDUCED)
   }
 
-  def edgeIncuded[L <: Gve[L]](edgeFilterExpression: String): GveSubgraph[L] = {
-    new GveSubgraph(FilterStrings.any, edgeFilterExpression, Strategy.EDGE_INDUCED)
+  def edgeIncuded[L <: Gve[L]](edgeFilterExpression: Column): GveSubgraph[L] = {
+    new GveSubgraph(FilterExpressions.any, edgeFilterExpression, Strategy.EDGE_INDUCED)
   }
 }

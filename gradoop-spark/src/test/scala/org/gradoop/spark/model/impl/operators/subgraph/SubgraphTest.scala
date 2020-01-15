@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.impl.operators.subgraph
 
 import org.gradoop.spark.EpgmGradoopSparkTestBase
-import org.gradoop.spark.expressions.filter.FilterStrings
+import org.gradoop.spark.expressions.filter.FilterExpressions
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 
 class SubgraphTest extends EpgmGradoopSparkTestBase {
@@ -16,7 +16,7 @@ class SubgraphTest extends EpgmGradoopSparkTestBase {
 
       describe("vertexFilter = Person, edgeFilter = true") {
         val subgraph = graph
-          .subgraph(FilterStrings.hasLabel("Person"), FilterStrings.any)
+          .subgraph(FilterExpressions.hasLabel("Person"), FilterExpressions.any)
 
         it("should have 6 vertices") {
           assert(subgraph.vertices.count() == 6)
@@ -26,7 +26,7 @@ class SubgraphTest extends EpgmGradoopSparkTestBase {
 
     describe("Strategy vertex induced") {
       val subgraph = graph
-        .vertexInducedSubgraph(FilterStrings.hasLabel("Person"))
+        .vertexInducedSubgraph(FilterExpressions.hasLabel("Person"))
 
       it("should have 6 vertices") {
         assert(subgraph.vertices.count() == 6)
@@ -38,7 +38,7 @@ class SubgraphTest extends EpgmGradoopSparkTestBase {
 
     describe("Strategy edge induced") {
       val subgraph = graph
-        .edgeInducedSubgraph(FilterStrings.hasLabel("hasMember"))
+        .edgeInducedSubgraph(FilterExpressions.hasLabel("hasMember"))
 
       it("should have 6 vertices") {
         assert(subgraph.vertices.count() == 6)

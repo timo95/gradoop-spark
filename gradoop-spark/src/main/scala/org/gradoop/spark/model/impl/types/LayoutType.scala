@@ -1,5 +1,6 @@
 package org.gradoop.spark.model.impl.types
 
+import org.gradoop.common.model.api.components.{Identifiable, Labeled}
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, Layout, LogicalGraphLayoutFactory}
 
@@ -12,4 +13,8 @@ class LayoutType[T <: LayoutType[T]] {
 
   type LGF <: LogicalGraphLayoutFactory[T]
   type GCF <: GraphCollectionLayoutFactory[T]
+
+  type LabeledGraphHead <: Labeled
+  type LabeledVertex <: Labeled
+  type LabeledEdge <: Labeled
 }

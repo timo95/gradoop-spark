@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.api.layouts.gve
 
 import org.apache.spark.sql.Dataset
-import org.gradoop.spark.expressions.filter.FilterStrings
+import org.gradoop.spark.expressions.filter.FilterExpressions
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayout, LogicalGraphLayout}
 import org.gradoop.spark.model.impl.types.Gve
 
@@ -21,19 +21,19 @@ abstract class GveLayout[L <: Gve[L]](val graphHeads: Dataset[L#G], val vertices
    * @param label graph head label
    * @return graph heads
    */
-  def graphHeadsByLabel(label: String): Dataset[L#G] = graphHeads.filter(FilterStrings.hasLabel(label))
+  def graphHeadsByLabel(label: String): Dataset[L#G] = graphHeads.filter(FilterExpressions.hasLabel(label))
 
   /** Returns all vertices having the specified label.
    *
    * @param label vertex label
    * @return filtered vertices
    */
-  def verticesByLabel(label: String): Dataset[L#V] = vertices.filter(FilterStrings.hasLabel(label))
+  def verticesByLabel(label: String): Dataset[L#V] = vertices.filter(FilterExpressions.hasLabel(label))
 
   /** Returns all edges having the specified label.
    *
    * @param label edge label
    * @return filtered edges
    */
-  def edgesByLabel(label: String): Dataset[L#E] = edges.filter(FilterStrings.hasLabel(label))
+  def edgesByLabel(label: String): Dataset[L#E] = edges.filter(FilterExpressions.hasLabel(label))
 }

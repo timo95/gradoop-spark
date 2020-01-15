@@ -1,5 +1,6 @@
 package org.gradoop.spark.model.api.graph
 
+import org.apache.spark.sql.Column
 import org.gradoop.spark.model.api.operators._
 import org.gradoop.spark.model.impl.types.LayoutType
 
@@ -12,11 +13,11 @@ trait LogicalGraphOperators[L <: LayoutType[L]] {
 
   def equalsByData(other: L#LG): Boolean
 
-  def subgraph(vertexFilterExpression: String, edgeFilterExpression: String): L#LG
+  def subgraph(vertexFilterExpression: Column, edgeFilterExpression: Column): L#LG
 
-  def vertexInducedSubgraph(vertexFilterExpression: String): L#LG
+  def vertexInducedSubgraph(vertexFilterExpression: Column): L#LG
 
-  def edgeInducedSubgraph(edgeFilterExpression: String): L#LG
+  def edgeInducedSubgraph(edgeFilterExpression: Column): L#LG
 
   def verify: L#LG
 

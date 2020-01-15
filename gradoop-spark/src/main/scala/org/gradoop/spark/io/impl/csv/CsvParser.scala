@@ -64,7 +64,7 @@ abstract protected class CsvParser[L <: Gve[L]] extends Serializable {
 
   private def compoundParser(compoundType: CompoundType): String => Iterable[_] = {
     valueString: String => compoundType match {
-      case Type.TYPED_LIST(elementType) => arrayParser(propertyParser(elementType.string))(valueString).toList
+      case Type.TYPED_LIST(elementType) => arrayParser(propertyParser(elementType.string))(valueString).toSeq
       case Type.TYPED_SET(elementType) => arrayParser(propertyParser(elementType.string))(valueString).toSet
       case Type.TYPED_MAP(keyType, valueType) =>
         mapParser(propertyParser(keyType.string), propertyParser(valueType.string))(valueString)
@@ -73,8 +73,8 @@ abstract protected class CsvParser[L <: Gve[L]] extends Serializable {
   }
 
   private def arrayParser(elementParser: String => PropertyValue): String => Array[PropertyValue] = {
-    arrayString: String => StringEscaper.split(arrayString.substring(1, arrayString.length - 1), CsvConstants.LIST_DELIMITER)
-      .map(elementParser)
+    arrayString: String => StringEscaper.split(arrayString.substring(1, arrayString.length - 1),
+      CsvConstants.LIST_DELIMITER).map(elementParser)
   }
 
   private def mapParser(keyParser: String => PropertyValue, valueParser: String => PropertyValue):

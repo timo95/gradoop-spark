@@ -3,6 +3,7 @@ package org.gradoop.spark.util
 import java.io.InputStream
 
 import org.gradoop.common.util.{AsciiGraphLoader, GradoopConstants}
+import org.gradoop.spark.expressions.transformation.TransformationFunctions
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.impl.types.Gve
 
@@ -35,7 +36,13 @@ class SparkAsciiGraphLoader[L <: Gve[L]](config: GradoopSparkConfig[L], loader: 
    */
   def getLogicalGraph(withGraphContainment: Boolean): L#LG = {
     val factory = config.logicalGraphFactory
-    if (withGraphContainment) factory.init(vertices, edges)
+    if (withGraphContainment) {
+      import config.Implicits._
+      import config.logicalGraphFactory.Implicits._
+      val tf = TransformationFunctions
+        .renameLabel[L#G](GradoopConstants.DEFAULT_GRAPH_LABEL, GradoopConstants.DB_GRAPH_LABEL)
+      factory.init(vertices, edges).transformGraphHead(tf)
+    }
       // TODO .transformGraphHead(new RenameLabel[G](GradoopConstants.DEFAULT_GRAPH_LABEL, GradoopConstants.DB_GRAPH_LABEL))
     else {
       val graphHead = factory.graphHeadFactory.create(GradoopConstants.DB_GRAPH_LABEL)

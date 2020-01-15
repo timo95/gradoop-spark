@@ -34,6 +34,15 @@ subprojects {
     // Run scalatest tests
     apply(plugin = "com.github.maiflai.scalatest")
 
+    tasks {
+        "test"(Test::class) {
+            //extensions.get("tags").delegateClosureOf<PatternSet> { // TODO make this work
+            "tags".delegateClosureOf<PatternSet> {
+                exclude("org.scalatest.tags.operator")
+            }
+        }
+    }
+
     // Scala style
     apply(plugin = "com.github.alisiikh.scalastyle")
     configure<com.github.alisiikh.scalastyle.ScalastyleExtension> {
