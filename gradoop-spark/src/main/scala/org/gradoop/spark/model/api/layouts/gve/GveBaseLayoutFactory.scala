@@ -1,9 +1,10 @@
 package org.gradoop.spark.model.api.layouts.gve
 
 import org.apache.spark.sql.{Dataset, Encoder}
+import org.gradoop.common.id.GradoopId
 import org.gradoop.common.model.api.components.ComponentTypes
 import org.gradoop.common.model.api.gve.GveElementFactoryProvider
-import org.gradoop.common.model.impl.id.GradoopId
+import org.gradoop.spark.expressions.transformation.TransformationFunctions
 import org.gradoop.spark.model.api.graph.BaseGraph
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, LogicalGraphLayoutFactory}
 import org.gradoop.spark.model.impl.types.Gve
@@ -49,13 +50,14 @@ trait GveBaseLayoutFactory[L <: Gve[L], BG <: BaseGraph[L]] extends LogicalGraph
     init(graphHead, vertices, edges)
   }
 
+  /** This creates a new graph head/id and adds it to each element. */
   def create(vertices: Dataset[L#V], edges: Dataset[L#E]): BG = {
     val id = GradoopId.get
     val graphHeads = sparkSession.createDataset[L#G](Seq(graphHeadFactory(id)))
 
-    // TODO add/set id to each element
-
-    init(graphHeads, vertices, edges)
+    val tfV = TransformationFunctions.addGraphId[L#V](id)
+    val tfE = TransformationFunctions.addGraphId[L#E](id)
+    init(graphHeads, tfV(vertices), tfE(edges))
   }
 
   def init(gveLayout: GveLayout[L], gveLayouts: GveLayout[L]*): BG = {

@@ -2,7 +2,7 @@ package org.gradoop.common.properties.strategies
 
 import java.util
 
-import org.gradoop.common.model.impl.id.GradoopId
+import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.properties.bytes.Bytes
 import org.gradoop.common.util.Type

@@ -98,8 +98,6 @@ class EqualityTest extends EpgmGradoopSparkTestBase with TableDrivenPropertyChec
         assert(leftCollection.equalsByGraphData(rightCollection) == equals)
       }
     }
-
-    // TODO speed equality up (flamegraph the tests)
   }
 
   // graphs to compare and equality for different modes

@@ -2,8 +2,8 @@ package org.gradoop.spark.model.impl.gve
 
 import org.apache.spark.sql.Encoder
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
+import org.gradoop.common.id.GradoopId
 import org.gradoop.common.model.api.gve.{GveGraphHead, GveGraphHeadFactory}
-import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 
 final case class EpgmGveGraphHead(var id: Id, var label: Label, var properties: Properties) extends GveGraphHead

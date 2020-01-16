@@ -2,7 +2,7 @@ package org.gradoop.spark.io.impl.csv
 
 import java.time.{LocalDate, LocalDateTime, LocalTime}
 
-import org.gradoop.common.model.impl.id.GradoopId
+import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.Type
 import org.gradoop.common.util.Type.CompoundType
@@ -32,7 +32,7 @@ abstract protected class CsvParser[L <: Gve[L]] extends Serializable {
       val propertyStrings = StringEscaper.split(propertiesString, CsvConstants.VALUE_DELIMITER)
       if(propertyStrings.length != properties.length) {
         println(s"Number of Properties for '${metaData.label}' does not fit metadata." +
-          s"Parsed Properties might be corrupt.") //TODO: Add logging
+          s"Parsed Properties might be corrupt.")
       }
       val length = propertyStrings.length min properties.length // only parse when metadata exists for it
       (0 until length)

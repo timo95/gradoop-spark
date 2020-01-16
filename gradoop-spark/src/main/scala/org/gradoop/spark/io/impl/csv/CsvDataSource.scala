@@ -19,7 +19,7 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
   private val metaData = new CsvMetaDataSource(csvPath).read
 
   private val graphHeadMetaData = metaData.graphHeadMetaData.collect()
-  private val vertexMetaData = metaData.vertexMetaData.collect() // TODO: property parsing with sql - join metadata and transform
+  private val vertexMetaData = metaData.vertexMetaData.collect()
   private val edgeMetaData = metaData.edgeMetaData.collect()
 
   override def readLogicalGraph: L#LG = {

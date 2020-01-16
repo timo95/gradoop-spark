@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.impl.operators.tostring.gve
 
 import org.apache.spark.sql.{Dataset, SparkSession}
-import org.gradoop.common.model.impl.id.GradoopId
+import org.gradoop.common.id.GradoopId
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.operators.{UnaryGraphCollectionToValueOperator, UnaryLogicalGraphToValueOperator}
 import org.gradoop.spark.model.impl.types.Gve

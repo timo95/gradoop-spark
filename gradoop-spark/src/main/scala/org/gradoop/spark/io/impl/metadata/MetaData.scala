@@ -59,6 +59,5 @@ object MetaData {
       // aggregate property structs to a set per label
       .agg(collect_set("property").as("properties"))
       .as[ElementMetaData]
-    // TODO reduce dependency on col names being equal to case class parameter names - reflection?
   }
 }

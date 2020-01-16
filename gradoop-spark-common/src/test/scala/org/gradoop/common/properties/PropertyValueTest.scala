@@ -3,7 +3,7 @@ package org.gradoop.common.properties
 import java.time.{LocalDate, LocalDateTime, LocalTime}
 
 import org.gradoop.common.GradoopSparkCommonTestBase
-import org.gradoop.common.model.impl.id.GradoopId
+import org.gradoop.common.id.GradoopId
 import org.gradoop.common.util.Type
 import org.scalatest.prop.TableDrivenPropertyChecks
 

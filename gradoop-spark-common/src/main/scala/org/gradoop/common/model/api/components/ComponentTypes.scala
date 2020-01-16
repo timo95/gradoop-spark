@@ -1,6 +1,6 @@
 package org.gradoop.common.model.api.components
 
-import org.gradoop.common.model.impl.id.GradoopId
+import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 
 trait ComponentTypes {

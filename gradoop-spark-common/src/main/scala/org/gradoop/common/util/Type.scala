@@ -2,8 +2,8 @@ package org.gradoop.common.util
 
 import java.time.{LocalDate, LocalDateTime, LocalTime}
 
+import org.gradoop.common.id.GradoopId
 import org.gradoop.common.util.Type.CompoundType.TYPE_TOKEN_DELIMITER
-import org.gradoop.common.model.impl.id.GradoopId
 
 sealed abstract class Type {
   def string: String

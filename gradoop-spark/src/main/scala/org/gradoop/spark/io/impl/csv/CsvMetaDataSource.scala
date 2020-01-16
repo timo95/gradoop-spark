@@ -48,6 +48,6 @@ class CsvMetaDataSource(csvPath: String)(implicit session: SparkSession)
           .map(array => PropertyMetaData(StringEscaper.unescape(array(0)), array(1).toLowerCase))
       }
 
-    ElementMetaData(label, propertyMetaData) // TODO: complex types
+    ElementMetaData(label, propertyMetaData)
   }
 }

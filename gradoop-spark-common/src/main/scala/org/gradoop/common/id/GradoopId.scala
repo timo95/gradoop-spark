@@ -1,4 +1,4 @@
-package org.gradoop.common.model.impl.id
+package org.gradoop.common.id
 
 import java.net.{NetworkInterface, SocketException}
 import java.nio.{BufferUnderflowException, ByteBuffer}
@@ -8,21 +8,17 @@ import java.util.concurrent.atomic.AtomicInteger
 
 case class GradoopId(bytes: Array[Byte]) extends Ordered[GradoopId] {
 
+  def copy: GradoopId = new GradoopId(bytes.clone)
+
   /** Checks if the specified object is equal to the current id.
    *
    * @param o the object to be compared
    * @return true, iff the specified id is equal to this id
    */
   override def equals(o: Any): Boolean = {
-    if (super.equals(o)) true
-    else if (o == null || (getClass ne o.getClass)) false
-    else {
-      val firstBytes = this.bytes
-      val secondBytes = o.asInstanceOf[GradoopId].bytes
-      for (i <- 0 until GradoopId.ID_SIZE) {
-        if (firstBytes(i) != secondBytes(i)) return false // scalastyle:ignore
-      }
-      true
+    o match {
+      case id: GradoopId => bytes.sameElements(id.bytes)
+      case _: Any => false
     }
   }
 
@@ -158,11 +154,9 @@ object GradoopId {
    * @return a short representing the process
    */
   private def createProcessIdentifier: Short = {
-    var processId: Short = 0
     val processName: String = java.lang.management.ManagementFactory.getRuntimeMXBean.getName
-    if (processName.contains("@")) processId = processName.substring(0, processName.indexOf('@')).toInt.toShort
-    else processId = java.lang.management.ManagementFactory.getRuntimeMXBean.getName.hashCode.toShort
-    processId
+    if (processName.contains("@")) processName.substring(0, processName.indexOf('@')).toInt.toShort
+    else java.lang.management.ManagementFactory.getRuntimeMXBean.getName.hashCode.toShort
   }
 
   /** Converts a date into the seconds since unix epoch.
@@ -240,11 +234,7 @@ object GradoopId {
    */
   def isValid(hexString: String): Boolean = {
     if (hexString.length != 2 * ID_SIZE) false
-    else {
-      hexString.foreach(c =>
-        if(!(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F')) return false) // scalastyle:ignore return
-      true
-    }
+    else hexString.forall(c => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
   }
 
   //------------------------------------------------------------------------------------------------

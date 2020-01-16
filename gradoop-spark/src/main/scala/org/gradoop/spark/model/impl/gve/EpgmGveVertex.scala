@@ -2,8 +2,8 @@ package org.gradoop.spark.model.impl.gve
 
 import org.apache.spark.sql.Encoder
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
+import org.gradoop.common.id.GradoopId
 import org.gradoop.common.model.api.gve.{GveVertex, GveVertexFactory}
-import org.gradoop.common.model.impl.id.GradoopId
 
 final case class EpgmGveVertex(var id: Id, var label: Label, var properties: Properties, var graphIds: IdSet)
   extends GveVertex

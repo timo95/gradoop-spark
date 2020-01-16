@@ -28,8 +28,6 @@ abstract class CsvComposer[L <: Gve[L]](var metadata: Option[MetaData]) extends 
 
   def composeLabels[T <: Labeled](obj: T): String = {
     StringEscaper.escape(obj.label, CsvConstants.ESCAPED_CHARS)
-    //obj.getLabels.map(label => StringEscaper.escape(label, CsvConstants.ESCAPED_CHARS))
-      //.mkString(CsvConstants.LIST_DELIMITER)
   }
 
   def composeProperties[T <: Attributed](obj: T): String = {

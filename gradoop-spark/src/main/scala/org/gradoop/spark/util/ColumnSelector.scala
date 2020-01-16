@@ -1,8 +1,8 @@
 package org.gradoop.spark.util
 
 import org.apache.spark.sql.{Column, Dataset, Encoder, TypedColumn}
+import org.gradoop.common.id.GradoopId
 import org.gradoop.common.model.api.components._
-import org.gradoop.common.model.impl.id.GradoopId
 import org.gradoop.common.util.ColumnNames._
 
 class ColumnSelector[T](val dataset: Dataset[T]) extends AnyVal {

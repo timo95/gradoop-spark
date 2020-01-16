@@ -17,9 +17,6 @@ class TransformationTest extends EpgmGradoopSparkTestBase {
 
         val graph2 = graph.transformVertices(
           TransformationFunctions.renameLabel("Person", "d"))
-
-        // TODO write for each transformation function
-
       }
     }
 

@@ -9,7 +9,7 @@ class GveGrouping[L <: Gve[L]] extends UnaryLogicalGraphToLogicalGraphOperator[L
     val config = graph.config
     val session = config.sparkSession
 
-    graph // TODO
+    graph
 
     // Vertex: Translate to tuples
     // Vertex: Group by Keys
