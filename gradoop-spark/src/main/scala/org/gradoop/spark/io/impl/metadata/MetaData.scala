@@ -40,8 +40,8 @@ object MetaData {
       fromElements(graphCollection.edges))
   }
 
-  private def fromElements[EL <: AttributedElement]
-  (dataset: Dataset[EL])(implicit session: SparkSession): Dataset[ElementMetaData] = {
+  private def fromElements[EL <: AttributedElement](dataset: Dataset[EL])
+    (implicit session: SparkSession): Dataset[ElementMetaData] = {
     import ColumnNames._
     import org.apache.spark.sql.functions._
     import org.gradoop.spark.util.Implicits._
