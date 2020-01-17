@@ -26,14 +26,14 @@ class CsvMetaDataSourceTest extends EpgmGradoopSparkTestBase {
       assert(edgeMetaData.map(_.label).sorted.sameElements(Array("a", "b")))
     }
     it("correct number of properties") {
-      assert(graphHeadMetaData.sortBy(_.label).map(_.properties.length).sameElements(Array(2, 2)))
-      assert(vertexMetaData.sortBy(_.label).map(_.properties.length).sameElements(Array(4, 3)))
-      assert(edgeMetaData.sortBy(_.label).map(_.properties.length).sameElements(Array(2, 1)))
+      assert(graphHeadMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(2, 2)))
+      assert(vertexMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(4, 3)))
+      assert(edgeMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(2, 1)))
     }
     it("correct properties") {
       val propsG1 = Array(PropertyMetaData("a", "string"), PropertyMetaData("b", "double"))
       val propsG2 = Array(PropertyMetaData("a", "string"), PropertyMetaData("b", "int"))
-      assert(graphHeadMetaData.sortBy(_.label).map(_.properties.deep).sameElements(Array(propsG1.deep, propsG2.deep)))
+      assert(graphHeadMetaData.sortBy(_.label).map(_.metaData).sameElements(Array(propsG1.deep, propsG2.deep)))
 
       val propsV1 = Array(
         PropertyMetaData("a", "string"),
@@ -44,11 +44,11 @@ class CsvMetaDataSourceTest extends EpgmGradoopSparkTestBase {
         PropertyMetaData("a", "long"),
         PropertyMetaData("b", "boolean"),
         PropertyMetaData("c", "double"))
-      assert(vertexMetaData.sortBy(_.label).map(_.properties.deep).sameElements(Array(propsV1.deep, propsV2.deep)))
+      assert(vertexMetaData.sortBy(_.label).map(_.metaData).sameElements(Array(propsV1.deep, propsV2.deep)))
 
       val propsE1 = Array(PropertyMetaData("a", "int"), PropertyMetaData("b", "float"))
       val propsE2 = Array(PropertyMetaData("a", "long"))
-      assert(edgeMetaData.sortBy(_.label).map(_.properties.deep).sameElements(Array(propsE1.deep, propsE2.deep)))
+      assert(edgeMetaData.sortBy(_.label).map(_.metaData).sameElements(Array(propsE1.deep, propsE2.deep)))
     }
   }
 
@@ -73,9 +73,9 @@ class CsvMetaDataSourceTest extends EpgmGradoopSparkTestBase {
       assert(edgeMetaData.map(_.label).sorted.sameElements(Array("creatorOf")))
     }
     it("correct number of properties") {
-      assert(graphHeadMetaData.sortBy(_.label).map(_.properties.length).sameElements(Array(18)))
-      assert(vertexMetaData.sortBy(_.label).map(_.properties.length).sameElements(Array(18, 18)))
-      assert(edgeMetaData.sortBy(_.label).map(_.properties.length).sameElements(Array(18)))
+      assert(graphHeadMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(18)))
+      assert(vertexMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(18, 18)))
+      assert(edgeMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(18)))
     }
     it("correct properties") {
       val props = Array(
@@ -99,9 +99,9 @@ class CsvMetaDataSourceTest extends EpgmGradoopSparkTestBase {
         PropertyMetaData("keyh", "set:int")
       )
 
-      assert(graphHeadMetaData.sortBy(_.label).map(_.properties.deep).sameElements(Array(props.deep)))
-      assert(vertexMetaData.sortBy(_.label).map(_.properties.deep).sameElements(Array(props.deep, props.deep)))
-      assert(edgeMetaData.sortBy(_.label).map(_.properties.deep).sameElements(Array(props.deep)))
+      assert(graphHeadMetaData.sortBy(_.label).map(_.metaData).sameElements(Array(props.deep)))
+      assert(vertexMetaData.sortBy(_.label).map(_.metaData).sameElements(Array(props.deep, props.deep)))
+      assert(edgeMetaData.sortBy(_.label).map(_.metaData).sameElements(Array(props.deep)))
     }
   }
 }

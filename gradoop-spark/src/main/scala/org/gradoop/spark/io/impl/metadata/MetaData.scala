@@ -57,7 +57,7 @@ object MetaData {
       // group by label
       .groupBy(LABEL)
       // aggregate property structs to a set per label
-      .agg(collect_set("property").as("properties"))
+      .agg(collect_set("property").as("metaData"))
       .as[ElementMetaData]
   }
 }

@@ -1,13 +1,25 @@
 package org.gradoop.spark.io.impl.csv
 
-import org.apache.spark.sql.{Dataset, Row}
-import org.gradoop.common.properties.PropertyValue
+import org.apache.spark.sql.Dataset
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
+import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.io.api.DataSource
+import org.gradoop.spark.io.impl.metadata.ElementMetaData
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.impl.types.Gve
 
+/**
+ * Read Graph from CSV file.
+ *
+ * Any elements or properties not included in the metadata are not read.
+ *
+ * @param csvPath Path to read from
+ * @param config Gradoop config
+ * @tparam L Layout type
+ */
 class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
-  extends CsvParser[L] with DataSource[L] {
+  extends DataSource[L] with Serializable {
   import config.Implicits._
   private val factory = config.logicalGraphFactory
   import factory.Implicits._
@@ -16,71 +28,110 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
     "sep" -> CsvConstants.TOKEN_DELIMITER,
     "quote" -> null) // default is '"' but we don't support quoting and don't escape quotes
 
-  private val metaData = new CsvMetaDataSource(csvPath).read
+  private val parseId = udf(s => CsvParser.parseId(s))
+  private val parseLabel = udf(s => CsvParser.parseLabel(s))
+  private val parseGraphIds = udf(s => CsvParser.parseGraphIds(s))
+  private val parseProperties = udf((s, label, metaData) =>
+    CsvParser.parseProperties(s, label, metaData))
 
-  private val graphHeadMetaData = metaData.graphHeadMetaData.collect()
-  private val vertexMetaData = metaData.vertexMetaData.collect()
-  private val edgeMetaData = metaData.edgeMetaData.collect()
+  private val parserPropertiesExpression = map_from_entries(parseProperties(col(ColumnNames.PROPERTIES),
+    col(ColumnNames.LABEL), col("metaData")))
 
   override def readLogicalGraph: L#LG = {
-    config.logicalGraphFactory.init(readGraphHeads, readVertices, readEdges)
+    val metaData = new CsvMetaDataSource(csvPath).read
+    config.logicalGraphFactory.init(readGraphHeads(metaData.graphHeadMetaData),
+      readVertices(metaData.vertexMetaData),
+      readEdges(metaData.edgeMetaData))
   }
 
   override def readGraphCollection: L#GC = {
-    config.graphCollectionFactory.init(readGraphHeads, readVertices, readEdges)
+    val metaData = new CsvMetaDataSource(csvPath).read
+    config.graphCollectionFactory.init(readGraphHeads(metaData.graphHeadMetaData),
+      readVertices(metaData.vertexMetaData),
+      readEdges(metaData.edgeMetaData))
   }
 
-  def readGraphHeads: Dataset[L#G] = {
-    config.sparkSession.read
+  def readGraphHeads(metaData: Dataset[ElementMetaData]): Dataset[L#G] = {
+    // read file
+    val strings = config.sparkSession.read
       .options(options)
+      .schema(StructType(Seq(
+        StructField(ColumnNames.ID, DataTypes.StringType, false),
+        StructField(ColumnNames.LABEL, DataTypes.StringType, true),
+        StructField(ColumnNames.PROPERTIES, DataTypes.StringType, true),
+      )))
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.GRAPH_HEAD_FILE)
-      .map(rowToGraphHead)
+
+    // parse id and label
+    val partiallyParsed = strings.select(
+      parseId(col(ColumnNames.ID)).as(ColumnNames.ID),
+      parseLabel(col(ColumnNames.LABEL)).as(ColumnNames.LABEL),
+      col(ColumnNames.PROPERTIES)
+    )
+
+    // parse properties
+    partiallyParsed.join(metaData, ColumnNames.LABEL)
+      .withColumn(ColumnNames.PROPERTIES, parserPropertiesExpression.as(ColumnNames.PROPERTIES))
+      .drop("metaData")
+      .as[L#G]
   }
 
-  def readVertices: Dataset[L#V] = {
-    config.sparkSession.read
+  def readVertices(metaData: Dataset[ElementMetaData]): Dataset[L#V] = {
+    // read file
+    val strings = config.sparkSession.read
       .options(options)
+      .schema(StructType(Seq(
+        StructField(ColumnNames.ID, DataTypes.StringType, false),
+        StructField(ColumnNames.GRAPH_IDS, DataTypes.StringType, false),
+        StructField(ColumnNames.LABEL, DataTypes.StringType, true),
+        StructField(ColumnNames.PROPERTIES, DataTypes.StringType, true),
+      )))
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.VERTEX_FILE)
-      .map(rowToVertex)
+
+    // parse ids and label
+    val partiallyParsed = strings.select(
+      parseId(col(ColumnNames.ID)).as(ColumnNames.ID),
+      parseGraphIds(col(ColumnNames.GRAPH_IDS)).as(ColumnNames.GRAPH_IDS),
+      parseLabel(col(ColumnNames.LABEL)).as(ColumnNames.LABEL),
+      col(ColumnNames.PROPERTIES)
+    )
+
+    // parse properties
+    partiallyParsed.join(metaData, ColumnNames.LABEL)
+      .withColumn(ColumnNames.PROPERTIES, parserPropertiesExpression.as(ColumnNames.PROPERTIES))
+      .drop("metaData")
+      .as[L#V]
   }
 
-  def readEdges: Dataset[L#E] = {
-    config.sparkSession.read
+  def readEdges(metaData: Dataset[ElementMetaData]): Dataset[L#E] = {
+    // read file
+    val strings = config.sparkSession.read
       .options(options)
+      .schema(StructType(Seq(
+        StructField(ColumnNames.ID, DataTypes.StringType, false),
+        StructField(ColumnNames.GRAPH_IDS, DataTypes.StringType, false),
+        StructField(ColumnNames.SOURCE_ID, DataTypes.StringType, false),
+        StructField(ColumnNames.TARGET_ID, DataTypes.StringType, false),
+        StructField(ColumnNames.LABEL, DataTypes.StringType, true),
+        StructField(ColumnNames.PROPERTIES, DataTypes.StringType, true),
+      )))
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.EDGE_FILE)
-      .map(rowToEdge)
-  }
 
-  def rowToGraphHead(row: Row): L#G = {
-    val label = parseLabel(row.getString(1))
-    val elementMetaData = graphHeadMetaData.filter(m => m.label == label)
-    config.logicalGraphFactory.graphHeadFactory(
-      parseId(row.getString(0)),
-      label,
-      if(elementMetaData.isEmpty) Map.empty[String, PropertyValue]
-      else parseProperties(row.getString(2), elementMetaData(0)))
-  }
+    // parse ids and label
+    val partiallyParsed = strings.select(
+      parseId(col(ColumnNames.ID)).as(ColumnNames.ID),
+      parseGraphIds(col(ColumnNames.GRAPH_IDS)).as(ColumnNames.GRAPH_IDS),
+      parseId(col(ColumnNames.SOURCE_ID)).as(ColumnNames.SOURCE_ID),
+      parseId(col(ColumnNames.TARGET_ID)).as(ColumnNames.TARGET_ID),
+      parseLabel(col(ColumnNames.LABEL)).as(ColumnNames.LABEL),
+      col(ColumnNames.PROPERTIES)
+    )
 
-  def rowToVertex(row: Row): L#V = {
-    val label = parseLabel(row.getString(2))
-    val elementMetaData = vertexMetaData.filter(m => m.label == label)
-    config.logicalGraphFactory.vertexFactory(
-      parseId(row.getString(0)),
-      label,
-      if(elementMetaData.isEmpty) Map.empty[String, PropertyValue]
-      else parseProperties(row.getString(3), elementMetaData(0)), parseGraphIds(row.getString(1)))
-  }
-
-  def rowToEdge(row: Row): L#E = {
-    val label = parseLabel(row.getString(4))
-    val elementMetaData = edgeMetaData.filter(m => m.label == label)
-    config.logicalGraphFactory.edgeFactory(
-      parseId(row.getString(0)),
-      label,
-      parseId(row.getString(2)), // sourceId
-      parseId(row.getString(3)), // targetId
-      if(elementMetaData.isEmpty) Map.empty[String, PropertyValue]
-      else parseProperties(row.getString(5), elementMetaData(0)), parseGraphIds(row.getString(1)))
+    // parse properties
+    partiallyParsed.join(metaData, ColumnNames.LABEL)
+      .withColumn(ColumnNames.PROPERTIES, parserPropertiesExpression.as(ColumnNames.PROPERTIES))
+      .drop("metaData")
+      .as[L#E]
   }
 }
 

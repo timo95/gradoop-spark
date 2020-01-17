@@ -18,7 +18,7 @@ object TransformationFunctions {
       import sparkSession.implicits._
 
       val expression: Column = when(dataset.label === lit(oldLabel), lit(newLabel)).otherwise(dataset.label)
-      dataset.select(replaceColumn(dataset.columns, dataset.label, expression): _*).as[A]
+      dataset.withColumn(dataset.label.toString, expression).as[A]
     }
     transformationFunction
   }
@@ -33,9 +33,5 @@ object TransformationFunctions {
       })
     }
     transformationFunction
-  }
-
-  private def replaceColumn(allColumns: Array[String], oldColumn: Column, newExpression: Column): Seq[Column] = {
-    (allColumns.toSet - oldColumn.toString).toSeq.map(col) :+ newExpression.as(oldColumn.toString)
   }
 }

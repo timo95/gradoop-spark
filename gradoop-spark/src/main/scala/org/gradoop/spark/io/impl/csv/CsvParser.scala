@@ -2,43 +2,45 @@ package org.gradoop.spark.io.impl.csv
 
 import java.time.{LocalDate, LocalDateTime, LocalTime}
 
+import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.Type
 import org.gradoop.common.util.Type.CompoundType
-import org.gradoop.spark.io.impl.metadata.ElementMetaData
-import org.gradoop.spark.model.impl.types.Gve
 import org.gradoop.spark.util.StringEscaper
 
-abstract protected class CsvParser[L <: Gve[L]] extends Serializable {
+object CsvParser extends Serializable {
 
-  protected def parseId(idString: String): GradoopId = GradoopId.fromString(idString)
+  def parseId(idString: String): GradoopId = GradoopId.fromString(idString)
 
-  protected def parseGraphIds(idSetString: String): IdSet = {
+  def parseGraphIds(idSetString: String): Array[GradoopId] = {
     idSetString.substring(1, idSetString.length - 1)
       .split(CsvConstants.LIST_DELIMITER)
-      .map(GradoopId.fromString).toSet
+      .map(GradoopId.fromString)
   }
 
-  protected def parseLabel(labelString: String): Label = {
+  def parseLabel(labelString: String): Label = {
     if(labelString == null) ""
     else StringEscaper.unescape(labelString)
   }
 
-  protected def parseProperties(propertiesString: String, metaData: ElementMetaData): Properties = {
-    if(propertiesString == null) Map.empty[String, PropertyValue]
+  def parseProperties(propertiesString: String, label: String, metaData: Seq[GenericRowWithSchema]): Seq[(String, PropertyValue)] = {
+    if(propertiesString == null) Seq.empty[(String, PropertyValue)]
     else {
-      val properties = metaData.properties
       val propertyStrings = StringEscaper.split(propertiesString, CsvConstants.VALUE_DELIMITER)
-      if(propertyStrings.length != properties.length) {
-        println(s"Number of Properties for '${metaData.label}' does not fit metadata." +
+      if(propertyStrings.length != metaData.length) {
+        println(s"Number of Properties for '${label}' does not fit metadata." +
           s"Parsed Properties might be corrupt.")
       }
-      val length = propertyStrings.length min properties.length // only parse when metadata exists for it
+
+      val length = propertyStrings.length min metaData.length // only parse when metadata exists for it
       (0 until length)
         .filter(i => !propertyStrings(i).equals("")) // empty value => no property value
-        .map(i => (properties(i).key, propertyParser(properties(i).typeString)(propertyStrings(i))))
-        .toMap
+        .map(i => {
+          val key = metaData(i)(0).asInstanceOf[String] // workaround for weird bug, cannot cast to PropertyMetaData
+          val typeString = metaData(i)(1).asInstanceOf[String] // TODO build minimal example (struct + udf)
+          (key, propertyParser(typeString)(propertyStrings(i)))
+        })
     }
   }
 
