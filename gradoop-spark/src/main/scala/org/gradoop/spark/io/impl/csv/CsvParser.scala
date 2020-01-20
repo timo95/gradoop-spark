@@ -2,7 +2,7 @@ package org.gradoop.spark.io.impl.csv
 
 import java.time.{LocalDate, LocalDateTime, LocalTime}
 
-import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
+import org.apache.spark.sql.Row
 import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.Type
@@ -24,7 +24,7 @@ object CsvParser extends Serializable {
     else StringEscaper.unescape(labelString)
   }
 
-  def parseProperties(propertiesString: String, label: String, metaData: Seq[GenericRowWithSchema]): Seq[(String, PropertyValue)] = {
+  def parseProperties(propertiesString: String, label: String, metaData: Seq[Row]): Seq[(String, PropertyValue)] = {
     if(propertiesString == null) Seq.empty[(String, PropertyValue)]
     else {
       val propertyStrings = StringEscaper.split(propertiesString, CsvConstants.VALUE_DELIMITER)

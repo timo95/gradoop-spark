@@ -18,7 +18,7 @@ import org.gradoop.spark.model.impl.types.Gve
  * @param config Gradoop config
  * @tparam L Layout type
  */
-class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L], metaData: Option[MetaData])
+class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
   extends DataSource[L] {
   import config.Implicits._
   private val factory = config.logicalGraphFactory
@@ -37,18 +37,25 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L],
   private val parserPropertiesExpression = map_from_entries(parseProperties(col(ColumnNames.PROPERTIES),
     col(ColumnNames.LABEL), col("metaData")))
 
+  private var metaData: Option[MetaData] = None
+
   override def readLogicalGraph: L#LG = {
-    val meta = metaData.getOrElse(new CsvMetaDataSource(csvPath).read)
+    val meta = getMetaData
     config.logicalGraphFactory.init(readGraphHeads(meta.graphHeadMetaData),
       readVertices(meta.vertexMetaData),
       readEdges(meta.edgeMetaData))
   }
 
   override def readGraphCollection: L#GC = {
-    val meta = metaData.getOrElse(new CsvMetaDataSource(csvPath).read)
+    val meta = getMetaData
     config.graphCollectionFactory.init(readGraphHeads(meta.graphHeadMetaData),
       readVertices(meta.vertexMetaData),
       readEdges(meta.edgeMetaData))
+  }
+
+  def getMetaData: MetaData = {
+    if(metaData.isEmpty) metaData = Some(new CsvMetaDataSource(csvPath).read)
+    metaData.get
   }
 
   def readGraphHeads(metaData: Dataset[ElementMetaData]): Dataset[L#G] = {
@@ -138,10 +145,6 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L],
 object CsvDataSource {
 
   def apply[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L]): CsvDataSource[L] = {
-    new CsvDataSource(csvPath, config, None)
-  }
-
-  def apply[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L], metaData: MetaData): CsvDataSource[L] = {
-    new CsvDataSource(csvPath, config, Some(metaData))
+    new CsvDataSource(csvPath, config)
   }
 }

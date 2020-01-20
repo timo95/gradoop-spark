@@ -51,3 +51,10 @@ class CsvMetaDataSource(csvPath: String)(implicit session: SparkSession)
     ElementMetaData(label, propertyMetaData)
   }
 }
+
+object CsvMetaDataSource {
+
+  def apply(csvPath: String)(implicit session: SparkSession): CsvMetaDataSource = {
+    new CsvMetaDataSource(csvPath)
+  }
+}

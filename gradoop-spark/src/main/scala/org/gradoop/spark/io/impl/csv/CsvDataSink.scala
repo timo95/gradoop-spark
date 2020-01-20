@@ -1,16 +1,17 @@
 package org.gradoop.spark.io.impl.csv
 
-import org.apache.spark.sql.{Dataset, SaveMode, SparkSession}
+import org.apache.spark.sql.catalyst.encoders.{ExpressionEncoder, RowEncoder}
+import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
+import org.apache.spark.sql.{Dataset, Row, SaveMode, SparkSession}
 import org.gradoop.common.util.GradoopConstants
 import org.gradoop.spark.io.api.DataSink
 import org.gradoop.spark.io.impl.csv.CsvConstants.ComposeFunction
-import org.gradoop.spark.io.impl.metadata.MetaData
+import org.gradoop.spark.io.impl.metadata.{ElementMetaData, MetaData}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.impl.types.Gve
 
-class CsvDataSink[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L], metadata: Option[MetaData])
-  extends CsvComposer[L](metadata) with DataSink[L] {
-  implicit val session: SparkSession = config.sparkSession
+class CsvDataSink[L <: Gve[L]] private (csvPath: String, config: GradoopSparkConfig[L], getMetaData: => MetaData)
+  extends DataSink[L] {
   import config.Implicits._
 
   private val options: Map[String, String] = Map(
@@ -20,38 +21,51 @@ class CsvDataSink[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L], m
     "emptyValue" -> "")
 
   override def write(logicalGraph: L#LG, saveMode: SaveMode): Unit = {
-    writeGraphHeads(logicalGraph.graphHead, saveMode)
-    writeVertices(logicalGraph.vertices, saveMode)
-    writeEdges(logicalGraph.edges, saveMode)
+    val metaData = getMetaData
+    writeGraphHeads(logicalGraph.graphHead, metaData.graphHeadMetaData, saveMode)
+    writeVertices(logicalGraph.vertices, metaData.vertexMetaData, saveMode)
+    writeEdges(logicalGraph.edges, metaData.edgeMetaData, saveMode)
+    new CsvMetaDataSink(csvPath).write(metaData, saveMode)
   }
 
   override def write(graphCollection: L#GC, saveMode: SaveMode): Unit = {
-    writeGraphHeads(graphCollection.graphHeads, saveMode)
-    writeVertices(graphCollection.vertices, saveMode)
-    writeEdges(graphCollection.edges, saveMode)
+    val metaData = getMetaData
+    writeGraphHeads(graphCollection.graphHeads, metaData.graphHeadMetaData, saveMode)
+    writeVertices(graphCollection.vertices, metaData.vertexMetaData, saveMode)
+    writeEdges(graphCollection.edges, metaData.edgeMetaData, saveMode)
+    new CsvMetaDataSink(csvPath).write(metaData, saveMode)
   }
 
-  def writeGraphHeads(graphHeads: Dataset[L#G], saveMode: SaveMode): Unit = {
-    val objectToRow = new ObjectToRow[L#G](graphHeadComposeFunctions)
-    graphHeads.map(objectToRow.call)(objectToRow.encoder)
+  def writeGraphHeads(graphHeads: Dataset[L#G], metaData: Dataset[ElementMetaData], saveMode: SaveMode): Unit = {
+    implicit val rowEncoder: ExpressionEncoder[Row] = RowEncoder(StructType( // TODO metadata
+      graphHeadComposeFunctions.indices
+        .map(i => StructField(i.toString, DataTypes.StringType, nullable = false))))
+
+    graphHeads.map(g => Row.fromSeq(graphHeadComposeFunctions.map(_(g))))
       .write
       .options(options)
       .mode(saveMode)
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.GRAPH_HEAD_FILE)
   }
 
-  def writeVertices(vertices: Dataset[L#V], saveMode: SaveMode): Unit = {
-    val objectToRow = new ObjectToRow[L#V](vertexComposeFunctions)
-    vertices.map(objectToRow.call)(objectToRow.encoder)
+  def writeVertices(vertices: Dataset[L#V], metaData: Dataset[ElementMetaData], saveMode: SaveMode): Unit = {
+    implicit val rowEncoder: ExpressionEncoder[Row] = RowEncoder(StructType(
+      vertexComposeFunctions.indices
+        .map(i => StructField(i.toString, DataTypes.StringType, nullable = false))))
+
+    vertices.map(g => Row.fromSeq(vertexComposeFunctions.map(_(g))))
       .write
       .options(options)
       .mode(saveMode)
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.VERTEX_FILE)
   }
 
-  def writeEdges(edges: Dataset[L#E], saveMode: SaveMode): Unit = {
-    val objectToRow = new ObjectToRow[L#E](edgeComposeFunctions)
-    edges.map(objectToRow.call)(objectToRow.encoder)
+  def writeEdges(edges: Dataset[L#E], metaData: Dataset[ElementMetaData], saveMode: SaveMode): Unit = {
+    implicit val rowEncoder: ExpressionEncoder[Row] = RowEncoder(StructType(
+      edgeComposeFunctions.indices
+        .map(i => StructField(i.toString, DataTypes.StringType, nullable = false))))
+
+    edges.map(g => Row.fromSeq(edgeComposeFunctions.map(_(g))))
       .write
       .options(options)
       .mode(saveMode)
@@ -59,27 +73,26 @@ class CsvDataSink[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L], m
   }
 
   def graphHeadComposeFunctions: Array[ComposeFunction[L#G]] = {
-    Array(composeId, composeLabels, composeProperties)
+    Array(CsvComposer.composeId, CsvComposer.composeLabels, CsvComposer.composeProperties)
   }
 
   def vertexComposeFunctions: Array[ComposeFunction[L#V]] = {
-    Array(composeId, composeGraphIds, composeLabels, composeProperties)
+    Array(CsvComposer.composeId, CsvComposer.composeGraphIds, CsvComposer.composeLabels, CsvComposer.composeProperties)
   }
 
   def edgeComposeFunctions: Array[ComposeFunction[L#E]] = {
-    Array(composeId, composeGraphIds, composeSourceId, composeTargetId, composeLabels, composeProperties)
+    Array(CsvComposer.composeId, CsvComposer.composeGraphIds, CsvComposer.composeSourceId, CsvComposer.composeTargetId,
+      CsvComposer.composeLabels, CsvComposer.composeProperties)
   }
 }
 
 object CsvDataSink {
 
-  def apply[L <: Gve[L]]
-  (csvPath: String, config: GradoopSparkConfig[L]): CsvDataSink[L] = {
-    new CsvDataSink(csvPath, config, None)
+  def apply[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L]): CsvDataSink[L] = {
+    new CsvDataSink(csvPath, config, new CsvMetaDataSource(csvPath)(config.sparkSession).read)
   }
 
-  def apply[L <: Gve[L]]
-  (csvPath: String, config: GradoopSparkConfig[L], metadata: MetaData): CsvDataSink[L] = {
-    new CsvDataSink(csvPath, config, Some(metadata))
+  def apply[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L], metadata: MetaData): CsvDataSink[L] = {
+    new CsvDataSink(csvPath, config, metadata)
   }
 }

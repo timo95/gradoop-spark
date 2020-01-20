@@ -5,9 +5,9 @@ import org.gradoop.spark.io.impl.metadata.PropertyMetaData
 
 class CsvMetaDataSourceTest extends EpgmGradoopSparkTestBase {
 
-  describe("graph collection metadata source") {
+  describe("CsvMetaDataSource - graph collection") {
     val path = getClass.getResource("/data/csv/input_graph_collection").getFile
-    val metaDataSource = new CsvMetaDataSource(path)
+    val metaDataSource = CsvMetaDataSource(path)
 
     val metaData = metaDataSource.read
 
@@ -52,9 +52,9 @@ class CsvMetaDataSourceTest extends EpgmGradoopSparkTestBase {
     }
   }
 
-  describe("logical graph metadata source") {
+  describe("CsvMetaDataSource - logical graph with extended properties") {
     val path = getClass.getResource("/data/csv/input_extended_properties").getFile
-    val metaDataSource = new CsvMetaDataSource(path)
+    val metaDataSource = CsvMetaDataSource(path)
 
     val metaData = metaDataSource.read
 

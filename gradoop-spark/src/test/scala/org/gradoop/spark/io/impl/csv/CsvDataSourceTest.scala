@@ -1,17 +1,13 @@
 package org.gradoop.spark.io.impl.csv
 
-import org.gradoop.common.GradoopTestUtils
-import org.gradoop.common.id.GradoopId
-import org.gradoop.spark.EpgmGradoopSparkTestBase
-import org.gradoop.spark.model.api.layouts.gve.GveBaseLayoutFactory
 import org.gradoop.spark.util.SparkAsciiGraphLoader
 
-class CsvDataSourceTest extends EpgmGradoopSparkTestBase {
+class CsvDataSourceTest extends CsvTestBase {
 
-  describe("csv data source") {
+  describe("CsvDataSource") {
     val config = getConfig
 
-    it("correctly reads extended properties logical graph") {
+    it("reads logical graph with extended properties") {
       val csvPath = getClass.getResource("/data/csv/input_extended_properties").getFile
       val csvDataSource = CsvDataSource(csvPath, config)
       val graph = csvDataSource.readLogicalGraph
@@ -21,7 +17,7 @@ class CsvDataSourceTest extends EpgmGradoopSparkTestBase {
       assert(graph.equalsByData(expected))
     }
 
-    it("correctly reads graph collection") {
+    it("reads graph collection") {
       val csvPath = getClass.getResource("/data/csv/input_graph_collection").getFile
       val csvDataSource = CsvDataSource(csvPath, config)
       val collection = csvDataSource.readGraphCollection
@@ -32,22 +28,5 @@ class CsvDataSourceTest extends EpgmGradoopSparkTestBase {
 
       assert(collection.equalsByGraphData(expected))
     }
-  }
-
-  protected def getExtendedLogicalGraph(factory: GveBaseLayoutFactory[L, L#LG]): L#LG = {
-    import factory.Implicits._
-
-    val idUser = GradoopId.get
-    val idPost = GradoopId.get
-    val idForum = GradoopId.get
-    val graphIds = Set(idForum)
-    val properties = GradoopTestUtils.PROPERTIES
-    val graphHead = factory.createDataset(Seq(factory.graphHeadFactory(idForum, "Forum", properties)))
-    val vertices = factory.createDataset(Seq(
-      factory.vertexFactory(idUser, "User", properties, graphIds),
-      factory.vertexFactory(idPost, "Post", properties, graphIds)))
-    val edges = factory.createDataset(Seq(
-      factory.edgeFactory(GradoopId.get, "creatorOf", idUser, idPost, properties, graphIds)))
-    factory.init(graphHead, vertices, edges)
   }
 }
