@@ -13,10 +13,10 @@ object MapStrategy extends VariableSizedPropertyValueStrategy[Map[PropertyValue,
     var index = offset
     while (it.nonEmpty) {
       val entry = it.next()
-      Bytes.putBytes(bytes, index, entry._1.value, 0, entry._1.value.length)
-      index += entry._1.value.length
-      Bytes.putBytes(bytes, index, entry._2.value, 0, entry._2.value.length)
-      index += entry._2.value.length
+      Bytes.putBytes(bytes, index, entry._1.bytes, 0, entry._1.bytes.length)
+      index += entry._1.bytes.length
+      Bytes.putBytes(bytes, index, entry._2.bytes, 0, entry._2.bytes.length)
+      index += entry._2.bytes.length
     }
   }
 
@@ -25,9 +25,9 @@ object MapStrategy extends VariableSizedPropertyValueStrategy[Map[PropertyValue,
     var seq = Seq.empty[Tuple2[PropertyValue, PropertyValue]]
     while (index < offset + size) {
       val key = PropertyValue(PropertyValueStrategy(bytes(index)).fromBytes(bytes, index))
-      index += key.value.length
+      index += key.bytes.length
       val value = PropertyValue(PropertyValueStrategy(bytes(index)).fromBytes(bytes, index))
-      index += value.value.length
+      index += value.bytes.length
       seq :+= (key, value)
     }
     seq.toMap[PropertyValue, PropertyValue]
@@ -43,7 +43,7 @@ object MapStrategy extends VariableSizedPropertyValueStrategy[Map[PropertyValue,
   }
 
   override def getRawSize(value: Map[PropertyValue, PropertyValue]): Int = {
-    value.map(e => e._1.value.length + e._2.value.length).sum
+    value.map(e => e._1.bytes.length + e._2.bytes.length).sum
   }
 
   override def getType: Type = Type.MAP

@@ -5,7 +5,7 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.io.api.DataSource
-import org.gradoop.spark.io.impl.metadata.ElementMetaData
+import org.gradoop.spark.io.impl.metadata.{ElementMetaData, MetaData}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.impl.types.Gve
 
@@ -18,8 +18,8 @@ import org.gradoop.spark.model.impl.types.Gve
  * @param config Gradoop config
  * @tparam L Layout type
  */
-class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
-  extends DataSource[L] with Serializable {
+class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L], metaData: Option[MetaData])
+  extends DataSource[L] {
   import config.Implicits._
   private val factory = config.logicalGraphFactory
   import factory.Implicits._
@@ -38,17 +38,17 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
     col(ColumnNames.LABEL), col("metaData")))
 
   override def readLogicalGraph: L#LG = {
-    val metaData = new CsvMetaDataSource(csvPath).read
-    config.logicalGraphFactory.init(readGraphHeads(metaData.graphHeadMetaData),
-      readVertices(metaData.vertexMetaData),
-      readEdges(metaData.edgeMetaData))
+    val meta = metaData.getOrElse(new CsvMetaDataSource(csvPath).read)
+    config.logicalGraphFactory.init(readGraphHeads(meta.graphHeadMetaData),
+      readVertices(meta.vertexMetaData),
+      readEdges(meta.edgeMetaData))
   }
 
   override def readGraphCollection: L#GC = {
-    val metaData = new CsvMetaDataSource(csvPath).read
-    config.graphCollectionFactory.init(readGraphHeads(metaData.graphHeadMetaData),
-      readVertices(metaData.vertexMetaData),
-      readEdges(metaData.edgeMetaData))
+    val meta = metaData.getOrElse(new CsvMetaDataSource(csvPath).read)
+    config.graphCollectionFactory.init(readGraphHeads(meta.graphHeadMetaData),
+      readVertices(meta.vertexMetaData),
+      readEdges(meta.edgeMetaData))
   }
 
   def readGraphHeads(metaData: Dataset[ElementMetaData]): Dataset[L#G] = {
@@ -137,5 +137,11 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
 
 object CsvDataSource {
 
-  def apply[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L]): CsvDataSource[L] = new CsvDataSource(csvPath, config)
+  def apply[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L]): CsvDataSource[L] = {
+    new CsvDataSource(csvPath, config, None)
+  }
+
+  def apply[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L], metaData: MetaData): CsvDataSource[L] = {
+    new CsvDataSource(csvPath, config, Some(metaData))
+  }
 }

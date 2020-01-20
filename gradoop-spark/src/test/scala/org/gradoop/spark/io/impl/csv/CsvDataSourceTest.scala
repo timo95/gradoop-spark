@@ -1,47 +1,53 @@
 package org.gradoop.spark.io.impl.csv
 
+import org.gradoop.common.GradoopTestUtils
+import org.gradoop.common.id.GradoopId
 import org.gradoop.spark.EpgmGradoopSparkTestBase
+import org.gradoop.spark.model.api.layouts.gve.GveBaseLayoutFactory
+import org.gradoop.spark.util.SparkAsciiGraphLoader
 
 class CsvDataSourceTest extends EpgmGradoopSparkTestBase {
-  private val config = getConfig
-  import config.Implicits._
 
-  describe("logical graph with extended properties") {
-    val path = getClass.getResource("/data/csv/input_extended_properties").getFile
-    val csvDataSource = CsvDataSource(path, config)
-    val graph = csvDataSource.readLogicalGraph
+  describe("csv data source") {
+    val config = getConfig
 
-    it("correct number of elements") {
-      assert(graph.graphHead.count() == 1)
-      assert(graph.vertices.count() == 2)
-      assert(graph.edges.count() == 1)
+    it("correctly reads extended properties logical graph") {
+      val csvPath = getClass.getResource("/data/csv/input_extended_properties").getFile
+      val csvDataSource = CsvDataSource(csvPath, config)
+      val graph = csvDataSource.readLogicalGraph
+
+      val expected = getExtendedLogicalGraph(config.logicalGraphFactory)
+
+      assert(graph.equalsByData(expected))
     }
-    it("correct ids") {
-      assert(graph.graphHead.collect()(0).id.toString == "000000000000000000000000")
 
-      val expected = Set[String]("000000000000000000000000", "000000000000000000000001")
-      assert(graph.vertices.collect.map(v => v.id.toString).toSet == expected)
+    it("correctly reads graph collection") {
+      val csvPath = getClass.getResource("/data/csv/input_graph_collection").getFile
+      val csvDataSource = CsvDataSource(csvPath, config)
+      val collection = csvDataSource.readGraphCollection
 
-      assert(graph.edges.collect()(0).id.toString == "000000000000000000000002")
-    }
-    it("correct labels") {
-      assert(graph.graphHead.collect()(0).label == "Forum")
+      val gdlPath = getClass.getResource("/data/gdl/csv_source_expected/expected_graph_collection.gdl").getFile
+      val expected = SparkAsciiGraphLoader.fromFile(config, gdlPath)
+        .getGraphCollectionByVariables("expected1", "expected2")
 
-      val expected = Set[String]("User", "Post")
-      assert(graph.vertices.collect.map(v => v.label).toSet == expected)
-
-      assert(graph.edges.collect()(0).label == "creatorOf")
+      assert(collection.equalsByGraphData(expected))
     }
   }
 
-  describe("graph collection") {
-    val csvDataSource = CsvDataSource(getClass.getResource("/data/csv/input_graph_collection").getFile, config)
-    val collection = csvDataSource.readGraphCollection
+  protected def getExtendedLogicalGraph(factory: GveBaseLayoutFactory[L, L#LG]): L#LG = {
+    import factory.Implicits._
 
-    it("correct number of elements") {
-      assert(collection.graphHeads.count() == 2)
-      assert(collection.vertices.count() == 5)
-      assert(collection.edges.count() == 6)
-    }
+    val idUser = GradoopId.get
+    val idPost = GradoopId.get
+    val idForum = GradoopId.get
+    val graphIds = Set(idForum)
+    val properties = GradoopTestUtils.PROPERTIES
+    val graphHead = factory.createDataset(Seq(factory.graphHeadFactory(idForum, "Forum", properties)))
+    val vertices = factory.createDataset(Seq(
+      factory.vertexFactory(idUser, "User", properties, graphIds),
+      factory.vertexFactory(idPost, "Post", properties, graphIds)))
+    val edges = factory.createDataset(Seq(
+      factory.edgeFactory(GradoopId.get, "creatorOf", idUser, idPost, properties, graphIds)))
+    factory.init(graphHead, vertices, edges)
   }
 }

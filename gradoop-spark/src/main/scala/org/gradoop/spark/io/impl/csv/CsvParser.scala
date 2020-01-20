@@ -83,7 +83,7 @@ object CsvParser extends Serializable {
   String => Map[PropertyValue, PropertyValue] = {
     mapString: String => StringEscaper.split(mapString.substring(1, mapString.length - 1), CsvConstants.LIST_DELIMITER)
       .map(entry => StringEscaper.split(entry, CsvConstants.MAP_SEPARATOR, 2))
-      .map(entry => (PropertyValue(entry(0)), PropertyValue(entry(1))))
+      .map(entry => (keyParser(entry(0)), valueParser(entry(1))))
       .toMap
   }
 }

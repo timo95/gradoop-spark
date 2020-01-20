@@ -11,8 +11,8 @@ object SetStrategy extends VariableSizedPropertyValueStrategy[Set[PropertyValue]
     var index = offset
     while (it.nonEmpty) {
       val prop = it.next()
-      Bytes.putBytes(bytes, index, prop.value, 0, prop.value.length)
-      index += prop.value.length
+      Bytes.putBytes(bytes, index, prop.bytes, 0, prop.bytes.length)
+      index += prop.bytes.length
     }
   }
 
@@ -21,7 +21,7 @@ object SetStrategy extends VariableSizedPropertyValueStrategy[Set[PropertyValue]
     var seq = Seq.empty[PropertyValue]
     while (index < offset + size) {
       val element = PropertyValue(PropertyValueStrategy(bytes(index)).fromBytes(bytes, index))
-      index += element.value.length
+      index += element.bytes.length
       seq :+= element
     }
     seq.toSet
@@ -35,7 +35,7 @@ object SetStrategy extends VariableSizedPropertyValueStrategy[Set[PropertyValue]
     value.isInstanceOf[Set[_]] && value.asInstanceOf[Set[_]].forall(_.isInstanceOf[PropertyValue])
   }
 
-  override def getRawSize(value: Set[PropertyValue]): Int = value.toArray.map(_.value.length).sum
+  override def getRawSize(value: Set[PropertyValue]): Int = value.toArray.map(_.bytes.length).sum
 
   override def getType: Type = Type.SET
 

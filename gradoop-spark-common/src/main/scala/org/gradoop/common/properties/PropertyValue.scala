@@ -7,28 +7,32 @@ import org.gradoop.common.properties.strategies.PropertyValueStrategy
 import org.gradoop.common.util.Type
 import org.gradoop.common.util.Type.PrimitiveType
 
-case class PropertyValue(value: Array[Byte]) {
+case class PropertyValue(bytes: Array[Byte]) {
 
-  def copy: PropertyValue = new PropertyValue(value.clone)
+  def copy: PropertyValue = new PropertyValue(bytes.clone)
 
-  def getTypeByte: Byte = value(0)
+  def getTypeByte: Byte = bytes(0)
 
   def getType: Type = Type(getTypeByte)
 
-  def getExactType: Type = PropertyValueStrategy(getTypeByte).getExactType(value)
+  def getExactType: Type = PropertyValueStrategy(getTypeByte).getExactType(bytes)
 
-  def get: Any = PropertyValueStrategy(getTypeByte).fromBytes(value)
+  def get: Any = PropertyValueStrategy(getTypeByte).fromBytes(bytes)
 
   override def equals(o: Any): Boolean = {
     o match {
-      case prop: PropertyValue => value.sameElements(prop.value)
+      case prop: PropertyValue => bytes.sameElements(prop.bytes)
       case _ => false
     }
   }
 
-  override def hashCode(): Int = value.hashCode()
+  override def hashCode(): Int = bytes.hashCode()
 
-  override def toString: String = s"${get.toString}:${getExactType.string}"
+  override def toString: String = {
+    val value = get
+    val string = if(value == null) Type.NULL.string else value.toString
+    "%s:%s".format(string, getExactType.string)
+  }
 
   // ---------- Convenience accessors ----------
   // Getter
