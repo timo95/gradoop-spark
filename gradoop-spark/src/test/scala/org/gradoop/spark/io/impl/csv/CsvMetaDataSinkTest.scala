@@ -9,7 +9,7 @@ import org.gradoop.spark.io.impl.metadata.ElementMetaData
 class CsvMetaDataSinkTest extends EpgmGradoopSparkTestBase {
 
   describe("CsvMetaDataSink") {
-    val tempDir = Files.createTempDirectory("csv").toString
+    val tempDir = Files.createTempDirectory("csv_metadata").toString
 
     it("GraphCollection") {
       val path = getClass.getResource("/data/csv/input_graph_collection").getFile

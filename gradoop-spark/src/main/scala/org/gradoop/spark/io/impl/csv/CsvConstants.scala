@@ -12,7 +12,7 @@ object CsvConstants {
    *
    * @tparam T type
    */
-  type ComposeFunction[T] = (T) => String
+  type ComposeFunction[T] = T => String
 
   // CSV file structure
 

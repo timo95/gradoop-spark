@@ -1,11 +1,13 @@
 package org.gradoop.spark.io.impl.metadata
 
-import org.apache.spark.sql.{Dataset, SparkSession}
+import org.apache.spark.sql.{Column, Dataset, Row, SparkSession}
 import org.gradoop.common.model.api.elements.AttributedElement
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.expressions.filter.FilterExpressions
+import org.gradoop.spark.io.impl.csv.CsvConstants
 import org.gradoop.spark.model.impl.types.Gve
+import org.gradoop.spark.util.StringEscaper
 
 class MetaData(val graphHeadMetaData: Dataset[ElementMetaData],
                val vertexMetaData: Dataset[ElementMetaData],
@@ -47,17 +49,24 @@ object MetaData {
     import org.gradoop.spark.util.Implicits._
     import session.implicits._
 
-    val getTypeString = udf((p: PropertyValue) => p.getExactType.string)
+    // Row = PropertyValue
+    val getTypeString = udf((r: Row) =>
+      if(r == null) null else new PropertyValue(r(0).asInstanceOf[Array[Byte]]).getExactType.string)
+
+    // If all elements are null, it returns null. Otherwise a struct.
+    def structOrNull(cols: Column*): Column = when(cols.map(c => isnull(c)).reduce(_&&_), lit(null))
+      .otherwise(struct(cols: _*))
 
     dataset
       // one row for each property per element
-      .select(dataset.label, explode(dataset.properties).as(Seq("key","property")))
+      .select(dataset.label, explode_outer(dataset.properties).as(Seq(PropertyMetaData.key, "property")))
       // put property key and type in struct
-      .select(col(LABEL), struct(col("key"), getTypeString(col(s"property")).as("typeString")).as("property"))
+      .select(col(LABEL), structOrNull(col(PropertyMetaData.key), getTypeString(col(s"property"))
+        .as(PropertyMetaData.typeString)).as("property"))
       // group by label
       .groupBy(LABEL)
       // aggregate property structs to a set per label
-      .agg(collect_set("property").as("metaData"))
+      .agg(collect_set("property").as(ElementMetaData.metaData))
       .as[ElementMetaData]
   }
 }

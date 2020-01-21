@@ -23,16 +23,19 @@ class CsvMetaDataSink(csvPath: String)(implicit sparkSession: SparkSession) exte
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.METADATA_FILE)
   }
 
-  private def getRows(typeString: String, metaData: Dataset[ElementMetaData]): DataFrame = {
+  private def getRows(elementType: String, metaData: Dataset[ElementMetaData]): DataFrame = {
     import org.apache.spark.sql.functions._
 
     val composeLabel = udf((l: String) => StringEscaper.escape(l, CsvConstants.ESCAPED_CHARS))
     val composeMetaData = udf((meta: Seq[Row]) => { // TODO doesn't work with PropertyMetaData
-      meta.map(m => m(0) + CsvConstants.PROPERTY_TOKEN_DELIMITER + m(1))
+      meta.map(m => StringEscaper.escape(m(0).asInstanceOf[String], CsvConstants.ESCAPED_CHARS) +
+        CsvConstants.PROPERTY_TOKEN_DELIMITER + m(1))
         .mkString(CsvConstants.LIST_DELIMITER)
     })
 
-    metaData.select(lit(typeString), composeLabel(col("label")), composeMetaData(col("metaData")))
+    metaData.select(lit(elementType),
+      composeLabel(col(ElementMetaData.label)),
+      composeMetaData(col(ElementMetaData.metaData)))
   }
 }
 

@@ -13,10 +13,12 @@ class CsvMetaDataSource(csvPath: String)(implicit session: SparkSession)
     "sep" -> CsvConstants.TOKEN_DELIMITER,
     "quote" -> null) // default is '"' but we don't support quoting and don't escape quotes
 
+  private val TYPE_FIELD = "type"
+
   private val schema = StructType(Seq(
-    StructField("type", DataTypes.StringType, false),
-    StructField("label", DataTypes.StringType, true),
-    StructField("properties", DataTypes.StringType, true)))
+    StructField(TYPE_FIELD, DataTypes.StringType, false),
+    StructField(ElementMetaData.label, DataTypes.StringType, true),
+    StructField(ElementMetaData.metaData, DataTypes.StringType, true)))
 
   override def read: MetaData = {
     val dataFrame = session.read
@@ -31,10 +33,11 @@ class CsvMetaDataSource(csvPath: String)(implicit session: SparkSession)
 
   private def getElementMetaData(dataFrame: DataFrame, elementType: String): Dataset[ElementMetaData] = {
     import session.implicits._
+    import org.apache.spark.sql.functions._
 
     dataFrame
-      .filter(s"type = '$elementType'")
-      .select("label", "properties")
+      .filter(col(TYPE_FIELD) === lit(elementType))
+      .select(ElementMetaData.label, ElementMetaData.metaData)
       .map(rowToElementMetaData)
   }
 
