@@ -1,6 +1,6 @@
 package org.gradoop.spark.io.impl.csv
 
-import org.gradoop.spark.EpgmGradoopSparkTestBase
+import org.gradoop.spark.{EpgmGradoopSparkTestBase, IoTest}
 import org.gradoop.spark.io.impl.metadata.PropertyMetaData
 
 class CsvMetaDataSourceTest extends EpgmGradoopSparkTestBase {
@@ -15,22 +15,22 @@ class CsvMetaDataSourceTest extends EpgmGradoopSparkTestBase {
     val vertexMetaData = metaData.vertexMetaData.collect()
     val edgeMetaData = metaData.edgeMetaData.collect()
 
-    it("correct number of entries") {
+    it("correct number of entries", IoTest) {
       assert(graphHeadMetaData.length == 2)
       assert(vertexMetaData.length == 2)
       assert(edgeMetaData.length == 2)
     }
-    it("correct labels") {
+    it("correct labels", IoTest) {
       assert(graphHeadMetaData.map(_.label).sorted.sameElements(Array("g1", "g2")))
       assert(vertexMetaData.map(_.label).sorted.sameElements(Array("A", "B")))
       assert(edgeMetaData.map(_.label).sorted.sameElements(Array("a", "b")))
     }
-    it("correct number of properties") {
+    it("correct number of properties", IoTest) {
       assert(graphHeadMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(2, 2)))
       assert(vertexMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(4, 3)))
       assert(edgeMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(2, 1)))
     }
-    it("correct properties") {
+    it("correct properties", IoTest) {
       val propsG1 = Array(PropertyMetaData("a", "string"), PropertyMetaData("b", "double"))
       val propsG2 = Array(PropertyMetaData("a", "string"), PropertyMetaData("b", "int"))
       assert(graphHeadMetaData.sortBy(_.label).map(_.metaData).sameElements(Array(propsG1.deep, propsG2.deep)))
@@ -62,22 +62,22 @@ class CsvMetaDataSourceTest extends EpgmGradoopSparkTestBase {
     val vertexMetaData = metaData.vertexMetaData.collect()
     val edgeMetaData = metaData.edgeMetaData.collect()
 
-    it("correct number of entries") {
+    it("correct number of entries", IoTest) {
       assert(graphHeadMetaData.length == 1)
       assert(vertexMetaData.length == 2)
       assert(edgeMetaData.length == 1)
     }
-    it("correct labels") {
+    it("correct labels", IoTest) {
       assert(graphHeadMetaData.map(_.label).sorted.sameElements(Array("Forum")))
       assert(vertexMetaData.map(_.label).sorted.sameElements(Array("Post", "User")))
       assert(edgeMetaData.map(_.label).sorted.sameElements(Array("creatorOf")))
     }
-    it("correct number of properties") {
+    it("correct number of properties", IoTest) {
       assert(graphHeadMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(18)))
       assert(vertexMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(18, 18)))
       assert(edgeMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(18)))
     }
-    it("correct properties") {
+    it("correct properties", IoTest) {
       val props = Array(
         PropertyMetaData("key0", "boolean"),
         PropertyMetaData("key1", "int"),

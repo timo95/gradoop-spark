@@ -18,8 +18,7 @@ import org.gradoop.spark.model.impl.types.Gve
  * @param config Gradoop config
  * @tparam L Layout type
  */
-class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
-  extends DataSource[L] {
+class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L]) extends DataSource[L] {
   import config.Implicits._
   private val factory = config.logicalGraphFactory
   import factory.Implicits._

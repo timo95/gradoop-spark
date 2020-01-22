@@ -1,12 +1,12 @@
 package org.gradoop.spark.model.impl.operators.tostring
 
-import org.gradoop.spark.EpgmGradoopSparkTestBase
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.GraphCollection
 import org.gradoop.spark.model.api.layouts.gve.GveGraphCollectionOperators
 import org.gradoop.spark.model.impl.operators.tostring.gve.CanonicalAdjacencyMatrixBuilder
 import org.gradoop.spark.model.impl.operators.tostring.gve.ElementToString._
 import org.gradoop.spark.util.SparkAsciiGraphLoader
+import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}
 
 import scala.io.Source
 
@@ -22,7 +22,7 @@ class CanonicalAdjacencyMatrixBuilderTest extends EpgmGradoopSparkTestBase {
 
     val result = collection.callForValue(cam)
 
-    it("Equals expected") {
+    it("Equals expected string", OperatorTest) {
       val stringPath = getClass.getResource("/data/string/cam_test_directed").getFile
       val expected = Source.fromFile(stringPath)
       assert(expected.mkString equals result)
@@ -36,7 +36,7 @@ class CanonicalAdjacencyMatrixBuilderTest extends EpgmGradoopSparkTestBase {
 
     val result = collection.callForValue(cam)
 
-    it("Equals expected") {
+    it("Equals expected string", OperatorTest) {
       val stringPath = getClass.getResource("/data/string/cam_test_undirected").getFile
       val expected = Source.fromFile(stringPath)
       assert(expected.mkString equals result)

@@ -3,7 +3,7 @@ package org.gradoop.spark.io.impl.csv
 import java.nio.file.Files
 
 import org.apache.spark.sql.{Dataset, SaveMode}
-import org.gradoop.spark.EpgmGradoopSparkTestBase
+import org.gradoop.spark.{EpgmGradoopSparkTestBase, IoTest}
 import org.gradoop.spark.io.impl.metadata.ElementMetaData
 
 class CsvMetaDataSinkTest extends EpgmGradoopSparkTestBase {
@@ -11,7 +11,7 @@ class CsvMetaDataSinkTest extends EpgmGradoopSparkTestBase {
   describe("CsvMetaDataSink") {
     val tempDir = Files.createTempDirectory("csv_metadata").toString
 
-    it("GraphCollection") {
+    it("GraphCollection", IoTest) {
       val path = getClass.getResource("/data/csv/input_graph_collection").getFile
       val metaData = CsvMetaDataSource(path).read
 
@@ -23,7 +23,7 @@ class CsvMetaDataSinkTest extends EpgmGradoopSparkTestBase {
       assert(metaDataEquals(metaData.edgeMetaData, writtenMetaData.edgeMetaData))
     }
 
-    it("LogicalGraph with extended properties") {
+    it("LogicalGraph with extended properties", IoTest) {
       val path = getClass.getResource("/data/csv/input_extended_properties").getFile
       val metaData = CsvMetaDataSource(path).read
 

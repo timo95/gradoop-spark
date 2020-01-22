@@ -137,10 +137,11 @@ object CsvDataSink {
     propertyValue.get match {
       case null => GradoopConstants.NULL_STRING
       case string: String => StringEscaper.escape(string, CsvConstants.ESCAPED_CHARS)
-      case list: List[PropertyValue] =>
-        list.map(e => propertyToString(e)).mkString("[", CsvConstants.LIST_DELIMITER, "]")
-      case set: Set[PropertyValue] => set.map(e => propertyToString(e)).mkString("[", CsvConstants.LIST_DELIMITER, "]")
-      case map: Map[PropertyValue, PropertyValue] => map
+      case list: List[_] => list.asInstanceOf[List[PropertyValue]]
+        .map(e => propertyToString(e)).mkString("[", CsvConstants.LIST_DELIMITER, "]")
+      case set: Set[_] => set.asInstanceOf[Set[PropertyValue]]
+        .map(e => propertyToString(e)).mkString("[", CsvConstants.LIST_DELIMITER, "]")
+      case map: Map[_, _] => map.asInstanceOf[Map[PropertyValue, PropertyValue]]
         .map(m => propertyToString(m._1) + CsvConstants.MAP_SEPARATOR.toString + propertyToString(m._2))
         .mkString("{", CsvConstants.LIST_DELIMITER, "}")
       case any: Any => any.toString

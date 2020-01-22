@@ -1,5 +1,6 @@
 package org.gradoop.spark.io.impl.csv
 
+import org.gradoop.spark.IoTest
 import org.gradoop.spark.util.SparkAsciiGraphLoader
 
 class CsvDataSourceTest extends CsvTestBase {
@@ -7,7 +8,7 @@ class CsvDataSourceTest extends CsvTestBase {
   describe("CsvDataSource") {
     val config = getConfig
 
-    it("reads logical graph with extended properties") {
+    it("reads logical graph with extended properties", IoTest) {
       val csvPath = getClass.getResource("/data/csv/input_extended_properties").getFile
       val csvDataSource = CsvDataSource(csvPath, config)
       val graph = csvDataSource.readLogicalGraph
@@ -17,7 +18,7 @@ class CsvDataSourceTest extends CsvTestBase {
       assert(graph.equalsByData(expected))
     }
 
-    it("reads graph collection") {
+    it("reads graph collection", IoTest) {
       val csvPath = getClass.getResource("/data/csv/input_graph_collection").getFile
       val csvDataSource = CsvDataSource(csvPath, config)
       val collection = csvDataSource.readGraphCollection

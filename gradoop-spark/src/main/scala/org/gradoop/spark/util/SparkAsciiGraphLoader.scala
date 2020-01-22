@@ -41,7 +41,7 @@ class SparkAsciiGraphLoader[L <: Gve[L]](config: GradoopSparkConfig[L], loader: 
       import config.logicalGraphFactory.Implicits._
       val tf = TransformationFunctions
         .renameLabel[L#G](GradoopConstants.DEFAULT_GRAPH_LABEL, GradoopConstants.DB_GRAPH_LABEL)
-      factory.init(vertices, edges).transformGraphHead(tf)
+      factory.create(vertices, edges).transformGraphHead(tf)
     }
     else {
       val graphHead = factory.graphHeadFactory.create(GradoopConstants.DB_GRAPH_LABEL)

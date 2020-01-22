@@ -50,6 +50,13 @@ trait GveBaseLayoutFactory[L <: Gve[L], BG <: BaseGraph[L]] extends LogicalGraph
     init(graphHead, vertices, edges)
   }
 
+  def create(vertices: Iterable[L#V], edges: Iterable[L#E]): BG = {
+    val vertexDS: Dataset[L#V] = createDataset[L#V](vertices)
+    val edgeDS: Dataset[L#E] = createDataset[L#E](edges)
+
+    create(vertexDS, edgeDS)
+  }
+
   /** This creates a new graph head/id and adds it to each element. */
   def create(vertices: Dataset[L#V], edges: Dataset[L#E]): BG = {
     val id = GradoopId.get

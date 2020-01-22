@@ -4,6 +4,7 @@ import java.nio.file.Files
 
 import org.apache.spark.sql.SaveMode
 import org.gradoop.common.properties.PropertyValue
+import org.gradoop.spark.IoTest
 import org.gradoop.spark.util.SparkAsciiGraphLoader
 
 class CsvDataSinkTest extends CsvTestBase {
@@ -12,11 +13,11 @@ class CsvDataSinkTest extends CsvTestBase {
   describe("CsvDataSink") {
     val config = getConfig
 
-    it("social network graph collection") {
+    it("social network graph collection", IoTest) {
       testCsvWrite(getSocialNetworkLoader.getGraphCollection)
     }
 
-    it("logical graph with different property types for the same property name") {
+    it("logical graph with different property types for the same property name", IoTest) {
       val loader = SparkAsciiGraphLoader.fromString(config, "vertices[" +
         "(v1:A {keya:1, keyb:2, keyc:\"Foo\"})" +
         "(v2:A {keya:1.2f, keyb:\"Bar\", keyc:2.3f})" +
@@ -31,7 +32,7 @@ class CsvDataSinkTest extends CsvTestBase {
       testCsvWrite(loader.getLogicalGraphByVariable("edges"))
     }
 
-    it("logical graph with the same label for vertices and edges") {
+    it("logical graph with the same label for vertices and edges", IoTest) {
       val loader = SparkAsciiGraphLoader.fromString(config, "single[" +
         "(v1:A {keya:2})" +
         "(v1)-[e1:A {keya:false}]->(v1)]" +
@@ -48,11 +49,11 @@ class CsvDataSinkTest extends CsvTestBase {
       testCsvWrite(loader.getLogicalGraphByVariable("single"))
       testCsvWrite(loader.getLogicalGraphByVariable("multiple"))    }
 
-    it("logical graph with extended properties") {
+    it("logical graph with extended properties", IoTest) {
       testCsvWrite(getExtendedLogicalGraph(config.logicalGraphFactory))
     }
 
-    it("logical graph containing delimiters") {
+    it("logical graph containing delimiters", IoTest) {
       val string1 = "abc;,|:\n=\\ def"
       val string2 = "def;,|:\n=\\ ghi"
       val list = Seq(PropertyValue(string2), PropertyValue(string1))
