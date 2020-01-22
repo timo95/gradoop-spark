@@ -5,9 +5,7 @@ import org.gradoop.common.model.api.elements.AttributedElement
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.expressions.filter.FilterExpressions
-import org.gradoop.spark.io.impl.csv.CsvConstants
 import org.gradoop.spark.model.impl.types.Gve
-import org.gradoop.spark.util.StringEscaper
 
 class MetaData(val graphHeadMetaData: Dataset[ElementMetaData],
                val vertexMetaData: Dataset[ElementMetaData],
@@ -68,5 +66,15 @@ object MetaData {
       // aggregate property structs to a set per label
       .agg(collect_set("property").as(ElementMetaData.metaData))
       .as[ElementMetaData]
+
+    /*
+    // Version without explode, might be faster with many properties per row or rows per group TODO Benchmark
+    val propToMeta = new PropertyMetaDataUnion
+
+    dataset
+      .groupBy(LABEL)
+      .agg(propToMeta(col(PROPERTIES)).as(ElementMetaData.metaData))
+      .as[ElementMetaData]
+    */
   }
 }
