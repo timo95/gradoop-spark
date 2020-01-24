@@ -34,7 +34,7 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
     CsvParser.parseProperties(s, label, metaData))
 
   private val parserPropertiesExpression = map_from_entries(parseProperties(col(ColumnNames.PROPERTIES),
-    col(ColumnNames.LABEL), col("metaData")))
+    col(ColumnNames.LABEL), col(ElementMetaData.metaData)))
 
   private var metaData: Option[MetaData] = None
 
@@ -62,9 +62,9 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
     val strings = config.sparkSession.read
       .options(options)
       .schema(StructType(Seq(
-        StructField(ColumnNames.ID, DataTypes.StringType, false),
-        StructField(ColumnNames.LABEL, DataTypes.StringType, true),
-        StructField(ColumnNames.PROPERTIES, DataTypes.StringType, true)
+        StructField(ColumnNames.ID, DataTypes.StringType, nullable = false),
+        StructField(ColumnNames.LABEL, DataTypes.StringType, nullable = true),
+        StructField(ColumnNames.PROPERTIES, DataTypes.StringType, nullable = true)
       )))
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.GRAPH_HEAD_FILE)
 
@@ -78,7 +78,7 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
     // parse properties
     partiallyParsed.join(metaData, ColumnNames.LABEL)
       .withColumn(ColumnNames.PROPERTIES, parserPropertiesExpression.as(ColumnNames.PROPERTIES))
-      .drop("metaData")
+      .drop(ElementMetaData.metaData)
       .as[L#G]
   }
 
@@ -87,10 +87,10 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
     val strings = config.sparkSession.read
       .options(options)
       .schema(StructType(Seq(
-        StructField(ColumnNames.ID, DataTypes.StringType, false),
-        StructField(ColumnNames.GRAPH_IDS, DataTypes.StringType, false),
-        StructField(ColumnNames.LABEL, DataTypes.StringType, true),
-        StructField(ColumnNames.PROPERTIES, DataTypes.StringType, true)
+        StructField(ColumnNames.ID, DataTypes.StringType, nullable = false),
+        StructField(ColumnNames.GRAPH_IDS, DataTypes.StringType, nullable = false),
+        StructField(ColumnNames.LABEL, DataTypes.StringType, nullable = true),
+        StructField(ColumnNames.PROPERTIES, DataTypes.StringType, nullable = true)
       )))
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.VERTEX_FILE)
 
@@ -105,7 +105,7 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
     // parse properties
     partiallyParsed.join(metaData, ColumnNames.LABEL)
       .withColumn(ColumnNames.PROPERTIES, parserPropertiesExpression.as(ColumnNames.PROPERTIES))
-      .drop("metaData")
+      .drop(ElementMetaData.metaData)
       .as[L#V]
   }
 
@@ -114,12 +114,12 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
     val strings = config.sparkSession.read
       .options(options)
       .schema(StructType(Seq(
-        StructField(ColumnNames.ID, DataTypes.StringType, false),
-        StructField(ColumnNames.GRAPH_IDS, DataTypes.StringType, false),
-        StructField(ColumnNames.SOURCE_ID, DataTypes.StringType, false),
-        StructField(ColumnNames.TARGET_ID, DataTypes.StringType, false),
-        StructField(ColumnNames.LABEL, DataTypes.StringType, true),
-        StructField(ColumnNames.PROPERTIES, DataTypes.StringType, true)
+        StructField(ColumnNames.ID, DataTypes.StringType, nullable = false),
+        StructField(ColumnNames.GRAPH_IDS, DataTypes.StringType, nullable = false),
+        StructField(ColumnNames.SOURCE_ID, DataTypes.StringType, nullable = false),
+        StructField(ColumnNames.TARGET_ID, DataTypes.StringType, nullable = false),
+        StructField(ColumnNames.LABEL, DataTypes.StringType, nullable = true),
+        StructField(ColumnNames.PROPERTIES, DataTypes.StringType, nullable = true)
       )))
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.EDGE_FILE)
 
@@ -136,7 +136,7 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
     // parse properties
     partiallyParsed.join(metaData, ColumnNames.LABEL)
       .withColumn(ColumnNames.PROPERTIES, parserPropertiesExpression.as(ColumnNames.PROPERTIES))
-      .drop("metaData")
+      .drop(ElementMetaData.metaData)
       .as[L#E]
   }
 }

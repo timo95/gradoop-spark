@@ -1,9 +1,9 @@
 package org.gradoop.spark.model.impl.operators.equality
 
-import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}
 import org.gradoop.spark.model.impl.operators.equality.gve.GveEquals
-import org.gradoop.spark.model.impl.operators.tostring.gve.{ElementToString, CanonicalAdjacencyMatrixBuilder}
+import org.gradoop.spark.model.impl.operators.tostring.gve.ElementToString
 import org.gradoop.spark.util.SparkAsciiGraphLoader
+import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}
 import org.scalatest.prop.TableDrivenPropertyChecks
 
 class EqualityTest extends EpgmGradoopSparkTestBase with TableDrivenPropertyChecks {
@@ -101,7 +101,7 @@ class EqualityTest extends EpgmGradoopSparkTestBase with TableDrivenPropertyChec
   }
 
   // graphs to compare and equality for different modes
-  val logicalGraphs = Table(
+  private val logicalGraphs = Table(
     ("left", "right", "by element id", "by element data", "by data", "by undirected data"),
     ("gRef", "gEmpty", false, false, false, false),
     ("gRef", "gClone", true, true, false, false),

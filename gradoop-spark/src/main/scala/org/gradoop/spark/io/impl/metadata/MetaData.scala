@@ -60,11 +60,11 @@ object MetaData {
       .select(dataset.label, explode_outer(dataset.properties).as(Seq(PropertyMetaData.key, "property")))
       // put property key and type in struct
       .select(col(LABEL), structOrNull(col(PropertyMetaData.key), getTypeString(col(s"property"))
-        .as(PropertyMetaData.typeString)).as("property"))
+        .as(PropertyMetaData.typeString)).as("propertyType"))
       // group by label
       .groupBy(LABEL)
       // aggregate property structs to a set per label
-      .agg(collect_set("property").as(ElementMetaData.metaData))
+      .agg(collect_set("propertyType").as(ElementMetaData.metaData))
       .as[ElementMetaData]
 
     /*

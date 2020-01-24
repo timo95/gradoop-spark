@@ -178,10 +178,12 @@ object GradoopId {
    */
   private def apply(timestamp: Int, machineIdentifier: Int, processIdentifier: Short, counter: Int, checkCounter: Boolean): GradoopId = {
     if ((machineIdentifier & HIGH_ORDER_ONE_BYTE) != 0) {
-      throw new IllegalArgumentException("The machine identifier must be between 0" + " and 16777215 (it must fit in three bytes).")
+      throw new IllegalArgumentException("The machine identifier must be between 0" +
+        " and 16777215 (it must fit in three bytes).")
     }
     if (checkCounter && ((counter & HIGH_ORDER_ONE_BYTE) != 0)) {
-      throw new IllegalArgumentException("The counter must be between 0" + " and 16777215 (it must fit in three bytes).")
+      throw new IllegalArgumentException("The counter must be between 0" +
+        " and 16777215 (it must fit in three bytes).")
     }
 
     val buffer = ByteBuffer.allocate(12)
@@ -206,7 +208,8 @@ object GradoopId {
   }
 
 
-  def get: GradoopId = apply(dateToTimestampSeconds(new Date), MACHINE_IDENTIFIER, PROCESS_IDENTIFIER, NEXT_COUNTER.getAndIncrement, false)
+  def get: GradoopId = apply(dateToTimestampSeconds(new Date), MACHINE_IDENTIFIER, PROCESS_IDENTIFIER,
+    NEXT_COUNTER.getAndIncrement, checkCounter = false)
 
   /** Returns the Gradoop ID represented by a specified hexadecimal string.
    *

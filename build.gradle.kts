@@ -36,8 +36,8 @@ subprojects {
 
     tasks {
         "test"(Test::class) {
-            //extensions.get("tags").delegateClosureOf<PatternSet> {
-            "tags".delegateClosureOf<PatternSet> {
+            extensions.get("tags").delegateClosureOf<PatternSet> {
+            //"tags".delegateClosureOf<PatternSet> {
                 exclude("org.scalatest.tags.operator")
             }
         }

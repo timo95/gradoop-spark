@@ -11,10 +11,10 @@ class GveVerify[L <: Gve[L]] extends UnaryLogicalGraphToLogicalGraphOperator[L#L
     import graph.config.sparkSession.implicits._
     val verifiedEdgesSource = graph.edges
       .joinWith(graph.vertices, graph.edges.sourceId === graph.vertices.id)
-      .map(t => t._1)
+      .map(_._1)
     val verifiedEdges = verifiedEdgesSource
       .joinWith(graph.vertices, verifiedEdgesSource.targetId === graph.vertices.id)
-      .map(t => t._1)
+      .map(_._1)
     graph.factory.init(graph.graphHead, graph.vertices, verifiedEdges)
   }
 }
