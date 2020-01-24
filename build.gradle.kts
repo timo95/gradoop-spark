@@ -62,7 +62,7 @@ subprojects {
         "testImplementation"("org.scalatest:scalatest_${Versions.scalaMajor}:${Versions.scalatest}")
 
         // Needed by scalatest plugin "com.github.maiflai.scalatest"
-        "testRuntime"("org.pegdown:pegdown:${Versions.pegdown}")
+        "testRuntimeOnly"("org.pegdown:pegdown:${Versions.pegdown}")
     }
 
     // make tests available in a test jar
