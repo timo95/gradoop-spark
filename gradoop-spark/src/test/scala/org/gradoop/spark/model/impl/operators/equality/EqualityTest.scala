@@ -2,7 +2,7 @@ package org.gradoop.spark.model.impl.operators.equality
 
 import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}
 import org.gradoop.spark.model.impl.operators.equality.gve.GveEquals
-import org.gradoop.spark.model.impl.operators.tostring.gve.ElementToString
+import org.gradoop.spark.model.impl.operators.tostring.gve.{ElementToString, CanonicalAdjacencyMatrixBuilder}
 import org.gradoop.spark.util.SparkAsciiGraphLoader
 import org.scalatest.prop.TableDrivenPropertyChecks
 

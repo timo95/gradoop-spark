@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.impl.operators.equality.gve
 
 import org.gradoop.spark.model.api.operators.{BinaryGraphCollectionToValueOperator, BinaryLogicalGraphToValueOperator}
-import org.gradoop.spark.model.impl.operators.tostring.gve.{CanonicalAdjacencyMatrixBuilder, EdgeString, ElementToString, GraphHeadString, VertexString}
+import org.gradoop.spark.model.impl.operators.tostring.gve.{EdgeString, GraphHeadString, CanonicalAdjacencyMatrixBuilder, VertexString}
 import org.gradoop.spark.model.impl.types.Gve
 
 import scala.collection.TraversableOnce

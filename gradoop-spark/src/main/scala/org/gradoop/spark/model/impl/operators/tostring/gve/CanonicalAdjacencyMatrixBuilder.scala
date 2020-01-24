@@ -1,6 +1,6 @@
 package org.gradoop.spark.model.impl.operators.tostring.gve
 
-import org.apache.spark.sql.{Dataset, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.gradoop.common.id.GradoopId
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.operators.{UnaryGraphCollectionToValueOperator, UnaryLogicalGraphToValueOperator}
@@ -8,170 +8,134 @@ import org.gradoop.spark.model.impl.types.Gve
 
 import scala.collection.TraversableOnce
 
+/** Local implementation of a adjacency matrix builder. Used for graph equality.
+ *
+ * @param graphHeadToString create string from graph head
+ * @param vertexToString create string from vertex
+ * @param edgeToString create string from edge
+ * @param directed consider edge direction
+ * @tparam L layout type
+ */
 class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => GraphHeadString,
-                                                   vertexToString: L#V => TraversableOnce[VertexString],
-                                                   edgeToString: L#E => TraversableOnce[EdgeString],
-                                                   directed: Boolean)
+  vertexToString: L#V => TraversableOnce[VertexString],
+  edgeToString: L#E => TraversableOnce[EdgeString],
+  directed: Boolean)
   extends UnaryGraphCollectionToValueOperator[L#GC, String] with UnaryLogicalGraphToValueOperator[L#LG, String] {
   import CanonicalAdjacencyMatrixBuilder._
 
   override def execute(collection: L#GC): String = {
-    import collection.config.sparkSession.implicits._
-
-    val graphStrings = getGraphStrings(collection.layout, collection.config)
-    if(graphStrings.isEmpty) "" // Collections can be empty
-    else {
-      graphStrings
-        .groupByKey(_ => "")
-        .flatMapGroups((_, g) => concatElementStrings(g, System.lineSeparator))
-        .first
-        .string
-    }
+    getGraphStrings(collection.layout, collection.config)
+      .sorted.mkString(System.lineSeparator)
   }
 
   override def execute(graph: L#LG): String = {
     val graphStrings = getGraphStrings(graph.layout, graph.config)
-    if(graphStrings.isEmpty) ""
-    else graphStrings.first.string
+    if (graphStrings.isEmpty) ""
+    else graphStrings.head
   }
 
-  private def getGraphStrings(gveLayout: L#L, config: GradoopSparkConfig[L]): Dataset[GraphHeadString] = {
+  private def getGraphStrings(gveLayout: L#L, config: GradoopSparkConfig[L]): Array[String] = {
     implicit val session: SparkSession = config.sparkSession
     import session.implicits._
 
-    // 1. extract string representations of elements
-    val graphHeadStrings = gveLayout.graphHeads.map(graphHeadToString)
-    var vertexStrings = gveLayout.vertices.flatMap(vertexToString)
-    var edgeStrings = gveLayout.edges.flatMap(edgeToString)
+    // 1. extract string representations of elements - collect here to local machine
+    val graphHeadStrings = gveLayout.graphHeads.map(graphHeadToString).collect
+    var vertexStrings = gveLayout.vertices.flatMap(vertexToString).collect
+    var edgeStrings = gveLayout.edges.flatMap(edgeToString).collect
 
     if(directed) {
       // 2. combine strings of parallel edges
       edgeStrings = edgeStrings
-        .groupByKey(e => e.graphId.toString + e.sourceId.toString + e.targetId.toString)
-        .flatMapGroups((_, e) => concatElementStrings(e, "&"))
+        .groupBy(e => e.graphId.toString + e.sourceId.toString + e.targetId.toString).toArray
+        .map(t => concatElementStrings(t._2, "&"))
 
-      // 3. extend edge strings by vertex strings
-      edgeStrings = edgeStrings
-        .joinWith(vertexStrings,
-          edgeStrings("graphId") === vertexStrings("graphId") and
-          edgeStrings("sourceId") === vertexStrings("id"))
-        .map(updateSourceString)
-      edgeStrings = edgeStrings
-        .joinWith(vertexStrings,
-          edgeStrings("graphId") === vertexStrings("graphId") and
-          edgeStrings("targetId") === vertexStrings("id"))
-        .map(updateTargetString)
+      // 3. extend edge strings by vertex strings (2 joins, max one match each)
+      edgeStrings.foreach(e => vertexStrings.foreach(v => {
+        if(e.graphId == v.graphId && e.sourceId == v.id) e.sourceString = v.string
+        if(e.graphId == v.graphId && e.targetId == v.id) e.targetString = v.string
+      }))
 
       // 4. extend vertex strings by outgoing vertex+edge strings
       val outgoingAdjacencyListStrings = edgeStrings
-        .groupByKey(e => e.graphId.toString + e.sourceId.toString)
-        .flatMapGroups((_, it) => adjacencyList(it, _.sourceId, e => s"\n  -${e.string}->${e.targetString}"))
+        .groupBy(e => e.graphId.toString + e.sourceId.toString).toArray
+        .map(t => adjacencyList(t._2, _.sourceId, e => s"\n  -${e.string}->${e.targetString}"))
 
-      // 5. extend vertex strings by outgoing vertex+edge strings
+      // 5. extend vertex strings by incoming vertex+edge strings
       val incomingAdjacencyListStrings = edgeStrings
-        .groupByKey(e => e.graphId.toString + e.targetId.toString)
-        .flatMapGroups((_, it) => adjacencyList(it, _.targetId, e => s"\n  <-${e.string}-${e.sourceString}"))
+        .groupBy(e => e.graphId.toString + e.targetId.toString).toArray
+        .map(t => adjacencyList(t._2, _.targetId, e => s"\n  <-${e.string}-${e.sourceString}"))
 
-      // 6. combine vertex strings
-      vertexStrings = vertexStrings
-        .joinWith(outgoingAdjacencyListStrings,
-          vertexStrings("graphId") === outgoingAdjacencyListStrings("graphId") and
-          vertexStrings("id") === outgoingAdjacencyListStrings("id"),
-          "left")
-        .map(combineElementStrings)
-      vertexStrings = vertexStrings
-        .joinWith(incomingAdjacencyListStrings,
-          vertexStrings("graphId") === incomingAdjacencyListStrings("graphId") and
-            vertexStrings("id") === incomingAdjacencyListStrings("id"),
-          "left")
-        .map(combineElementStrings)
+      // 6. combine vertex strings (2 left joins, max one match each)
+      vertexStrings.foreach(v => {
+        outgoingAdjacencyListStrings.foreach(ad => if(v.graphId == ad.graphId && v.id == ad.id) v.string += ad.string)
+        incomingAdjacencyListStrings.foreach(ad => if(v.graphId == ad.graphId && v.id == ad.id) v.string += ad.string)
+      })
 
     } else {
-
       // 2. union edges with flipped edges and combine strings of parallel edges
       edgeStrings = edgeStrings
         .union(edgeStrings.map(switchSourceTargetIds))
-        .groupByKey(e => e.graphId.toString + e.sourceId.toString + e.targetId.toString)
-        .flatMapGroups((_, e) => concatElementStrings(e, "&"))
+        .groupBy(e => e.graphId.toString + e.sourceId.toString + e.targetId.toString).toArray
+        .map(t => concatElementStrings(t._2, "&"))
 
-      // 3. extend edge strings by vertex strings
-      edgeStrings = edgeStrings
-        .joinWith(vertexStrings,
-          edgeStrings("graphId") === vertexStrings("graphId") and
-          edgeStrings("targetId") === vertexStrings("id"))
-        .map(updateTargetString)
+      // 3. extend edge strings by vertex strings (join, multiple matches)
+      edgeStrings = edgeStrings.flatMap(e => vertexStrings.filter(v => e.graphId == v.graphId && e.targetId == v.id)
+        .map(s => EdgeString(e.graphId, e.sourceId, e.targetId, e.sourceString, e.string, s.string)))
 
       // 4/5. extend vertex strings by vertex+edge strings
       val adjacencyListStrings = edgeStrings
-        .groupByKey(e => e.graphId.toString + e.sourceId.toString)
-        .flatMapGroups((_, it) => adjacencyList(it, _.sourceId, e => s"\n  -${e.string}-${e.targetString}"))
+        .groupBy(e => e.graphId.toString + e.sourceId.toString)
+        .map(t => adjacencyList(t._2, _.sourceId, e => s"\n  -${e.string}-${e.targetString}"))
 
-      // 6. combine vertex strings
-      vertexStrings = vertexStrings
-        .joinWith(adjacencyListStrings,
-          vertexStrings("graphId") === adjacencyListStrings("graphId") and
-          vertexStrings("id") === adjacencyListStrings("id"),
-          "left")
-        .map(combineElementStrings)
+      // 6. combine vertex strings (left join, possibly multiple matches)
+      vertexStrings = vertexStrings.flatMap(v => {
+        val result = adjacencyListStrings
+          .filter(ad => v.graphId == ad.graphId && v.id == ad.id)
+          .map(ad => VertexString(v.graphId, v.id, v.string + ad.string))
+        if(result.isEmpty) Traversable(v)
+        else result
+      })
     }
 
     // 7. create adjacency matrix strings
     val adjacencyMatrixStrings = vertexStrings
-      .groupByKey(_.graphId)
-      .flatMapGroups(adjacencyMatrix)
+      .groupBy(_.graphId).toArray
+      .map(t => adjacencyMatrix(t._1, t._2))
 
-    // 8. combine graph strings
-    graphHeadStrings
-      .joinWith(adjacencyMatrixStrings,
-        graphHeadStrings("id") === adjacencyMatrixStrings("id"),
-        "left")
-      .map(combineElementStrings)
+    // 8. combine graph strings (left join, max one match)
+    graphHeadStrings.foreach(g => adjacencyMatrixStrings
+      .foreach(am => if(am.id == g.id) g.string += am.string))
+    graphHeadStrings.map(_.string)
   }
 }
 
 object CanonicalAdjacencyMatrixBuilder {
+
   private def switchSourceTargetIds(edgeString: EdgeString): EdgeString = {
-    val sourceId = edgeString.sourceId
-    edgeString.sourceId = edgeString.targetId
-    edgeString.targetId = sourceId
-    edgeString
+    EdgeString(edgeString.graphId, edgeString.targetId, edgeString.sourceId,
+      edgeString.sourceString, edgeString.string, edgeString.targetString)
   }
 
-  private def updateSourceString(tuple: Tuple2[EdgeString, VertexString]): EdgeString = {
-    tuple._1.sourceString = tuple._2.string
-    tuple._1
-  }
-
-  private def updateTargetString(tuple: Tuple2[EdgeString, VertexString]): EdgeString = {
-    tuple._1.targetString = tuple._2.string
-    tuple._1
-  }
-
-  private def combineElementStrings[A <: ElementString](tuple: Tuple2[A, A]): A = {
-    if (tuple._2 != null) tuple._1.string = tuple._1.string + tuple._2.string
-    tuple._1
-  }
-
-  private def concatElementStrings[A <: ElementString](values: Iterator[A], sep: String): TraversableOnce[A] = {
+  private def concatElementStrings[A <: ElementString](values: Array[A], sep: String): A = {
     val strings = values.toSeq
     val result = strings.head
     result.string = strings.map(_.string).sorted.mkString(sep)
-    Traversable(result)
+    result
   }
 
-  private def adjacencyList(edgeStrings: Iterator[EdgeString],
-                            idSelector: EdgeString => GradoopId,
-                            toString: EdgeString => String): TraversableOnce[VertexString] = {
+  private def adjacencyList(edgeStrings: Array[EdgeString],
+    idSelector: EdgeString => GradoopId,
+    toString: EdgeString => String): VertexString = {
     val strings = edgeStrings.toSeq
     val first = strings.head
     val string = strings.map(toString).sorted.mkString
-    Traversable(VertexString(first.graphId, idSelector(first), string))
+    VertexString(first.graphId, idSelector(first), string)
   }
 
-  private def adjacencyMatrix(key: GradoopId, vertexStrings: Iterator[VertexString]): TraversableOnce[GraphHeadString] = {
+  private def adjacencyMatrix(key: GradoopId, vertexStrings: Array[VertexString]): GraphHeadString = {
     val strings = vertexStrings.toSeq
     val first = strings.head
     val string = strings.map("\n " + _.string).sorted.mkString
-    Traversable(GraphHeadString(first.graphId, string))
+    GraphHeadString(first.graphId, string)
   }
 }

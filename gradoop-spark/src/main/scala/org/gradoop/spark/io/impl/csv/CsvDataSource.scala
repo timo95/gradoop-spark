@@ -64,7 +64,7 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
       .schema(StructType(Seq(
         StructField(ColumnNames.ID, DataTypes.StringType, false),
         StructField(ColumnNames.LABEL, DataTypes.StringType, true),
-        StructField(ColumnNames.PROPERTIES, DataTypes.StringType, true),
+        StructField(ColumnNames.PROPERTIES, DataTypes.StringType, true)
       )))
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.GRAPH_HEAD_FILE)
 
@@ -90,7 +90,7 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
         StructField(ColumnNames.ID, DataTypes.StringType, false),
         StructField(ColumnNames.GRAPH_IDS, DataTypes.StringType, false),
         StructField(ColumnNames.LABEL, DataTypes.StringType, true),
-        StructField(ColumnNames.PROPERTIES, DataTypes.StringType, true),
+        StructField(ColumnNames.PROPERTIES, DataTypes.StringType, true)
       )))
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.VERTEX_FILE)
 
@@ -119,7 +119,7 @@ class CsvDataSource[L <: Gve[L]](csvPath: String, config: GradoopSparkConfig[L])
         StructField(ColumnNames.SOURCE_ID, DataTypes.StringType, false),
         StructField(ColumnNames.TARGET_ID, DataTypes.StringType, false),
         StructField(ColumnNames.LABEL, DataTypes.StringType, true),
-        StructField(ColumnNames.PROPERTIES, DataTypes.StringType, true),
+        StructField(ColumnNames.PROPERTIES, DataTypes.StringType, true)
       )))
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.EDGE_FILE)
 

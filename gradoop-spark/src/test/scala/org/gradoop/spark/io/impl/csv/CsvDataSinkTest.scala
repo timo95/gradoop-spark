@@ -78,7 +78,7 @@ class CsvDataSinkTest extends CsvTestBase {
         "key5" -> PropertyValue(set),
         "key6" -> PropertyValue(map1),
         "key6" -> PropertyValue(map2),
-        "key6" -> PropertyValue(map3),
+        "key6" -> PropertyValue(map3)
       )
 
       val factory = config.logicalGraphFactory
