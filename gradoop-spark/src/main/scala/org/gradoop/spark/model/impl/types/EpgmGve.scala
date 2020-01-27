@@ -7,9 +7,10 @@ import org.gradoop.spark.model.impl.gve._
 final class EpgmGve extends Gve[EpgmGve] with Epgm {
   type T = EpgmGve
   type L = EpgmGveLayout
+
   type G = EpgmGveGraphHead
   type V = EpgmGveVertex
-  type E = EpgmGveEdgeFactory
+  type E = EpgmGveEdge
 
   type LG = LogicalGraph[T] with GveLogicalGraphOperators[T]
   type GC = GraphCollection[T] with GveGraphCollectionOperators[T]

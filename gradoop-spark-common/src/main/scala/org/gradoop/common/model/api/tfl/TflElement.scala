@@ -1,3 +1,5 @@
 package org.gradoop.common.model.api.tfl
 
-trait TflElement
+import org.gradoop.common.model.api.components.Labeled
+
+trait TflElement extends Labeled

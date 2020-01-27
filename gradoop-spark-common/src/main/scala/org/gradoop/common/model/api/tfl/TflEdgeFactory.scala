@@ -1,8 +1,8 @@
-package org.gradoop.common.model.api.gve
+package org.gradoop.common.model.api.tfl
 
 import org.gradoop.common.model.api.elements.ElementFactory
 
-trait GveEdgeFactory[E <: GveEdge] extends ElementFactory[E] {
+trait TflEdgeFactory[E <: TflEdge] extends ElementFactory[E] {
 
   /** Creates a new edge based on the given parameters.
    *
@@ -45,27 +45,6 @@ trait GveEdgeFactory[E <: GveEdge] extends ElementFactory[E] {
    * @param label          edge label
    * @param sourceVertexId source vertex id
    * @param targetVertexId target vertex id
-   * @param properties     edge properties
-   * @return edge data
-   */
-  def create(label: Label, sourceVertexId: Id, targetVertexId: Id, properties: Properties): E
-
-  /** Initializes an edge based on the given parameters.
-   *
-   * @param id             edge identifier
-   * @param label          edge label
-   * @param sourceVertexId source vertex id
-   * @param targetVertexId target vertex id
-   * @param properties     edge properties
-   * @return edge data
-   */
-  def apply(id: Id, label: Label, sourceVertexId: Id, targetVertexId: Id, properties: Properties): E
-
-  /** Creates a new edge based on the given parameters.
-   *
-   * @param label          edge label
-   * @param sourceVertexId source vertex id
-   * @param targetVertexId target vertex id
    * @param graphIds       graphIds, that contain the edge
    * @return edge data
    */
@@ -81,27 +60,4 @@ trait GveEdgeFactory[E <: GveEdge] extends ElementFactory[E] {
    * @return edge data
    */
   def apply(id: Id, label: Label, sourceVertexId: Id, targetVertexId: Id, graphIds: IdSet): E
-
-  /** Creates a new edge based on the given parameters.
-   *
-   * @param label          edge label
-   * @param sourceVertexId source vertex id
-   * @param targetVertexId target vertex id
-   * @param properties     edge properties
-   * @param graphIds       graphIds, that contain the edge
-   * @return edge data
-   */
-  def create(label: Label, sourceVertexId: Id, targetVertexId: Id, properties: Properties, graphIds: IdSet): E
-
-  /** Initializes an edge based on the given parameters.
-   *
-   * @param id             edge identifier
-   * @param label          edge label
-   * @param sourceVertexId source vertex id
-   * @param targetVertexId target vertex id
-   * @param properties     edge properties
-   * @param graphIds       graphIds, that contain the edge
-   * @return edge data
-   */
-  def apply(id: Id, label: Label, sourceVertexId: Id, targetVertexId: Id, properties: Properties, graphIds: IdSet): E
 }

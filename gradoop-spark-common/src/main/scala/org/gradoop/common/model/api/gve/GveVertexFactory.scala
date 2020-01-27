@@ -19,69 +19,69 @@ trait GveVertexFactory[V <: GveVertex] extends ElementFactory[V] {
 
   /** Creates a new vertex based on the given parameters.
    *
-   * @param labels vertex labels
+   * @param label vertex label
    * @return vertex data
    */
-  def create(labels: Label): V
+  def create(label: Label): V
 
   /** Initializes a vertex based on the given parameters.
    *
    * @param id    vertex identifier
-   * @param labels vertex labels
+   * @param label vertex label
    * @return vertex data
    */
-  def apply(id: Id, labels: Label): V
+  def apply(id: Id, label: Label): V
 
   /** Creates a new vertex based on the given parameters.
    *
-   * @param labels      vertex labels
+   * @param label      vertex label
    * @param properties vertex properties
    * @return vertex data
    */
-  def create(labels: Label, properties: Properties): V
+  def create(label: Label, properties: Properties): V
 
   /** Initializes a vertex based on the given parameters.
    *
    * @param id         vertex identifier
-   * @param labels      vertex labels
+   * @param label      vertex label
    * @param properties vertex properties
    * @return vertex data
    */
-  def apply(id: Id, labels: Label, properties: Properties): V
+  def apply(id: Id, label: Label, properties: Properties): V
 
   /** Creates a new vertex based on the given parameters.
    *
-   * @param labels    vertex labels
+   * @param label    vertex label
    * @param graphIds graphIds, that contain the vertex
    * @return vertex data
    */
-  def create(labels: Label, graphIds: IdSet): V
+  def create(label: Label, graphIds: IdSet): V
 
   /** Initializes a vertex based on the given parameters.
    *
    * @param id       vertex identifier
-   * @param labels    vertex labels
+   * @param label    vertex label
    * @param graphIds graphIds, that contain the vertex
    * @return vertex data
    */
-  def apply(id: Id, labels: Label, graphIds: IdSet): V
+  def apply(id: Id, label: Label, graphIds: IdSet): V
 
   /** Creates a new vertex based on the given parameters.
    *
-   * @param labels      vertex labels
+   * @param label      vertex label
    * @param properties vertex properties
    * @param graphIds   graphIds, that contain the vertex
    * @return vertex data
    */
-  def create(labels: Label, properties: Properties, graphIds: IdSet): V
+  def create(label: Label, properties: Properties, graphIds: IdSet): V
 
   /** Initializes a vertex based on the given parameters.
    *
    * @param id         vertex identifier
-   * @param labels      vertex labels
+   * @param label      vertex label
    * @param properties vertex properties
    * @param graphIds   graphIds, that contain the vertex
    * @return vertex data
    */
-  def apply(id: Id, labels: Label, properties: Properties, graphIds: IdSet): V
+  def apply(id: Id, label: Label, properties: Properties, graphIds: IdSet): V
 }

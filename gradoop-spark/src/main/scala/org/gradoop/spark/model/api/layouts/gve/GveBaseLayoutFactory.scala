@@ -1,7 +1,6 @@
 package org.gradoop.spark.model.api.layouts.gve
 
 import org.apache.spark.sql.{Dataset, Encoder}
-import org.gradoop.common.id.GradoopId
 import org.gradoop.common.model.api.components.ComponentTypes
 import org.gradoop.common.model.api.gve.GveElementFactoryProvider
 import org.gradoop.spark.expressions.transformation.TransformationFunctions
@@ -27,10 +26,10 @@ trait GveBaseLayoutFactory[L <: Gve[L], BG <: BaseGraph[L]] extends LogicalGraph
 
   implicit def edgeEncoder: Encoder[L#E]
 
-  def init(graphHead: Dataset[L#G], vertices: Dataset[L#V], edges: Dataset[L#E]): BG
+  def init(graphHeads: Dataset[L#G], vertices: Dataset[L#V], edges: Dataset[L#E]): BG
 
-  def init(graphHead: L#G, vertices: Iterable[L#V], edges: Iterable[L#E]): BG = {
-    val graphHeadDS: Dataset[L#G] = sparkSession.createDataset[L#G](Seq(graphHead))
+  def init(graphHeads: L#G, vertices: Iterable[L#V], edges: Iterable[L#E]): BG = {
+    val graphHeadDS: Dataset[L#G] = sparkSession.createDataset[L#G](Seq(graphHeads))
     val vertexDS: Dataset[L#V] = createDataset[L#V](vertices)
     val edgeDS: Dataset[L#E] = createDataset[L#E](edges)
 
@@ -45,11 +44,7 @@ trait GveBaseLayoutFactory[L <: Gve[L], BG <: BaseGraph[L]] extends LogicalGraph
     init(graphHeadDS, vertexDS, edgeDS)
   }
 
-  def init(vertices: Iterable[L#V], edges: Iterable[L#E]): BG = {
-    val graphHead = graphHeadFactory(GradoopId.get)
-    init(graphHead, vertices, edges)
-  }
-
+  /** This creates a new graph head and adds its id to each element. */
   def create(vertices: Iterable[L#V], edges: Iterable[L#E]): BG = {
     val vertexDS: Dataset[L#V] = createDataset[L#V](vertices)
     val edgeDS: Dataset[L#E] = createDataset[L#E](edges)
@@ -57,14 +52,14 @@ trait GveBaseLayoutFactory[L <: Gve[L], BG <: BaseGraph[L]] extends LogicalGraph
     create(vertexDS, edgeDS)
   }
 
-  /** This creates a new graph head/id and adds it to each element. */
+  /** This creates a new graph head and adds its id to each element. */
   def create(vertices: Dataset[L#V], edges: Dataset[L#E]): BG = {
-    val id = GradoopId.get
-    val graphHeads = sparkSession.createDataset[L#G](Seq(graphHeadFactory(id)))
+    val graphHead = graphHeadFactory.create
+    val graphHeads = sparkSession.createDataset[L#G](Seq(graphHead))
 
-    val tfV = TransformationFunctions.addGraphId[L#V](id)
-    val tfE = TransformationFunctions.addGraphId[L#E](id)
-    init(graphHeads, tfV(vertices), tfE(edges))
+    val addToV = TransformationFunctions.addGraphId[L#V](graphHead.id)
+    val addToE = TransformationFunctions.addGraphId[L#E](graphHead.id)
+    init(graphHeads, addToV(vertices), addToE(edges))
   }
 
   def init(gveLayout: GveLayout[L], gveLayouts: GveLayout[L]*): BG = {

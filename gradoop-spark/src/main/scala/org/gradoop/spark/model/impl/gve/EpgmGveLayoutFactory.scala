@@ -14,11 +14,11 @@ abstract class EpgmGveLayoutFactory[BG <: BaseGraph[L]](implicit session: SparkS
 
   override def vertexEncoder: Encoder[L#V] = EpgmGveVertex.encoder
 
-  override def edgeEncoder: Encoder[L#E] = EpgmGveEdgeFactory.encoder
+  override def edgeEncoder: Encoder[L#E] = EpgmGveEdge.encoder
 
   override def graphHeadFactory: GveGraphHeadFactory[L#G] = EpgmGveGraphHead
 
   override def vertexFactory: GveVertexFactory[L#V] = EpgmGveVertex
 
-  override def edgeFactory: GveEdgeFactory[L#E] = EpgmGveEdgeFactory
+  override def edgeFactory: GveEdgeFactory[L#E] = EpgmGveEdge
 }

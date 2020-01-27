@@ -8,7 +8,7 @@ import org.gradoop.spark.model.api.layouts.gve.GveLogicalGraphOperators
 class EpgmGveLogicalGraphFactory(var config: GradoopSparkConfig[L])(implicit session: SparkSession)
   extends EpgmGveLayoutFactory[L#LG] {
 
-  override def init(graphHead: Dataset[L#G], vertices: Dataset[L#V], edges: Dataset[L#E]): L#LG = {
-    new LogicalGraph[L](new EpgmGveLayout(graphHead, vertices, edges), config) with GveLogicalGraphOperators[L]
+  override def init(graphHeads: Dataset[L#G], vertices: Dataset[L#V], edges: Dataset[L#E]): L#LG = {
+    new LogicalGraph[L](new EpgmGveLayout(graphHeads, vertices, edges), config) with GveLogicalGraphOperators[L]
   }
 }

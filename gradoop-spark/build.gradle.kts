@@ -9,7 +9,7 @@
 description = "Gradoop Spark"
 
 dependencies {
-    implementation(project(path = ":gradoop-spark-common"))
+    api(project(path = ":gradoop-spark-common"))
     testImplementation(project(path = ":gradoop-spark-common", configuration = "testArtifact"))
 
     implementation("org.scala-lang:scala-reflect:${Versions.scalaFull}")
