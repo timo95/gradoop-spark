@@ -13,6 +13,13 @@ abstract class TflLayout[L <: Tfl[L]](val graphHeads: Map[String, Dataset[L#G]],
   extends GraphCollectionLayout[L] with LogicalGraphLayout[L] {
 
   /**
+   * Returns a dataset containing a single graph head associated with that logical graph.
+   *
+   * @return 1-element dataset
+   */
+  def graphHead: Map[String, Dataset[L#G]] = graphHeads
+
+  /**
    * Returns the graph heads associated with the logical graphs in that collection filtered by label.
    *
    * @param label graph head label

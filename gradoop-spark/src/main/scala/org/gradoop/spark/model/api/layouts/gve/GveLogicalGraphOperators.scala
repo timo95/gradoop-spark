@@ -3,15 +3,24 @@ package org.gradoop.spark.model.api.layouts.gve
 import org.apache.spark.sql.Column
 import org.gradoop.spark.expressions.transformation.TransformationFunctions
 import org.gradoop.spark.expressions.transformation.TransformationFunctions.TransformationFunction
+import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.LogicalGraphOperators
+import org.gradoop.spark.model.impl.operators.changelayout.GveToTfl
 import org.gradoop.spark.model.impl.operators.equality.gve.GveEquals
 import org.gradoop.spark.model.impl.operators.subgraph.gve.GveSubgraph
 import org.gradoop.spark.model.impl.operators.tostring.gve.ElementToString
 import org.gradoop.spark.model.impl.operators.verify.GveVerify
-import org.gradoop.spark.model.impl.types.Gve
+import org.gradoop.spark.model.impl.types.{Gve, Tfl}
 
 trait GveLogicalGraphOperators[L <: Gve[L]] extends LogicalGraphOperators[L] {
   this: L#LG =>
+
+  // Gve specific operators
+  def toTfl[L2 <: Tfl[L2]](config: GradoopSparkConfig[L2]): L2#LG = {
+    callForValue(new GveToTfl[L, L2](config))
+  }
+
+  // General operators
 
   override def equalsByElementIds(other: L#LG): Boolean = {
     callForValue(new GveEquals(ElementToString.graphHeadToEmptyString, ElementToString.vertexToIdString,

@@ -1,17 +1,27 @@
 package org.gradoop.spark.model.api.layouts.tfl
 
 import org.apache.spark.sql.{Dataset, Encoder}
+import org.gradoop.common.model.api.components.ComponentTypes
 import org.gradoop.common.model.api.tfl.TflElementFactoryProvider
 import org.gradoop.spark.expressions.transformation.TransformationFunctions
 import org.gradoop.spark.model.api.graph.BaseGraph
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, LogicalGraphLayoutFactory}
 import org.gradoop.spark.model.impl.types.Tfl
+import org.gradoop.spark.util.Implicits
 
 import scala.collection.mutable
 
 trait TflBaseLayoutFactory[L <: Tfl[L], BG <: BaseGraph[L]] extends LogicalGraphLayoutFactory[L]
   with GraphCollectionLayoutFactory[L]
   with TflElementFactoryProvider[L#G, L#V, L#E, L#P] {
+
+  object Implicits extends Implicits with ComponentTypes {
+    // Encoder
+    implicit def implicitTflGraphHeadEncoder: Encoder[L#G] = graphHeadEncoder
+    implicit def impliticTflVertexEncoder: Encoder[L#V] = vertexEncoder
+    implicit def implicitTflEdgeEncoder: Encoder[L#E] = edgeEncoder
+    implicit def implicitTflPropertiesEncoder: Encoder[L#P] = propertiesEncoder
+  }
 
   implicit def graphHeadEncoder: Encoder[L#G]
 

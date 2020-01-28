@@ -15,9 +15,9 @@ trait GveBaseLayoutFactory[L <: Gve[L], BG <: BaseGraph[L]] extends LogicalGraph
 
   object Implicits extends Implicits with ComponentTypes {
     // Encoder
-    implicit def implicitGraphHeadEncoder: Encoder[L#G] = graphHeadEncoder
-    implicit def impliticVertexEncoder: Encoder[L#V] = vertexEncoder
-    implicit def implicitEdgeEncoder: Encoder[L#E] = edgeEncoder
+    implicit def implicitGveGraphHeadEncoder: Encoder[L#G] = graphHeadEncoder
+    implicit def impliticGveVertexEncoder: Encoder[L#V] = vertexEncoder
+    implicit def implicitGveEdgeEncoder: Encoder[L#E] = edgeEncoder
   }
 
   implicit def graphHeadEncoder: Encoder[L#G]
