@@ -6,6 +6,7 @@ import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOper
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy.Strategy
 import org.gradoop.spark.model.impl.types.Tfl
+import org.gradoop.spark.util.TflFunctions
 
 class TflSubgraph[L <: Tfl[L]] private
 (vertexFilterExpression: Column, edgeFilterExpression: Column, strategy: Strategy)
@@ -16,17 +17,27 @@ class TflSubgraph[L <: Tfl[L]] private
     import factory.Implicits._
     strategy match {
       case Strategy.BOTH =>
-        val vertexProp = graph.vertexProperties
-        val vertices = graph.vertices.map(v => (v._1, v._2.join(vertexProp(v._1))))
-          .mapValues(_.filter(vertexFilterExpression))
-        val resVert = vertices.mapValues(_.as[L#V])
-        val resVertProp = vertices.mapValues(_.as[L#P])
+        /*
+        val filterString = vertexFilterExpression.toString
 
-        val edgeProp = graph.edgeProperties
-        val edges = graph.edges.map(v => (v._1, v._2.join(edgeProp(v._1))))
-          .mapValues(_.filter(edgeFilterExpression))
-        val resEdge = edges.mapValues(_.as[L#E])
-        val resEdgeProp = edges.mapValues(_.as[L#P])
+        val filtersElements = filterString.contains(ColumnNames.ID) || filterString.contains(ColumnNames.LABEL)
+        val filtersProperties = filterString.contains(ColumnNames.PROPERTIES)
+
+        if(filtersElements && filtersProperties) {
+
+        } else if(filtersProperties) {
+
+        } else {
+
+        }*/
+
+        // Filter element + properties combined
+        val vertices = graph.verticesWithProperties.mapValues(_.filter(vertexFilterExpression))
+        val edges = graph.edgesWithProperties.mapValues(_.filter(edgeFilterExpression))
+
+        // Split element and properties
+        val (resVert, resVertProp) = TflFunctions.splitVertexMap(vertices)
+        val (resEdge, resEdgeProp) = TflFunctions.splitEdgeMap(edges)
         graph.factory.init(graph.graphHead, resVert, resEdge, graph.graphHeadProperties, resVertProp, resEdgeProp)
 
       case Strategy.VERTEX_INDUCED =>

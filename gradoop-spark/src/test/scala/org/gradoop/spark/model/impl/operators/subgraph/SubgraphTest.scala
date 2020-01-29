@@ -28,6 +28,26 @@ class SubgraphTest extends EpgmGradoopSparkTestBase {
       assert(subgraph.equalsByData(expected))
     }
 
+    it("Tfl SocialNetworkGraph both", OperatorTest) {
+      val loader = getSocialNetworkLoader
+      loader.appendToDatabaseFromString("expected:_DB[" +
+        "(alice)-[akb]->(bob)-[bkc]->(carol)-[ckd]->(dave)" +
+        "(alice)<-[bka]-(bob)<-[ckb]-(carol)<-[dkc]-(dave)" +
+        "(eve)-[eka]->(alice)" +
+        "(eve)-[ekb]->(bob)" +
+        "(frank)-[fkc]->(carol)" +
+        "(frank)-[fkd]->(dave)]")
+
+      val graph = loader.getLogicalGraph.toTfl(tflConfig)
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val subgraph = graph.subgraph(
+        FilterExpressions.hasLabel("Person"),
+        FilterExpressions.hasLabel("knows"))
+
+      assert(subgraph.toGve(gveConfig).equalsByData(expected))
+    }
+
     it("SocialNetworkGraph both with verify", OperatorTest) {
       val loader = getSocialNetworkLoader
       loader.appendToDatabaseFromString("expected:_DB[" +

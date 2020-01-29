@@ -17,7 +17,7 @@ trait GveLogicalGraphOperators[L <: Gve[L]] extends LogicalGraphOperators[L] {
 
   // Gve specific operators
   def toTfl[L2 <: Tfl[L2]](config: GradoopSparkConfig[L2]): L2#LG = {
-    callForValue(new GveToTfl[L, L2](config))
+    callForValue(GveToTfl[L, L2](config))
   }
 
   // General operators

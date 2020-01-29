@@ -17,6 +17,8 @@ object SubgraphBenchmark extends BaseBenchmark {
       descr = "Input path for a csv graph")
     val output: ScallopOption[String] = opt[String](required = true,
       descr = "Output path for a csv graph")
+    val layout: ScallopOption[String] = opt[String](default = Some("gve"),
+      descr = "Graph Layout (gve, tfl)")
     val verification: ScallopOption[Boolean] = toggle(default = Some(false),
       descrYes = "Verifies the Graph after applying Subgraph")
     val vertexLabel: ScallopOption[String] = opt[String](name = "vl", noshort = true,
@@ -28,9 +30,16 @@ object SubgraphBenchmark extends BaseBenchmark {
 
   def main(args: Array[String]): Unit = {
     val cmdConf = new CmdConf(args)
+    cmdConf.layout() match {
+      case "gve" => runGve(cmdConf)
+      case "tfl" => runTfl(cmdConf)
+      case layout: Any => throw new IllegalArgumentException("Layout '%s' is not supported.".format(layout))
+    }
+  }
 
+  def runGve(cmdConf: CmdConf): Unit = {
     implicit val session: SparkSession = SparkSession.builder
-      .appName("Subgraph Benchmark")//.master("local[1]")
+      .appName("GveSubgraph Benchmark")//.master("local[1]")
       .getOrCreate()
     val config = gveConfig
 
@@ -54,4 +63,31 @@ object SubgraphBenchmark extends BaseBenchmark {
     val sink = CsvDataSink(cmdConf.output(), config)
     sink.write(graph, SaveMode.Overwrite)
   }
+
+  def runTfl(cmdConf: CmdConf): Unit = {
+    implicit val session: SparkSession = SparkSession.builder
+      .appName("TflSubgraph Benchmark")//.master("local[1]")
+      .getOrCreate()
+
+    val source = CsvDataSource(cmdConf.input(), gveConfig)
+    var graph = source.readLogicalGraph.toTfl(tflConfig)
+
+    val vertexFilterString: Column = if(cmdConf.vertexLabel.isDefined) {
+      FilterExpressions.hasLabel(cmdConf.vertexLabel())
+    } else {
+      FilterExpressions.any
+    }
+    val edgeFilterString: Column = if(cmdConf.edgeLabel.isDefined) {
+      FilterExpressions.hasLabel(cmdConf.edgeLabel())
+    } else {
+      FilterExpressions.any
+    }
+    graph = graph.subgraph(vertexFilterString, edgeFilterString)
+
+    if(cmdConf.verification()) graph = graph.verify
+
+    val sink = CsvDataSink(cmdConf.output(), gveConfig)
+    sink.write(graph.toGve(gveConfig), SaveMode.Overwrite)
+  }
+
 }

@@ -1,6 +1,6 @@
 package org.gradoop.spark.model.api.layouts.tfl
 
-import org.apache.spark.sql.{Dataset, Encoder}
+import org.apache.spark.sql.{DataFrame, Dataset, Encoder}
 import org.gradoop.common.model.api.components.ComponentTypes
 import org.gradoop.common.model.api.tfl.TflElementFactoryProvider
 import org.gradoop.spark.expressions.transformation.TransformationFunctions
@@ -61,12 +61,12 @@ trait TflBaseLayoutFactory[L <: Tfl[L], BG <: BaseGraph[L]] extends LogicalGraph
     var edgeProperties = tflLayout.edgeProperties
 
     for (tflLayout: TflLayout[L] <- tflLayouts) {
-      graphHeads = mergeMaps(graphHeads, tflLayout.graphHeads)
-      vertices = mergeMaps(vertices, tflLayout.vertices)
-      edges = mergeMaps(edges, tflLayout.edges)
-      graphHeadProperties = mergeMaps(graphHeadProperties, tflLayout.graphHeadProperties)
-      vertexProperties = mergeMaps(vertexProperties, tflLayout.vertexProperties)
-      edgeProperties = mergeMaps(edgeProperties, tflLayout.edgeProperties)
+      graphHeads = unionMaps(graphHeads, tflLayout.graphHeads)
+      vertices = unionMaps(vertices, tflLayout.vertices)
+      edges = unionMaps(edges, tflLayout.edges)
+      graphHeadProperties = unionMaps(graphHeadProperties, tflLayout.graphHeadProperties)
+      vertexProperties = unionMaps(vertexProperties, tflLayout.vertexProperties)
+      edgeProperties = unionMaps(edgeProperties, tflLayout.edgeProperties)
     }
 
     init(graphHeads, vertices, edges, graphHeadProperties, vertexProperties, edgeProperties)
@@ -77,7 +77,7 @@ trait TflBaseLayoutFactory[L <: Tfl[L], BG <: BaseGraph[L]] extends LogicalGraph
       Map.empty[String, Dataset[L#P]], Map.empty[String, Dataset[L#P]], Map.empty[String, Dataset[L#P]])
   }
 
-  private def mergeMaps[A](left: Map[String, Dataset[A]], right: Map[String, Dataset[A]]): Map[String, Dataset[A]] = {
+  private def unionMaps[A](left: Map[String, Dataset[A]], right: Map[String, Dataset[A]]): Map[String, Dataset[A]] = {
     val result = mutable.Map.empty[String, Dataset[A]]
     left.foreach(l => result.update(l._1, l._2))
     right.foreach(r => result.update(r._1, if(result.contains(r._1)) result(r._1).union(r._2) else r._2))

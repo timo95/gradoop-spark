@@ -1,53 +1,65 @@
 package org.gradoop.spark.model.impl.operators.changelayout
 
-import org.gradoop.common.util.ColumnNames
+import org.apache.spark.sql.SparkSession
 import org.gradoop.spark.expressions.filter.FilterExpressions
+import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToValueOperator
 import org.gradoop.spark.model.impl.types.{Gve, Tfl}
+import org.gradoop.spark.util.TflFunctions
 
-class GveToTfl[L1 <: Gve[L1], L2 <: Tfl[L2]](tflConfig: GradoopSparkConfig[L2])
+class GveToTfl[L1 <: Gve[L1], L2 <: Tfl[L2]](tflConfig: GradoopSparkConfig[L2],
+  graphLabelsOpt: Option[Iterable[String]],
+  vertexLabelsOpt: Option[Iterable[String]],
+  edgeLabelsOpt: Option[Iterable[String]])
   extends UnaryLogicalGraphToValueOperator[L1#LG, L2#LG] {
+  import tflConfig.sparkSession.implicits._
 
   override def execute(graph: L1#LG): L2#LG = {
-    import graph.config.sparkSession.implicits._
-    import org.apache.spark.sql.functions._
-
-    // Extract labels
     val factory = graph.factory
     import factory.Implicits._
-    val graphLabels = graph.graphHead.select(graph.graphHead.label).distinct.collect
-    val vertexLabels = graph.vertices.select(graph.vertices.label).distinct.collect
-    val edgeLabels = graph.edges.select(graph.edges.label).distinct.collect
 
-    // Split datasets by labels
-    val graphHeads = graphLabels
-      .map(l => (l, graph.graphHeads.filter(FilterExpressions.hasLabel(l)))).toMap
-    val vertices = vertexLabels
+    // Extract labels
+    val graphLabels: Iterable[String] = graphLabelsOpt.getOrElse(
+      graph.graphHead.select(graph.graphHead.label).distinct.collect)
+    val vertexLabels: Iterable[String] = vertexLabelsOpt.getOrElse(
+      graph.vertices.select(graph.vertices.label).distinct.collect)
+    val edgeLabels: Iterable[String] = edgeLabelsOpt.getOrElse(
+      graph.edges.select(graph.edges.label).distinct.collect)
+
+    // Split single gve dataset in maps [label -> dataset]
+    val graphHeadMap = graphLabels.map(l =>
+      (l, graph.graphHeads.filter(FilterExpressions.hasLabel(l)))).toMap
+    val vertexMap = vertexLabels
       .map(l => (l, graph.vertices.filter(FilterExpressions.hasLabel(l)))).toMap
-    val edges = edgeLabels
-      .map(l => (l, graph.edges.filter(FilterExpressions.hasLabel(l)))).toMap
+    val edgeMap = edgeLabels.map(l =>
+      (l, graph.edges.filter(FilterExpressions.hasLabel(l)))).toMap
 
-    { // Put tfl implicits in scope to prefer them over gve implicits (above)
-      val factory2 = tflConfig.logicalGraphFactory
-      import factory2.Implicits._
+    { // Limit scope of implicits (Tfl inside, Gve above)
+      // Transform gve map to two tfl maps (element, properties)
+      val tflFactory = tflConfig.logicalGraphFactory
+      import tflFactory.Implicits._
+      val (resGrap, resGrapProp) = TflFunctions.splitGraphHeadMap(graphHeadMap.mapValues(_.toDF))
+      val (resVert, resVertProp) = TflFunctions.splitVertexMap(vertexMap.mapValues(_.toDF))
+      val (resEdge, resEdgeProp) = TflFunctions.splitEdgeMap(edgeMap.mapValues(_.toDF))
 
-      // Split maps in main element and property. Use constant as label.
-      val resGrap = graphHeads
-        .map(g => (g._1, g._2.select(g._2.id, lit(g._1).as(ColumnNames.LABEL)).as[L2#G]))
-      val resGrapProp = graphHeads
-        .map(p => (p._1, p._2.select(p._2.id, lit(p._1).as(ColumnNames.LABEL), p._2.properties).as[L2#P]))
-      val resVert = vertices
-        .map(v => (v._1, v._2.select(v._2.id, lit(v._1).as(ColumnNames.LABEL), v._2.graphIds).as[L2#V]))
-      val resVertProp = vertices
-        .map(p => (p._1, p._2.select(p._2.id, lit(p._1).as(ColumnNames.LABEL), p._2.properties).as[L2#P]))
-      val resEdge = edges
-        .map(e => (e._1, e._2.select(e._2.id, lit(e._1).as(ColumnNames.LABEL), e._2.sourceId, e._2.targetId,
-          e._2.graphIds).as[L2#E]))
-      val resEdgeProp = edges
-        .map(p => (p._1, p._2.select(p._2.id, lit(p._1).as(ColumnNames.LABEL), p._2.properties).as[L2#P]))
-
-      factory2.init(resGrap, resVert, resEdge, resGrapProp, resVertProp, resEdgeProp)
+      tflConfig.logicalGraphFactory.init(resGrap, resVert, resEdge, resGrapProp, resVertProp, resEdgeProp)
     }
+  }
+}
+
+object GveToTfl {
+
+  def apply[L1 <: Gve[L1], L2 <: Tfl[L2]](tflConfig: GradoopSparkConfig[L2]): GveToTfl[L1, L2] = {
+    new GveToTfl[L1, L2](tflConfig, None, None, None)
+  }
+
+  def apply[L1 <: Gve[L1], L2 <: Tfl[L2]](tflConfig: GradoopSparkConfig[L2], metaData: MetaData)
+    (implicit sparkSession: SparkSession): GveToTfl[L1, L2] = {
+    import sparkSession.implicits._
+    val graphHeadLabels = metaData.graphHeadMetaData.map(_.label).collect
+    val vertexLabels = metaData.vertexMetaData.map(_.label).collect
+    val edgeLabels = metaData.edgeMetaData.map(_.label).collect
+    new GveToTfl[L1, L2](tflConfig, Some(graphHeadLabels), Some(vertexLabels), Some(edgeLabels))
   }
 }
