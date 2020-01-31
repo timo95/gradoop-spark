@@ -1,4 +1,4 @@
-package org.gradoop.spark.model.impl.operators.verify
+package org.gradoop.spark.model.impl.operators.verify.gve
 
 import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.types.Gve

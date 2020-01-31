@@ -7,15 +7,11 @@ import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.LogicalGraphOperators
 import org.gradoop.spark.model.impl.operators.changelayout.TflToGve
 import org.gradoop.spark.model.impl.operators.subgraph.tfl.TflSubgraph
+import org.gradoop.spark.model.impl.operators.verify.tfl.TflVerify
 import org.gradoop.spark.model.impl.types.{Gve, Tfl}
 
 trait TflLogicalGraphOperators[L <: Tfl[L]] extends LogicalGraphOperators[L] {
   this: L#LG =>
-
-  // Tfl specific operators
-  def toGve[L2 <: Gve[L2]](config: GradoopSparkConfig[L2]): L2#LG = {
-    callForValue(new TflToGve[L, L2](config))
-  }
 
   // General operators
 
@@ -43,9 +39,7 @@ trait TflLogicalGraphOperators[L <: Tfl[L]] extends LogicalGraphOperators[L] {
     callForGraph(TflSubgraph.edgeIncuded[L](edgeFilterExpression))
   }
 
-  override def verify: L#LG = {
-    throw new RuntimeException("Not implemented")
-  }
+  override def verify: L#LG = callForGraph(new TflVerify[L])
 
   def transform(graphHeadTransformationFunction: TransformationFunction[L#G],
     vertexTransformationFunction: TransformationFunction[L#V],
@@ -63,5 +57,15 @@ trait TflLogicalGraphOperators[L <: Tfl[L]] extends LogicalGraphOperators[L] {
 
   def transformEdges(edgeTransformationFunction: TransformationFunction[L#E]): L#LG = {
     transform(TransformationFunctions.identity, TransformationFunctions.identity, edgeTransformationFunction)
+  }
+
+  // Change layout
+
+  def asGve[L2 <: Gve[L2]](config: GradoopSparkConfig[L2]): L2#LG = {
+    callForValue(new TflToGve[L, L2](config))
+  }
+
+  def asTfl[L2 <: Tfl[L2]](config: GradoopSparkConfig[L2]): L2#LG = {
+    this.asInstanceOf[L2#LG] // only works, if L2 has the same ModelType
   }
 }

@@ -5,7 +5,7 @@ import org.gradoop.common.id.GradoopId
 import org.gradoop.spark.EpgmGradoopSparkTestBase
 import org.gradoop.spark.model.api.layouts.gve.GveBaseLayoutFactory
 
-class CsvTestBase extends EpgmGradoopSparkTestBase {
+trait CsvTestBase extends EpgmGradoopSparkTestBase {
 
   protected def getExtendedLogicalGraph(factory: GveBaseLayoutFactory[L, L#LG]): L#LG = {
     import factory.Implicits._

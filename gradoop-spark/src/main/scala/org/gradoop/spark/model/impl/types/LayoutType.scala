@@ -1,6 +1,6 @@
 package org.gradoop.spark.model.impl.types
 
-import org.gradoop.common.model.api.components.{Identifiable, Labeled}
+import org.gradoop.common.model.api.components.Labeled
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, Layout, LogicalGraphLayoutFactory}
 

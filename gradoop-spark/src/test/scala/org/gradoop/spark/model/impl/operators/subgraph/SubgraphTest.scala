@@ -1,130 +1,36 @@
 package org.gradoop.spark.model.impl.operators.subgraph
 
+import org.apache.spark.sql.Column
+import org.gradoop.spark.EpgmGradoopSparkTestBase
 import org.gradoop.spark.expressions.filter.FilterExpressions
-import org.gradoop.spark.model.api.config.GradoopSparkConfig
-import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}
+import org.gradoop.spark.model.impl.operators.subgraph.Strategy.Strategy
+import org.gradoop.spark.model.impl.operators.subgraph.gve.GveSubgraph
+import org.gradoop.spark.model.impl.operators.subgraph.tfl.TflSubgraph
+import org.gradoop.spark.model.impl.types.EpgmTfl
 
-class SubgraphTest extends EpgmGradoopSparkTestBase {
-  private val config: GradoopSparkConfig[L] = getConfig
+class SubgraphTest extends EpgmGradoopSparkTestBase with SubgraphBehaviors {
 
-  describe("Subgraph") {
-    it("SocialNetworkGraph both", OperatorTest) {
-      val loader = getSocialNetworkLoader
-      loader.appendToDatabaseFromString("expected:_DB[" +
-        "(alice)-[akb]->(bob)-[bkc]->(carol)-[ckd]->(dave)" +
-        "(alice)<-[bka]-(bob)<-[ckb]-(carol)<-[dkc]-(dave)" +
-        "(eve)-[eka]->(alice)" +
-        "(eve)-[ekb]->(bob)" +
-        "(frank)-[fkc]->(carol)" +
-        "(frank)-[fkd]->(dave)]")
+  describe("GveSubgrah") {
+    it should behave like subgraphBoth(runGveSubgraph(_, _, _, Strategy.BOTH))
+    it should behave like subgraphVertexInduced(runGveSubgraph(_, _, FilterExpressions.any, Strategy.VERTEX_INDUCED))
+    it should behave like subgraphEdgeInduced(runGveSubgraph(_, FilterExpressions.any, _, Strategy.EDGE_INDUCED))
+  }
 
-      val graph = loader.getLogicalGraph
-      val expected = loader.getLogicalGraphByVariable("expected")
+  describe("TflSubgraph") {
+    it should behave like subgraphBoth(runTflSubgraph(_, _, _, Strategy.BOTH))
+    //it should behave like subgraphVertexInduced(runTflSubgraph(_, _, FilterExpressions.any, Strategy.VERTEX_INDUCED))
+    //it should behave like subgraphEdgeInduced(runTflSubgraph(_, FilterExpressions.any, _, Strategy.EDGE_INDUCED))
+  }
 
-      val subgraph = graph.subgraph(
-        FilterExpressions.hasLabel("Person"),
-        FilterExpressions.hasLabel("knows"))
+  def runGveSubgraph(graph: L#LG, vertexFilterExpression: Column, edgeFilterExpression: Column,
+    strategy: Strategy): L#LG = {
+    graph.callForGraph(new GveSubgraph[L](vertexFilterExpression, edgeFilterExpression, strategy))
+  }
 
-      assert(subgraph.equalsByData(expected))
-    }
-
-    it("Tfl SocialNetworkGraph both", OperatorTest) {
-      val loader = getSocialNetworkLoader
-      loader.appendToDatabaseFromString("expected:_DB[" +
-        "(alice)-[akb]->(bob)-[bkc]->(carol)-[ckd]->(dave)" +
-        "(alice)<-[bka]-(bob)<-[ckb]-(carol)<-[dkc]-(dave)" +
-        "(eve)-[eka]->(alice)" +
-        "(eve)-[ekb]->(bob)" +
-        "(frank)-[fkc]->(carol)" +
-        "(frank)-[fkd]->(dave)]")
-
-      val graph = loader.getLogicalGraph.toTfl(tflConfig)
-      val expected = loader.getLogicalGraphByVariable("expected")
-
-      val subgraph = graph.subgraph(
-        FilterExpressions.hasLabel("Person"),
-        FilterExpressions.hasLabel("knows"))
-
-      assert(subgraph.toGve(gveConfig).equalsByData(expected))
-    }
-
-    it("SocialNetworkGraph both with verify", OperatorTest) {
-      val loader = getSocialNetworkLoader
-      loader.appendToDatabaseFromString("expected:_DB[" +
-        "(alice)-[akb]->(bob)-[bkc]->(carol)-[ckd]->(dave)" +
-        "(alice)<-[bka]-(bob)<-[ckb]-(carol)<-[dkc]-(dave)" +
-        "(eve)-[eka]->(alice)" +
-        "(eve)-[ekb]->(bob)" +
-        "(frank)-[fkc]->(carol)" +
-        "(frank)-[fkd]->(dave)]")
-
-      val graph = loader.getLogicalGraph
-      val expected = loader.getLogicalGraphByVariable("expected")
-
-      val subgraph = graph.subgraph(
-        FilterExpressions.hasLabel("Person"),
-        FilterExpressions.hasLabel("knows"))
-
-      assert(subgraph.equalsByData(expected))
-    }
-
-    it("SocialNetworkGraph both only vertices fulfill filter", OperatorTest) {
-      val loader = getSocialNetworkLoader
-      loader.appendToDatabaseFromString("expected:_DB[" +
-        "(alice)(bob)(carol)(dave)(eve)(frank)]")
-
-      val graph = loader.getLogicalGraph
-      val expected = loader.getLogicalGraphByVariable("expected")
-
-      val subgraph = graph.subgraph(
-        FilterExpressions.hasLabel("Person"),
-        FilterExpressions.hasLabel("friendOf"))
-
-      assert(subgraph.equalsByData(expected))
-    }
-
-    it("SocialNetworkGraph both empty subgraph", OperatorTest) {
-      val loader = getSocialNetworkLoader
-      loader.appendToDatabaseFromString("expected:_DB[]")
-
-      val graph = loader.getLogicalGraph
-      val expected = loader.getLogicalGraphByVariable("expected")
-
-      val subgraph = graph.subgraph(
-        FilterExpressions.hasLabel("User"),
-        FilterExpressions.hasLabel("friendOf"))
-
-      assert(subgraph.equalsByData(expected))
-    }
-
-    it("SocialNetworkGraph vertex induced", OperatorTest) {
-      val loader = getSocialNetworkLoader
-      loader.appendToDatabaseFromString("expected:_DB[" +
-        "(databases)<-[ghtd]-(gdbs)-[ghtg1]->(graphs)" +
-        "(graphs)<-[ghtg2]-(gps)-[ghth]->(hadoop)]")
-
-      val graph = loader.getLogicalGraph
-      val expected = loader.getLogicalGraphByVariable("expected")
-
-      val subgraph = graph.vertexInducedSubgraph(
-        FilterExpressions.hasLabel("Forum") or FilterExpressions.hasLabel("Tag"))
-
-      assert(subgraph.equalsByData(expected))
-    }
-
-    it("SocialNetworkGraph edge induced", OperatorTest) {
-      val loader = getSocialNetworkLoader
-      loader.appendToDatabaseFromString("expected:_DB[" +
-        "(databases)<-[ghtd]-(gdbs)-[ghtg1]->(graphs)" +
-        "(graphs)<-[ghtg2]-(gps)-[ghth]->(hadoop)]")
-
-      val graph = loader.getLogicalGraph
-      val expected = loader.getLogicalGraphByVariable("expected")
-
-      val subgraph = graph.edgeInducedSubgraph(
-        FilterExpressions.hasLabel("hasTag"))
-
-      assert(subgraph.equalsByData(expected))
-    }
+  def runTflSubgraph(graph: L#LG, vertexFilterExpression: Column, edgeFilterExpression: Column,
+    strategy: Strategy): L#LG = {
+    graph.asTfl(tflConfig)
+      .callForGraph(new TflSubgraph[EpgmTfl](vertexFilterExpression, edgeFilterExpression, strategy))
+      .asGve(graph.config)
   }
 }

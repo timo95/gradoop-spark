@@ -7,8 +7,8 @@ class ChangeLayoutTest extends EpgmGradoopSparkTestBase {
   describe("Change layout") {
     it("Gve to Tfl to Gve", OperatorTest) {
       val gveGraph = getSocialNetworkLoader.getLogicalGraph
-      val tflGraph = gveGraph.toTfl(tflConfig)
-      val gveGraph2 = tflGraph.toGve(gveConfig)
+      val tflGraph = gveGraph.asTfl(tflConfig)
+      val gveGraph2 = tflGraph.asGve(gveConfig)
       assert(gveGraph.equalsByData(gveGraph2))
     }
   }

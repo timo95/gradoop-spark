@@ -6,7 +6,6 @@ import org.gradoop.spark.expressions.transformation.TransformationFunctions
 class TransformationTest extends EpgmGradoopSparkTestBase {
 
   describe("Transformation") {
-
     describe("Rename Label") {
       it("do") {
         val config = getConfig

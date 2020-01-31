@@ -2,15 +2,13 @@ package org.gradoop.spark.model.impl.operators.subgraph.tfl
 
 import org.apache.spark.sql.Column
 import org.gradoop.spark.expressions.filter.FilterExpressions
-import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOperator
-import org.gradoop.spark.model.impl.operators.subgraph.Strategy
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy.Strategy
+import org.gradoop.spark.model.impl.operators.subgraph.{Strategy, Subgraph}
 import org.gradoop.spark.model.impl.types.Tfl
 import org.gradoop.spark.util.TflFunctions
 
-class TflSubgraph[L <: Tfl[L]] private
-(vertexFilterExpression: Column, edgeFilterExpression: Column, strategy: Strategy)
-  extends UnaryLogicalGraphToLogicalGraphOperator[L#LG] {
+class TflSubgraph[L <: Tfl[L]](vertexFilterExpression: Column, edgeFilterExpression: Column, strategy: Strategy)
+  extends Subgraph[L] {
 
   override def execute(graph: L#LG): L#LG = {
     val factory = graph.factory

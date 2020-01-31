@@ -4,6 +4,7 @@ import org.apache.spark.sql.{Column, SaveMode, SparkSession}
 import org.gradoop.spark.benchmarks.BaseBenchmark
 import org.gradoop.spark.expressions.filter.FilterExpressions
 import org.gradoop.spark.io.impl.csv.{CsvDataSink, CsvDataSource}
+import org.gradoop.spark.model.impl.types.LayoutType
 import org.rogach.scallop.{ScallopConf, ScallopOption}
 
 object SubgraphBenchmark extends BaseBenchmark {
@@ -37,41 +38,34 @@ object SubgraphBenchmark extends BaseBenchmark {
     }
   }
 
-  def runGve(cmdConf: CmdConf): Unit = {
+  private def runGve(cmdConf: CmdConf): Unit = {
     implicit val session: SparkSession = SparkSession.builder
       .appName("GveSubgraph Benchmark")//.master("local[1]")
       .getOrCreate()
     val config = gveConfig
 
     val source = CsvDataSource(cmdConf.input(), config)
-    var graph = source.readLogicalGraph
-
-    val vertexFilterString: Column = if(cmdConf.vertexLabel.isDefined) {
-      FilterExpressions.hasLabel(cmdConf.vertexLabel())
-    } else {
-      FilterExpressions.any
-    }
-    val edgeFilterString: Column = if(cmdConf.edgeLabel.isDefined) {
-      FilterExpressions.hasLabel(cmdConf.edgeLabel())
-    } else {
-      FilterExpressions.any
-    }
-    graph = graph.subgraph(vertexFilterString, edgeFilterString)
-
-    if(cmdConf.verification()) graph = graph.verify
+    val graph = source.readLogicalGraph
+    val subgraph = run(graph, cmdConf)
 
     val sink = CsvDataSink(cmdConf.output(), config)
-    sink.write(graph, SaveMode.Overwrite)
+    sink.write(subgraph, SaveMode.Overwrite)
   }
 
-  def runTfl(cmdConf: CmdConf): Unit = {
+  private def runTfl(cmdConf: CmdConf): Unit = {
     implicit val session: SparkSession = SparkSession.builder
       .appName("TflSubgraph Benchmark")//.master("local[1]")
       .getOrCreate()
 
     val source = CsvDataSource(cmdConf.input(), gveConfig)
-    var graph = source.readLogicalGraph.toTfl(tflConfig)
+    val graph = source.readLogicalGraph.asTfl(tflConfig)
+    val subgraph = run(graph, cmdConf)
 
+    val sink = CsvDataSink(cmdConf.output(), gveConfig)
+    sink.write(subgraph.asGve(gveConfig), SaveMode.Overwrite)
+  }
+
+  private def run[L <: LayoutType[L]](graph: L#LG, cmdConf: CmdConf): L#LG = {
     val vertexFilterString: Column = if(cmdConf.vertexLabel.isDefined) {
       FilterExpressions.hasLabel(cmdConf.vertexLabel())
     } else {
@@ -82,12 +76,8 @@ object SubgraphBenchmark extends BaseBenchmark {
     } else {
       FilterExpressions.any
     }
-    graph = graph.subgraph(vertexFilterString, edgeFilterString)
 
-    if(cmdConf.verification()) graph = graph.verify
-
-    val sink = CsvDataSink(cmdConf.output(), gveConfig)
-    sink.write(graph.toGve(gveConfig), SaveMode.Overwrite)
+    if(cmdConf.verification()) graph.subgraph(vertexFilterString, edgeFilterString).verify
+    else graph.subgraph(vertexFilterString, edgeFilterString)
   }
-
 }

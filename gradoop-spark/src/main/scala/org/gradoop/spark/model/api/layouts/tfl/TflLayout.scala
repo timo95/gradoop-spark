@@ -4,6 +4,7 @@ import org.apache.spark.sql.{DataFrame, Dataset, Encoder, SparkSession}
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayout, LogicalGraphLayout}
 import org.gradoop.spark.model.impl.types.Tfl
+import org.gradoop.spark.util.TflFunctions
 
 abstract class TflLayout[L <: Tfl[L]](val graphHeads: Map[String, Dataset[L#G]],
                                       val vertices: Map[String, Dataset[L#V]],
@@ -24,12 +25,13 @@ abstract class TflLayout[L <: Tfl[L]](val graphHeads: Map[String, Dataset[L#G]],
     graphHeads.getOrElse(label, session.emptyDataset[L#G])
   }
 
-  /** Returns the graph heads combined with their properties.
+  /** Returns the graph heads combined with their properties. This uses an inner join.
+   * Any entry where the element or property is missing will be removed.
    *
    * @return label to graph head map
    */
   def graphHeadsWithProperties: Map[String, DataFrame] = {
-    graphHeads.map(g => (g._1, g._2.join(graphHeadProperties(g._1), Seq(ColumnNames.ID, ColumnNames.LABEL))))
+    TflFunctions.joinMaps(graphHeads, graphHeadProperties, "inner")
   }
 
   /** Returns all vertices having the specified label.
@@ -41,12 +43,13 @@ abstract class TflLayout[L <: Tfl[L]](val graphHeads: Map[String, Dataset[L#G]],
     vertices.getOrElse(label, session.emptyDataset[L#V])
   }
 
-  /** Returns the vertices with their properties.
+  /** Returns the vertices with their properties. This uses an inner join.
+   * Any entry where the element or property is missing will be removed.
    *
    * @return label to vertex map
    */
   def verticesWithProperties: Map[String, DataFrame] = {
-    vertices.map(v => (v._1, v._2.join(vertexProperties(v._1), Seq(ColumnNames.ID, ColumnNames.LABEL))))
+    TflFunctions.joinMaps(vertices, vertexProperties, "inner")
   }
 
   /** Returns all edges having the specified label.
@@ -58,13 +61,12 @@ abstract class TflLayout[L <: Tfl[L]](val graphHeads: Map[String, Dataset[L#G]],
     edges.getOrElse(label, session.emptyDataset[L#E])
   }
 
-  /** Returns the edges with their properties.
+  /** Returns the edges with their properties. This uses an inner join.
+   * Any entry where the element or property is missing will be removed.
    *
    * @return label to edge map
    */
-  def edgesWithProperties: Map[String, DataFrame] = {
-    edges.map(e => (e._1, e._2.join(edgeProperties(e._1), Seq(ColumnNames.ID, ColumnNames.LABEL))))
-  }
+  def edgesWithProperties: Map[String, DataFrame] = TflFunctions.joinMaps(edges, edgeProperties, "inner")
 
   /** Returns the graph head properties associated with the graph heads filtered by label.
    *

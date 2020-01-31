@@ -3,8 +3,8 @@ package org.gradoop.spark.model.impl.operators.tostring
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.GraphCollection
 import org.gradoop.spark.model.api.layouts.gve.GveGraphCollectionOperators
-import org.gradoop.spark.model.impl.operators.tostring.gve.ElementToString._
 import org.gradoop.spark.model.impl.operators.tostring.gve.CanonicalAdjacencyMatrixBuilder
+import org.gradoop.spark.model.impl.operators.tostring.gve.ElementToString._
 import org.gradoop.spark.util.SparkAsciiGraphLoader
 import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}
 

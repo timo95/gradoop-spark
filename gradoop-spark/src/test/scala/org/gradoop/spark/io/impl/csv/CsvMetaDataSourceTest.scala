@@ -1,7 +1,7 @@
 package org.gradoop.spark.io.impl.csv
 
-import org.gradoop.spark.{EpgmGradoopSparkTestBase, IoTest}
 import org.gradoop.spark.io.impl.metadata.PropertyMetaData
+import org.gradoop.spark.{EpgmGradoopSparkTestBase, IoTest}
 
 class CsvMetaDataSourceTest extends EpgmGradoopSparkTestBase {
 

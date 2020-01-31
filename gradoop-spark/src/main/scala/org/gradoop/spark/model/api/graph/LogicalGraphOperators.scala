@@ -1,8 +1,9 @@
 package org.gradoop.spark.model.api.graph
 
 import org.apache.spark.sql.Column
+import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.operators._
-import org.gradoop.spark.model.impl.types.LayoutType
+import org.gradoop.spark.model.impl.types.{Gve, LayoutType, Tfl}
 
 trait LogicalGraphOperators[L <: LayoutType[L]] {
   this: L#LG =>
@@ -20,6 +21,12 @@ trait LogicalGraphOperators[L <: LayoutType[L]] {
   def edgeInducedSubgraph(edgeFilterExpression: Column): L#LG
 
   def verify: L#LG
+
+  // Change layout
+
+  def asGve[L2 <: Gve[L2]](config: GradoopSparkConfig[L2]): L2#LG
+
+  def asTfl[L2 <: Tfl[L2]](config: GradoopSparkConfig[L2]): L2#LG
 
   // Call for operators
 

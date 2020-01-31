@@ -3,8 +3,8 @@ package org.gradoop.spark.io.impl.csv
 import java.nio.file.Files
 
 import org.apache.spark.sql.{Dataset, SaveMode}
-import org.gradoop.spark.{EpgmGradoopSparkTestBase, IoTest}
 import org.gradoop.spark.io.impl.metadata.ElementMetaData
+import org.gradoop.spark.{EpgmGradoopSparkTestBase, IoTest}
 
 class CsvMetaDataSinkTest extends EpgmGradoopSparkTestBase {
 
