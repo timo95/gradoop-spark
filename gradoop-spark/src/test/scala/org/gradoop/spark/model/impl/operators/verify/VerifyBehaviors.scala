@@ -2,7 +2,7 @@ package org.gradoop.spark.model.impl.operators.verify
 
 import org.apache.spark.sql.functions._
 import org.gradoop.common.properties.PropertyValue
-import org.gradoop.spark.EpgmGradoopSparkTestBase
+import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}
 import org.gradoop.spark.expressions.filter.FilterExpressions
 import org.scalatest.FunSpec
 
@@ -11,7 +11,7 @@ trait VerifyBehaviors extends EpgmGradoopSparkTestBase {
   this: FunSpec =>
 
   def verify(runVerify: L#LG => L#LG): Unit = {
-    it("Verify with Subgraph") {
+    it("Verify with Subgraph", OperatorTest) {
       val loader = getSocialNetworkLoader
       loader.appendToDatabaseFromString("expected:Community {interest : \"Databases\", vertexCount : 3}[" +
         "(eve)-[ekb:knows {since : 2015}]->(bob)]")

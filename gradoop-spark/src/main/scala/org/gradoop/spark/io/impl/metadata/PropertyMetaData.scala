@@ -8,5 +8,7 @@ object PropertyMetaData {
   val key = "key"
   val typeString = "typeString"
 
-  def apply(key: String, propertyType: Type): PropertyMetaData = PropertyMetaData(key, propertyType.string)
+  def apply(key: String, typeString: String): PropertyMetaData = new PropertyMetaData(key, typeString)
+
+  def apply(key: String, propertyType: Type): PropertyMetaData = new PropertyMetaData(key, propertyType.string)
 }

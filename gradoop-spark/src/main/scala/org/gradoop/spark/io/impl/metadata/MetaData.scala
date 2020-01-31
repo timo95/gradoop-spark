@@ -5,7 +5,10 @@ import org.gradoop.common.model.api.elements.AttributedElement
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.expressions.filter.FilterExpressions
-import org.gradoop.spark.model.impl.types.Gve
+import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
+import org.gradoop.spark.model.api.layouts.gve.GveLayout
+import org.gradoop.spark.model.api.layouts.tfl.TflLayout
+import org.gradoop.spark.model.impl.types.LayoutType
 
 class MetaData(val graphHeadMetaData: Dataset[ElementMetaData],
                val vertexMetaData: Dataset[ElementMetaData],
@@ -26,18 +29,27 @@ class MetaData(val graphHeadMetaData: Dataset[ElementMetaData],
 
 object MetaData {
 
-  def apply[L <: Gve[L]](logicalGraph: L#LG): MetaData = {
+  def apply[L <: LayoutType[L]](logicalGraph: LogicalGraph[L]): MetaData = {
     import logicalGraph.config.Implicits._
-    new MetaData(fromElements(logicalGraph.graphHead),
-      fromElements(logicalGraph.vertices),
-      fromElements(logicalGraph.edges))
+    fromLayout[L](logicalGraph.layout)
   }
 
-  def apply[L <: Gve[L]](graphCollection: L#GC): MetaData = {
+  def apply[L <: LayoutType[L]](graphCollection: GraphCollection[L]): MetaData = {
     import graphCollection.config.Implicits._
-    new MetaData(fromElements(graphCollection.graphHeads),
-      fromElements(graphCollection.vertices),
-      fromElements(graphCollection.edges))
+    fromLayout[L](graphCollection.layout)
+  }
+
+  def fromLayout[L <: LayoutType[L]](layout: L#L)(implicit sparkSession: SparkSession): MetaData = {
+    layout match {
+      case gve: GveLayout[L] => new MetaData(fromElements(gve.graphHead),
+        fromElements(gve.vertices),
+        fromElements(gve.edges))
+      case tfl: TflLayout[L] => new MetaData(tfl.graphHeadProperties.values.map(p => fromElements(p)).reduce(_ union _),
+        tfl.vertexProperties.values.map(p => fromElements(p)).reduce(_ union _),
+        tfl.edgeProperties.values.map(p => fromElements(p)).reduce(_ union _))
+      case other: Any => throw new IllegalArgumentException("Layout %s is not supported by MetaData."
+        .format(other.getClass.getSimpleName))
+    }
   }
 
   private def fromElements[EL <: AttributedElement](dataset: Dataset[EL])
