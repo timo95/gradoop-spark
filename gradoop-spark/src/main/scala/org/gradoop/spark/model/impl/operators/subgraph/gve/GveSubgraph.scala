@@ -14,6 +14,7 @@ class GveSubgraph[L <: Gve[L]](vertexFilterExpression: Column, edgeFilterExpress
     val factory = graph.factory
     import factory.Implicits._
     import graph.config.sparkSession.implicits._
+
     strategy match {
       case Strategy.BOTH =>
         val filteredVertices = graph.vertices.filter(vertexFilterExpression)

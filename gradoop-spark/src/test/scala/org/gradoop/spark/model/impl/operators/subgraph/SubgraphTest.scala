@@ -17,8 +17,8 @@ class SubgraphTest extends SubgraphBehaviors {
 
   describe("TflSubgraph") {
     it should behave like subgraphBoth(runTflSubgraph(_, _, _, Strategy.BOTH))
-    //it should behave like subgraphVertexInduced(runTflSubgraph(_, _, FilterExpressions.any, Strategy.VERTEX_INDUCED))
-    //it should behave like subgraphEdgeInduced(runTflSubgraph(_, FilterExpressions.any, _, Strategy.EDGE_INDUCED))
+    it should behave like subgraphVertexInduced(runTflSubgraph(_, _, FilterExpressions.any, Strategy.VERTEX_INDUCED))
+    it should behave like subgraphEdgeInduced(runTflSubgraph(_, FilterExpressions.any, _, Strategy.EDGE_INDUCED))
   }
 
   def runGveSubgraph(graph: L#LG, vertexFilterExpression: Column, edgeFilterExpression: Column,
