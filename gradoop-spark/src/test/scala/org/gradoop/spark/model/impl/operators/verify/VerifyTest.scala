@@ -1,13 +1,12 @@
 package org.gradoop.spark.model.impl.operators.verify
 
-import org.gradoop.spark.EpgmGradoopSparkTestBase
+class VerifyTest extends VerifyBehaviors {
 
-class VerifyTest extends EpgmGradoopSparkTestBase {
+  describe("GveVerify") {
+    it should behave like verify(_.verify)
+  }
 
-  describe("verify") {
-    val loader = getSocialNetworkLoader
-    val graph = loader.getLogicalGraph
-
-    val graph2 = graph.verify
+  describe("TflVerify") {
+    it should behave like verify(_.asTfl(tflConfig).verify.asGve(gveConfig))
   }
 }

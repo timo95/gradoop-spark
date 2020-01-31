@@ -100,6 +100,7 @@ case class PropertyValue(bytes: Array[Byte]) {
 }
 
 object PropertyValue {
+  val bytes = "bytes"
 
   /** Value offset in byte */
   val OFFSET: Byte = 0x01.toByte

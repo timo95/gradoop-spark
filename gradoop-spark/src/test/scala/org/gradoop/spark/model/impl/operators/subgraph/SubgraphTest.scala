@@ -1,14 +1,13 @@
 package org.gradoop.spark.model.impl.operators.subgraph
 
 import org.apache.spark.sql.Column
-import org.gradoop.spark.EpgmGradoopSparkTestBase
 import org.gradoop.spark.expressions.filter.FilterExpressions
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy.Strategy
 import org.gradoop.spark.model.impl.operators.subgraph.gve.GveSubgraph
 import org.gradoop.spark.model.impl.operators.subgraph.tfl.TflSubgraph
 import org.gradoop.spark.model.impl.types.EpgmTfl
 
-class SubgraphTest extends EpgmGradoopSparkTestBase with SubgraphBehaviors {
+class SubgraphTest extends SubgraphBehaviors {
 
   describe("GveSubgrah") {
     it should behave like subgraphBoth(runGveSubgraph(_, _, _, Strategy.BOTH))

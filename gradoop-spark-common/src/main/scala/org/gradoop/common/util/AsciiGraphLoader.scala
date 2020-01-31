@@ -8,9 +8,8 @@ import org.s1ck.gdl.GDLHandler
 
 import scala.collection.mutable
 
-class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge]
-(gdlHandler: GDLHandler, graphHeadFactory: GveGraphHeadFactory[G],
- vertexFactory: GveVertexFactory[V], edgeFactory: GveEdgeFactory[E]) {
+class AsciiGraphLoader[G <: GveGraphHead, V <: GveVertex, E <: GveEdge](gdlHandler: GDLHandler,
+  graphHeadFactory: GveGraphHeadFactory[G], vertexFactory: GveVertexFactory[V], edgeFactory: GveEdgeFactory[E]) {
 
   /** Stores all graphs contained in the GDL script. */
   private val idToGraphHead: mutable.Map[Id, G] = mutable.HashMap.empty
