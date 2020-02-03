@@ -7,8 +7,8 @@ class DifferenceTest extends DifferenceBehaviors {
   }
 
   describe("TflDifference") {
-    //it should behave like difference((left, right) => {
-    // left.asTfl(tflConfig).difference(right.asTfl(tflConfig)).asGve(left.config)
-    // })
+    it should behave like difference((left, right) => {
+      left.asTfl(tflConfig).difference(right.asTfl(tflConfig)).asGve(left.config)
+    })
   }
 }

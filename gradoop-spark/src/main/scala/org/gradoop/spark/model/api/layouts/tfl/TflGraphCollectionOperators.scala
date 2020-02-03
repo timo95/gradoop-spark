@@ -3,13 +3,14 @@ package org.gradoop.spark.model.api.layouts.tfl
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.GraphCollectionOperators
 import org.gradoop.spark.model.impl.operators.changelayout.TflToGve
+import org.gradoop.spark.model.impl.operators.difference.TflDifference
 import org.gradoop.spark.model.impl.types.{Gve, Tfl}
 
 trait TflGraphCollectionOperators[L <: Tfl[L]] extends GraphCollectionOperators[L] {
   this: L#GC =>
 
   override def difference(other: L#GC): L#GC = {
-    throw new RuntimeException("Not implemented")
+    callForCollection(new TflDifference[L], other)
   }
 
   override def equalsByGraphIds(other: L#GC): Boolean = {

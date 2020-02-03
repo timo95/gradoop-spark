@@ -34,11 +34,11 @@ class GveDifference[L <: Gve[L]] extends BinaryGraphCollectionToGraphCollectionO
 
     val elementContainment = elements.select(elements.id, explode(elements.graphIds).as("graphId"))
 
-    val remainingIds = elementContainment
+    val remainingElementIds = elementContainment
       .join(graphIds.withColumnRenamed(ColumnNames.ID, "graphId"), "graphId")
       .select(ColumnNames.ID)
       .distinct
 
-    elements.join(remainingIds, ColumnNames.ID).as[EL]
+    elements.join(remainingElementIds, ColumnNames.ID).as[EL]
   }
 }
