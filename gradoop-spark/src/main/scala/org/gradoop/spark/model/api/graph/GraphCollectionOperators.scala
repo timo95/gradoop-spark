@@ -1,10 +1,12 @@
 package org.gradoop.spark.model.api.graph
 
-import org.gradoop.spark.model.api.operators.{BinaryGraphCollectionToValueOperator, UnaryGraphCollectionToValueOperator, UnaryLogicalGraphToValueOperator}
+import org.gradoop.spark.model.api.operators._
 import org.gradoop.spark.model.impl.types.LayoutType
 
 trait GraphCollectionOperators[L <: LayoutType[L]] {
   this: L#GC =>
+
+  def difference(other: L#GC): L#GC
 
   def equalsByGraphIds(other: L#GC): Boolean
 
@@ -22,5 +24,9 @@ trait GraphCollectionOperators[L <: LayoutType[L]] {
 
   def callForValue[V](operator: BinaryGraphCollectionToValueOperator[L#GC, V], other: L#GC): V = {
     operator.execute(this, other)
+  }
+
+  def callForCollection(operator: BinaryGraphCollectionToGraphCollectionOperator[L#GC], other: L#GC): L#GC = {
+    callForValue(operator, other)
   }
 }

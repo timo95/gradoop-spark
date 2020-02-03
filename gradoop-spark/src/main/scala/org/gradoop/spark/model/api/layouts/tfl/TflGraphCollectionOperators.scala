@@ -6,19 +6,23 @@ import org.gradoop.spark.model.impl.types.Tfl
 trait TflGraphCollectionOperators[L <: Tfl[L]] extends GraphCollectionOperators[L] {
   this: L#GC =>
 
-  def equalsByGraphIds(other: L#GC): Boolean = {
+  override def difference(other: L#GC): L#GC = {
     throw new RuntimeException("Not implemented")
   }
 
-  def equalsByGraphElementIds(other: L#GC): Boolean = {
+  override def equalsByGraphIds(other: L#GC): Boolean = {
     throw new RuntimeException("Not implemented")
   }
 
-  def equalsByGraphElementData(other: L#GC): Boolean = {
+  override def equalsByGraphElementIds(other: L#GC): Boolean = {
     throw new RuntimeException("Not implemented")
   }
 
-  def equalsByGraphData(other: L#GC): Boolean = {
+  override def equalsByGraphElementData(other: L#GC): Boolean = {
+    throw new RuntimeException("Not implemented")
+  }
+
+  override def equalsByGraphData(other: L#GC): Boolean = {
     throw new RuntimeException("Not implemented")
   }
 }
