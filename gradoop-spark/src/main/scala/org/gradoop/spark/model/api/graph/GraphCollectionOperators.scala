@@ -1,7 +1,8 @@
 package org.gradoop.spark.model.api.graph
 
+import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.operators._
-import org.gradoop.spark.model.impl.types.LayoutType
+import org.gradoop.spark.model.impl.types.{Gve, LayoutType, Tfl}
 
 trait GraphCollectionOperators[L <: LayoutType[L]] {
   this: L#GC =>
@@ -15,6 +16,12 @@ trait GraphCollectionOperators[L <: LayoutType[L]] {
   def equalsByGraphElementData(other: L#GC): Boolean
 
   def equalsByGraphData(other: L#GC): Boolean
+
+  // Change layout
+
+  def asGve[L2 <: Gve[L2]](config: GradoopSparkConfig[L2]): L2#GC
+
+  def asTfl[L2 <: Tfl[L2]](config: GradoopSparkConfig[L2]): L2#GC
 
   // Call for operators
 

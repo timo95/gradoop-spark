@@ -9,7 +9,7 @@ import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, Logica
 import org.gradoop.spark.model.impl.types.Gve
 import org.gradoop.spark.util.Implicits
 
-trait GveBaseLayoutFactory[L <: Gve[L], BG <: BaseGraph[L]] extends LogicalGraphLayoutFactory[L]
+trait GveBaseLayoutFactory[L <: Gve[L], +BG <: BaseGraph[L]] extends LogicalGraphLayoutFactory[L]
   with GraphCollectionLayoutFactory[L]
   with GveElementFactoryProvider[L#G, L#V, L#E] {
 

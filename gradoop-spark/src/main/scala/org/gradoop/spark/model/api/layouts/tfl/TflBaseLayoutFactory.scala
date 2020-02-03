@@ -11,7 +11,7 @@ import org.gradoop.spark.util.Implicits
 
 import scala.collection.mutable
 
-trait TflBaseLayoutFactory[L <: Tfl[L], BG <: BaseGraph[L]] extends LogicalGraphLayoutFactory[L]
+trait TflBaseLayoutFactory[L <: Tfl[L], +BG <: BaseGraph[L]] extends LogicalGraphLayoutFactory[L]
   with GraphCollectionLayoutFactory[L]
   with TflElementFactoryProvider[L#G, L#V, L#E, L#P] {
 
