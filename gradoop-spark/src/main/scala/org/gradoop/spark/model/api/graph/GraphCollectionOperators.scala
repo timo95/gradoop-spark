@@ -7,6 +7,10 @@ import org.gradoop.spark.model.impl.types.{Gve, LayoutType, Tfl}
 trait GraphCollectionOperators[L <: LayoutType[L]] {
   this: L#GC =>
 
+  def union(other: L#GC): L#GC
+
+  def intersect(other: L#GC): L#GC
+
   def difference(other: L#GC): L#GC
 
   def equalsByGraphIds(other: L#GC): Boolean

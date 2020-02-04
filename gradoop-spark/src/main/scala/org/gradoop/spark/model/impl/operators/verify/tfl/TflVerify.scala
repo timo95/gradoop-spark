@@ -19,6 +19,6 @@ class TflVerify[L <: Tfl[L]] extends UnaryLogicalGraphToLogicalGraphOperator[L#L
       e.joinWith(vertexUnion, e.targetId === vertexUnion.id).map(_._1))
 
     graph.factory.init(graph.graphHead, graph.vertices, verifiedEdges, graph.graphHeadProperties,
-      graph.vertexProperties, TflFunctions.induceRightMap(verifiedEdges, graph.edgeProperties))
+      graph.vertexProperties, TflFunctions.inducePropMap(verifiedEdges, graph.edgeProperties))
   }
 }

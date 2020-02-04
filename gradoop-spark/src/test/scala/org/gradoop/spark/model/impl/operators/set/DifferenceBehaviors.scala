@@ -1,13 +1,13 @@
-package org.gradoop.spark.model.impl.operators.difference
+package org.gradoop.spark.model.impl.operators.set
 
-import org.gradoop.spark.EpgmGradoopSparkTestBase
+import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}
 import org.scalatest.FunSpec
 
 trait DifferenceBehaviors extends EpgmGradoopSparkTestBase {
   this: FunSpec =>
 
   def difference(runDifference: (L#GC, L#GC) => L#GC) {
-    it("Overlapping graph collections") {
+    it("Overlapping graph collections", OperatorTest) {
       val loader = getSocialNetworkLoader
       val col02 = loader.getGraphCollectionByVariables("g0", "g2")
       val col12 = loader.getGraphCollectionByVariables("g1", "g2")
@@ -17,7 +17,7 @@ trait DifferenceBehaviors extends EpgmGradoopSparkTestBase {
       assert(result.equalsByGraphData(expected))
     }
 
-    it("Non overlapping graph collections") {
+    it("Non overlapping graph collections", OperatorTest) {
       val loader = getSocialNetworkLoader
       val col01 = loader.getGraphCollectionByVariables("g0", "g1")
       val col23 = loader.getGraphCollectionByVariables("g2", "g3")
@@ -26,7 +26,7 @@ trait DifferenceBehaviors extends EpgmGradoopSparkTestBase {
       assert(result.equalsByGraphData(col01))
     }
 
-    it("Total overlapping graph collections") {
+    it("Total overlapping graph collections", OperatorTest) {
       val loader = getSocialNetworkLoader
       val col01 = loader.getGraphCollectionByVariables("g0", "g1")
       val expected = col01.factory.empty

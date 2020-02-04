@@ -54,7 +54,7 @@ class TflSubgraph[L <: Tfl[L]](vertexFilterExpression: Column, edgeFilterExpress
             .dropDuplicates(ColumnNames.ID))
 
         // Induce properties from elements
-        val inducedVertProp = TflFunctions.induceRightMap(inducedVertices,
+        val inducedVertProp = TflFunctions.inducePropMap(inducedVertices,
           graph.vertexProperties)
 
         // Split element and properties

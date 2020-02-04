@@ -1,7 +1,6 @@
 package org.gradoop.spark.model.api.layouts.tfl
 
 import org.apache.spark.sql.{DataFrame, Dataset, Encoder, SparkSession}
-import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayout, LogicalGraphLayout}
 import org.gradoop.spark.model.impl.types.Tfl
 import org.gradoop.spark.util.TflFunctions
@@ -31,7 +30,7 @@ abstract class TflLayout[L <: Tfl[L]](val graphHeads: Map[String, Dataset[L#G]],
    * @return label to graph head map
    */
   def graphHeadsWithProperties: Map[String, DataFrame] = {
-    TflFunctions.joinMaps(graphHeads, graphHeadProperties, "inner")
+    TflFunctions.joinPropMap(graphHeads, graphHeadProperties, "inner")
   }
 
   /** Returns all vertices having the specified label.
@@ -49,7 +48,7 @@ abstract class TflLayout[L <: Tfl[L]](val graphHeads: Map[String, Dataset[L#G]],
    * @return label to vertex map
    */
   def verticesWithProperties: Map[String, DataFrame] = {
-    TflFunctions.joinMaps(vertices, vertexProperties, "inner")
+    TflFunctions.joinPropMap(vertices, vertexProperties, "inner")
   }
 
   /** Returns all edges having the specified label.
@@ -66,7 +65,7 @@ abstract class TflLayout[L <: Tfl[L]](val graphHeads: Map[String, Dataset[L#G]],
    *
    * @return label to edge map
    */
-  def edgesWithProperties: Map[String, DataFrame] = TflFunctions.joinMaps(edges, edgeProperties, "inner")
+  def edgesWithProperties: Map[String, DataFrame] = TflFunctions.joinPropMap(edges, edgeProperties, "inner")
 
   /** Returns the graph head properties associated with the graph heads filtered by label.
    *

@@ -1,4 +1,4 @@
-package org.gradoop.spark.model.impl.operators.difference
+package org.gradoop.spark.model.impl.operators.set
 
 class DifferenceTest extends DifferenceBehaviors {
 
