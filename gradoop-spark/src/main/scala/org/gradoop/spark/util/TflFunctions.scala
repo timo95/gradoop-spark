@@ -1,7 +1,7 @@
 package org.gradoop.spark.util
 
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, Dataset, Encoder}
+import org.apache.spark.sql.{DataFrame, Dataset, Encoder, SparkSession}
 import org.gradoop.common.model.api.elements.MainElement
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.model.impl.types.Tfl
@@ -24,6 +24,14 @@ object TflFunctions {
 
   def unionMaps[A](left: Map[String, Dataset[A]], right: Map[String, Dataset[A]]): Map[String, Dataset[A]] = {
     mergeMaps[Dataset[A]](left, right, _ union _)
+  }
+
+  def reduceUnion(it: Iterable[DataFrame])(implicit sparkSession: SparkSession): DataFrame = {
+    it.reduce(_ union _) // TODO find way to keep row data (for empty DF) or eliminate uses
+  }
+
+  def reduceUnion[A](it: Iterable[Dataset[A]])(implicit sparkSession: SparkSession, encoder: Encoder[A]): Dataset[A] = {
+    it.reduceOption(_ union _).getOrElse(sparkSession.emptyDataset[A])
   }
 
   // Properties map functions

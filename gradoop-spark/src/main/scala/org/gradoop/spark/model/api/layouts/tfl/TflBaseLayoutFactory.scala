@@ -44,12 +44,14 @@ trait TflBaseLayoutFactory[L <: Tfl[L], +BG <: BaseGraph[L]] extends LogicalGrap
     edgeProperties: Map[String, Dataset[L#P]]): BG = {
 
     val graphHead = graphHeadFactory.create
-    val graphHeads = sparkSession.createDataset[L#G](Seq(graphHead))
+    val graphHeads = Map(graphHead.label -> sparkSession.createDataset[L#G](Seq(graphHead)))
+    val graphHeadProp = propertiesFactory(graphHead.id, graphHead.label, Map.empty)
+    val graphHeadProps = Map(graphHead.label -> sparkSession.createDataset[L#P](Seq(graphHeadProp)))
 
     val addToV = TransformationFunctions.addGraphId[L#V](graphHead.id)
     val addToE = TransformationFunctions.addGraphId[L#E](graphHead.id)
-    init(Map(graphHead.label -> graphHeads), vertices.mapValues(addToV), edges.mapValues(addToE),
-      Map.empty[String, Dataset[L#P]], vertexProperties, edgeProperties)
+    init(graphHeads, vertices.mapValues(addToV), edges.mapValues(addToE),
+      graphHeadProps, vertexProperties, edgeProperties)
   }
 
   def init(tflLayout: TflLayout[L], tflLayouts: TflLayout[L]*): BG = {

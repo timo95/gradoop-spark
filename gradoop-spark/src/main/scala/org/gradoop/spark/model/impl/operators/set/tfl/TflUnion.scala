@@ -7,7 +7,8 @@ import org.gradoop.spark.util.TflFunctions
 
 class TflUnion[L <: Tfl[L]] extends BinaryGraphCollectionToGraphCollectionOperator[L#GC] {
 
-  override def execute(left: L#GC, right: L#GC): L#GC = {    val factory = left.factory
+  override def execute(left: L#GC, right: L#GC): L#GC = {
+    val factory = left.factory
     import factory.Implicits._
     implicit val sparkSession = factory.sparkSession
 

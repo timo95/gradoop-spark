@@ -9,6 +9,7 @@ import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.api.layouts.gve.GveLayout
 import org.gradoop.spark.model.api.layouts.tfl.TflLayout
 import org.gradoop.spark.model.impl.types.LayoutType
+import org.gradoop.spark.util.TflFunctions
 
 class MetaData(val graphHeadMetaData: Dataset[ElementMetaData],
                val vertexMetaData: Dataset[ElementMetaData],
@@ -40,13 +41,15 @@ object MetaData {
   }
 
   def fromLayout[L <: LayoutType[L]](layout: L#L)(implicit sparkSession: SparkSession): MetaData = {
+    import sparkSession.implicits._
     layout match {
       case gve: GveLayout[L] => new MetaData(fromElements(gve.graphHead),
         fromElements(gve.vertices),
         fromElements(gve.edges))
-      case tfl: TflLayout[L] => new MetaData(tfl.graphHeadProperties.values.map(p => fromElements(p)).reduce(_ union _),
-        tfl.vertexProperties.values.map(p => fromElements(p)).reduce(_ union _),
-        tfl.edgeProperties.values.map(p => fromElements(p)).reduce(_ union _))
+      case tfl: TflLayout[L] => new MetaData(
+        TflFunctions.reduceUnion(tfl.graphHeadProperties.values.map(p => fromElements(p))),
+        TflFunctions.reduceUnion(tfl.vertexProperties.values.map(p => fromElements(p))),
+        TflFunctions.reduceUnion(tfl.edgeProperties.values.map(p => fromElements(p))))
       case other: Any => throw new IllegalArgumentException("Layout %s is not supported by MetaData."
         .format(other.getClass.getSimpleName))
     }

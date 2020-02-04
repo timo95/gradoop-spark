@@ -8,6 +8,19 @@ import org.gradoop.spark.model.impl.types.{Gve, LayoutType, Tfl}
 trait LogicalGraphOperators[L <: LayoutType[L]] {
   this: L#LG =>
 
+  /** Returns combination of both input graphs.
+   *
+   * Vertices and Edges are created by the union of both inputs. A new graph head is created.
+   *
+   * @param other other graph
+   * @return combined graph
+   */
+  def combine(other: L#LG): L#LG
+
+  def overlap(other: L#LG): L#LG
+
+  def exclude(other: L#LG): L#LG
+
   def equalsByElementIds(other: L#LG): Boolean
 
   def equalsByElementData(other: L#LG): Boolean

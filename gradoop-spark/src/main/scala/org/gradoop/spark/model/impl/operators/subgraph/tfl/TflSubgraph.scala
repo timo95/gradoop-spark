@@ -15,7 +15,8 @@ class TflSubgraph[L <: Tfl[L]](vertexFilterExpression: Column, edgeFilterExpress
   override def execute(graph: L#LG): L#LG = {
     val factory = graph.factory
     import factory.Implicits._
-    import graph.config.sparkSession.implicits._
+    implicit val sparkSession = graph.config.sparkSession
+    import sparkSession.implicits._
 
     strategy match {
       case Strategy.BOTH =>
@@ -47,7 +48,7 @@ class TflSubgraph[L <: Tfl[L]](vertexFilterExpression: Column, edgeFilterExpress
           .mapValues(_.filter(edgeFilterExpression))
 
         // Induce vertices from edges
-        val unionEdges = filteredEdges.values.reduce(_ union _) // single dataset
+        val unionEdges = TflFunctions.reduceUnion(filteredEdges.values) // single dataset
         val inducedVertices = graph.vertices.mapValues(v =>
           v.joinWith(unionEdges, v.id isin(col(ColumnNames.SOURCE_ID), col(ColumnNames.TARGET_ID)))
             .map(t => t._1)

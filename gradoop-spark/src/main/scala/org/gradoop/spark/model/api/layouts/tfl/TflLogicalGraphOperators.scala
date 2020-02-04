@@ -6,6 +6,7 @@ import org.gradoop.spark.expressions.transformation.TransformationFunctions.Tran
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.LogicalGraphOperators
 import org.gradoop.spark.model.impl.operators.changelayout.TflToGve
+import org.gradoop.spark.model.impl.operators.setgraph.tfl.TflCombination
 import org.gradoop.spark.model.impl.operators.subgraph.tfl.TflSubgraph
 import org.gradoop.spark.model.impl.operators.verify.tfl.TflVerify
 import org.gradoop.spark.model.impl.types.{Gve, Tfl}
@@ -14,6 +15,18 @@ trait TflLogicalGraphOperators[L <: Tfl[L]] extends LogicalGraphOperators[L] {
   this: L#LG =>
 
   // General operators
+
+  override def combine(other: L#LG): L#LG = {
+    callForGraph(new TflCombination[L], other)
+  }
+
+  override def overlap(other: L#LG): L#LG = {
+    throw new RuntimeException("Not implemented")
+  }
+
+  override def exclude(other: L#LG): L#LG = {
+    throw new RuntimeException("Not implemented")
+  }
 
   override def equalsByElementIds(other: L#LG): Boolean = {
     throw new RuntimeException("Not implemented")

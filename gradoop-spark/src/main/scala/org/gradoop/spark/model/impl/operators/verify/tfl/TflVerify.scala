@@ -9,9 +9,10 @@ class TflVerify[L <: Tfl[L]] extends UnaryLogicalGraphToLogicalGraphOperator[L#L
   override def execute(graph: L#LG): L#LG = {
     val factory = graph.factory
     import factory.Implicits._
-    import graph.config.sparkSession.implicits._
+    implicit val sparkSession = graph.config.sparkSession
+    import sparkSession.implicits._
 
-    val vertexUnion = graph.vertices.values.reduce(_ union _)
+    val vertexUnion = TflFunctions.reduceUnion(graph.vertices.values)
 
     val verifiedEdgesSource = graph.edges.mapValues(e =>
       e.joinWith(vertexUnion, e.sourceId === vertexUnion.id).map(_._1))

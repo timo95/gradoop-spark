@@ -14,14 +14,13 @@ class TflIntersection[L <: Tfl[L]] extends BinaryGraphCollectionToGraphCollectio
     import sparkSession.implicits._
 
     val leftGraphIds = left.graphHeads.mapValues(v => v.select(v.id))
-    val rightGraphIdsUnion = right.graphHeads.values.map(v => v.select(v.id)).reduce(_ union _)
+    val rightGraphIdsUnion = TflFunctions.reduceUnion(right.graphHeads.values.map(v => v.select(v.id)))
 
     val remainingIds = leftGraphIds.mapValues(v => v.intersect(rightGraphIdsUnion))
-    val resGraphHeads = left.graphHeads.transform((k, v) => {
-      v.join(remainingIds(k), ColumnNames.ID).as[L#G]
-    })
+    val resGraphHeads = left.graphHeads.transform((k, v) =>
+      v.join(remainingIds(k), ColumnNames.ID).as[L#G])
 
-    val remainingIdsUnion = remainingIds.values.reduce(_ union _)
+    val remainingIdsUnion = TflFunctions.reduceUnion(remainingIds.values)
     val resVertices = removeUncontainedElements(left.vertices, remainingIdsUnion)
     val resEdges = removeUncontainedElements(left.edges, remainingIdsUnion)
 

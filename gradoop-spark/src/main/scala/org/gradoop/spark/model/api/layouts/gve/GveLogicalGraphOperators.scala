@@ -7,6 +7,7 @@ import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.LogicalGraphOperators
 import org.gradoop.spark.model.impl.operators.changelayout.GveToTfl
 import org.gradoop.spark.model.impl.operators.equality.gve.GveEquals
+import org.gradoop.spark.model.impl.operators.setgraph.gve.GveCombination
 import org.gradoop.spark.model.impl.operators.subgraph.gve.GveSubgraph
 import org.gradoop.spark.model.impl.operators.tostring.gve.ElementToString
 import org.gradoop.spark.model.impl.operators.verify.gve.GveVerify
@@ -16,6 +17,18 @@ trait GveLogicalGraphOperators[L <: Gve[L]] extends LogicalGraphOperators[L] {
   this: L#LG =>
 
   // General operators
+
+  override def combine(other: L#LG): L#LG = {
+    callForGraph(new GveCombination[L], other)
+  }
+
+  override def overlap(other: L#LG): L#LG = {
+    throw new RuntimeException("Not implemented")
+  }
+
+  override def exclude(other: L#LG): L#LG = {
+    throw new RuntimeException("Not implemented")
+  }
 
   override def equalsByElementIds(other: L#LG): Boolean = {
     callForValue(new GveEquals(ElementToString.graphHeadToEmptyString, ElementToString.vertexToIdString,
