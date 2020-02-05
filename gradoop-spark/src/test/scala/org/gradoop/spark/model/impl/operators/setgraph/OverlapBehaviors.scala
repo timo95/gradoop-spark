@@ -6,70 +6,52 @@ import org.gradoop.spark.util.SparkAsciiGraphLoader
 import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}
 import org.scalatest.FunSpec
 
-trait CombinationBehaviors extends EpgmGradoopSparkTestBase {
+trait OverlapBehaviors extends EpgmGradoopSparkTestBase {
   this: FunSpec =>
 
-  def combination(runCombination: (L#LG, L#LG) => L#LG) {
+  def overlap(runOverlap: (L#LG, L#LG) => L#LG) {
     it("Overlapping graphs", OperatorTest) {
       val loader = getSocialNetworkLoader
-      loader.appendToDatabaseFromString("expected[" +
-        "(alice)-[akb]->(bob)" +
-        "(bob)-[bka]->(alice)" +
-        "(bob)-[bkc]->(carol)" +
-        "(carol)-[ckb]->(bob)" +
-        "(carol)-[ckd]->(dave)" +
-        "(dave)-[dkc]->(carol)" +
-        "(eve)-[eka]->(alice)" +
-        "(eve)-[ekb]->(bob)]")
+      loader.appendToDatabaseFromString("expected[(alice)-[akb]->(bob)-[bka]->(alice)]")
 
       val left = loader.getLogicalGraphByVariable("g0")
       val right = loader.getLogicalGraphByVariable("g2")
       val expected = loader.getLogicalGraphByVariable("expected")
 
-      assert(runCombination(left, right).equalsByElementData(expected))
-      assert(runCombination(right, left).equalsByElementData(expected))
+      assert(runOverlap(left, right).equalsByElementData(expected))
+      assert(runOverlap(right, left).equalsByElementData(expected))
     }
 
     it("Overlapping graphs derived", OperatorTest) {
       val loader = SparkAsciiGraphLoader.fromString(gveConfig,
-        "g[(a {x: true, y: true})" +
-          "(b {x: true, y: false})]" +
-          "expected[(a)(b)]")
+        "g[(a)]" +
+          "expected[(a)]")
 
       val left = loader.getLogicalGraphByVariable("g")
-        .vertexInducedSubgraph(FilterExpressions.hasProperty("x", PropertyValue(true)))
+        .vertexInducedSubgraph(FilterExpressions.any)
       val right = loader.getLogicalGraphByVariable("g")
-        .vertexInducedSubgraph(FilterExpressions.hasProperty("y", PropertyValue(false)))
+        .vertexInducedSubgraph(FilterExpressions.any)
       val expected = loader.getLogicalGraphByVariable("expected")
 
-      assert(runCombination(left, right).equalsByElementData(expected))
-      assert(runCombination(right, left).equalsByElementData(expected))
+      assert(runOverlap(left, right).equalsByElementData(expected))
     }
 
     it("Non overlapping graphs", OperatorTest) {
       val loader = getSocialNetworkLoader
-      loader.appendToDatabaseFromString("expected[" +
-        "(alice)-[akb]->(bob)" +
-        "(bob)-[bka]->(alice)" +
-        "(eve)-[eka]->(alice)" +
-        "(eve)-[ekb]->(bob)" +
-        "(carol)-[ckd]->(dave)" +
-        "(dave)-[dkc]->(carol)" +
-        "(frank)-[fkc]->(carol)" +
-        "(frank)-[fkd]->(dave)]")
+      loader.appendToDatabaseFromString("expected[]")
 
       val left = loader.getLogicalGraphByVariable("g0")
       val right = loader.getLogicalGraphByVariable("g1")
       val expected = loader.getLogicalGraphByVariable("expected")
 
-      assert(runCombination(left, right).equalsByElementData(expected))
-      assert(runCombination(right, left).equalsByElementData(expected))
+      assert(runOverlap(left, right).equalsByElementData(expected))
+      assert(runOverlap(right, left).equalsByElementData(expected))
     }
 
     it("Non overlapping graphs derived", OperatorTest) {
       val loader = SparkAsciiGraphLoader.fromString(gveConfig,
-        "g[(a {x: true})(b {x: false})]" +
-          "expected[(a)(b)]")
+        "g[(a {x: true}),(b {x: false})]" +
+          "expected[]")
 
       val left = loader.getLogicalGraphByVariable("g")
         .vertexInducedSubgraph(FilterExpressions.hasProperty("x", PropertyValue(true)))
@@ -77,15 +59,27 @@ trait CombinationBehaviors extends EpgmGradoopSparkTestBase {
         .vertexInducedSubgraph(FilterExpressions.hasProperty("x", PropertyValue(false)))
       val expected = loader.getLogicalGraphByVariable("expected")
 
-      assert(runCombination(left, right).equalsByElementData(expected))
-      assert(runCombination(right, left).equalsByElementData(expected))
+      assert(runOverlap(left, right).equalsByElementData(expected))
     }
 
     it("Total overlapping graphs", OperatorTest) {
       val loader = getSocialNetworkLoader
       val left = loader.getLogicalGraphByVariable("g0")
 
-      assert(runCombination(left, left).equalsByElementData(left))
+      assert(runOverlap(left, left).equalsByElementData(left))
+    }
+
+    it("Vertex only overlapping graphs", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig,
+        "g1[(a)-[e1]->(b)]" +
+          "g2[(a)-[e2]->(b)]" +
+          "expected[(a)(b)]")
+
+      val left = loader.getLogicalGraphByVariable("g1")
+      val right = loader.getLogicalGraphByVariable("g2")
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      assert(runOverlap(left, right).equalsByData(expected))
     }
   }
 }

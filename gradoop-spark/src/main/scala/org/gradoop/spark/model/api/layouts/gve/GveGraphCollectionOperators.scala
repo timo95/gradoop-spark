@@ -4,7 +4,7 @@ import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.GraphCollectionOperators
 import org.gradoop.spark.model.impl.operators.changelayout.GveToTfl
 import org.gradoop.spark.model.impl.operators.equality.gve.{GveEquals, GveGraphCollectionEqualityByGraphIds}
-import org.gradoop.spark.model.impl.operators.set.gve.{GveDifference, GveIntersection, GveUnion}
+import org.gradoop.spark.model.impl.operators.setcollection.gve.{GveDifference, GveIntersection, GveUnion}
 import org.gradoop.spark.model.impl.operators.tostring.gve.ElementToString
 import org.gradoop.spark.model.impl.types.{Gve, Tfl}
 

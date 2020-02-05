@@ -1,4 +1,4 @@
-package org.gradoop.spark.model.impl.operators.set.tfl
+package org.gradoop.spark.model.impl.operators.setcollection.tfl
 
 import org.apache.spark.sql.{DataFrame, Dataset, Encoder, SparkSession}
 import org.gradoop.common.model.api.elements.GraphElement

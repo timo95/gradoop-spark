@@ -1,4 +1,4 @@
-package org.gradoop.spark.model.impl.operators.set.gve
+package org.gradoop.spark.model.impl.operators.setcollection.gve
 
 import org.apache.spark.sql.{DataFrame, Dataset, Encoder, SparkSession}
 import org.gradoop.common.model.api.elements.GraphElement

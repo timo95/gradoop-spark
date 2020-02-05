@@ -1,4 +1,4 @@
-package org.gradoop.spark.model.impl.operators.set.gve
+package org.gradoop.spark.model.impl.operators.setcollection.gve
 
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.model.api.operators.BinaryGraphCollectionToGraphCollectionOperator

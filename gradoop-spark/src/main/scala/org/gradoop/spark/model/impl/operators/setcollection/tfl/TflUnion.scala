@@ -1,4 +1,4 @@
-package org.gradoop.spark.model.impl.operators.set.tfl
+package org.gradoop.spark.model.impl.operators.setcollection.tfl
 
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.model.api.operators.BinaryGraphCollectionToGraphCollectionOperator
