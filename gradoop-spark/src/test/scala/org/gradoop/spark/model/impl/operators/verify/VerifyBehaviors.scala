@@ -2,8 +2,8 @@ package org.gradoop.spark.model.impl.operators.verify
 
 import org.apache.spark.sql.functions._
 import org.gradoop.common.properties.PropertyValue
+import org.gradoop.spark.expressions.FilterExpressions
 import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}
-import org.gradoop.spark.expressions.filter.FilterExpressions
 import org.scalatest.FunSpec
 
 

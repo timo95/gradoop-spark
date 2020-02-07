@@ -1,12 +1,14 @@
 package org.gradoop.spark.model.api.layouts.gve
 
 import org.apache.spark.sql.Column
-import org.gradoop.spark.expressions.transformation.TransformationFunctions
-import org.gradoop.spark.expressions.transformation.TransformationFunctions.TransformationFunction
+import org.gradoop.spark.transformation.TransformationFunctions
+import org.gradoop.spark.transformation.TransformationFunctions.TransformationFunction
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.LogicalGraphOperators
 import org.gradoop.spark.model.impl.operators.changelayout.GveToTfl
 import org.gradoop.spark.model.impl.operators.equality.gve.GveEquals
+import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
+import org.gradoop.spark.model.impl.operators.grouping.gve.GveGrouping
 import org.gradoop.spark.model.impl.operators.setgraph.gve.{GveCombination, GveExclusion, GveOverlap}
 import org.gradoop.spark.model.impl.operators.subgraph.gve.GveSubgraph
 import org.gradoop.spark.model.impl.operators.tostring.gve.ElementToString
@@ -43,6 +45,10 @@ trait GveLogicalGraphOperators[L <: Gve[L]] extends LogicalGraphOperators[L] {
   override def equalsByData(other: L#LG): Boolean = {
     callForValue(new GveEquals(ElementToString.graphHeadToDataString, ElementToString.vertexToDataString,
       ElementToString.edgeToDataString, true), other)
+  }
+
+  override def groupBy(builder: GroupingBuilder): L#LG = {
+    callForGraph(GveGrouping[L](builder))
   }
 
   override def subgraph(vertexFilterExpression: Column, edgeFilterExpression: Column): L#LG = {

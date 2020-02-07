@@ -7,6 +7,8 @@ import org.gradoop.common.properties.strategies.PropertyValueStrategy
 import org.gradoop.common.util.Type
 import org.gradoop.common.util.Type.PrimitiveType
 
+import scala.math.ScalaNumber
+
 case class PropertyValue(bytes: Array[Byte]) {
 
   def copy: PropertyValue = new PropertyValue(bytes.clone)
@@ -66,6 +68,9 @@ case class PropertyValue(bytes: Array[Byte]) {
 
   def getMap: Map[PropertyValue, PropertyValue] = get.ensuring(_.isInstanceOf[Map[_, _]])
     .asInstanceOf[Map[PropertyValue, PropertyValue]]
+
+  // Special getter
+  def getNumber: ScalaNumber = get.ensuring(_.isInstanceOf[ScalaNumber]).asInstanceOf[ScalaNumber]
 
   // is type
   def isBoolean: Boolean = getTypeByte == Type.BOOLEAN.byte

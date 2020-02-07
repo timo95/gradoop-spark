@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.api.layouts.gve
 
 import org.apache.spark.sql.Dataset
-import org.gradoop.spark.expressions.filter.FilterExpressions
+import org.gradoop.spark.expressions.FilterExpressions
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayout, LogicalGraphLayout}
 import org.gradoop.spark.model.impl.types.Gve
 

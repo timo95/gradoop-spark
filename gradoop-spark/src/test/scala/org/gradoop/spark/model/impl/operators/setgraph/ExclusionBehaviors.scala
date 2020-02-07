@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.impl.operators.setgraph
 
 import org.gradoop.common.properties.PropertyValue
-import org.gradoop.spark.expressions.filter.FilterExpressions
+import org.gradoop.spark.expressions.FilterExpressions
 import org.gradoop.spark.model.impl.operators.tostring.gve.{CanonicalAdjacencyMatrixBuilder, ElementToString}
 import org.gradoop.spark.util.SparkAsciiGraphLoader
 import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}

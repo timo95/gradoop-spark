@@ -3,7 +3,7 @@ package org.gradoop.spark.model.api.layouts.tfl
 import org.apache.spark.sql.{DataFrame, Dataset, Encoder}
 import org.gradoop.common.model.api.components.ComponentTypes
 import org.gradoop.common.model.api.tfl.TflElementFactoryProvider
-import org.gradoop.spark.expressions.transformation.TransformationFunctions
+import org.gradoop.spark.transformation.TransformationFunctions
 import org.gradoop.spark.model.api.graph.BaseGraph
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, LogicalGraphLayoutFactory}
 import org.gradoop.spark.model.impl.types.Tfl

@@ -1,4 +1,4 @@
-package org.gradoop.spark.expressions.transformation
+package org.gradoop.spark.transformation
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{Column, Dataset, Encoder, SparkSession}

@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.impl.operators.changelayout
 
 import org.apache.spark.sql.SparkSession
-import org.gradoop.spark.expressions.filter.FilterExpressions
+import org.gradoop.spark.expressions.FilterExpressions
 import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.BaseGraph

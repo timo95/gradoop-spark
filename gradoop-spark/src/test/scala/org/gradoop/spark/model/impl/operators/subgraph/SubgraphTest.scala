@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.impl.operators.subgraph
 
 import org.apache.spark.sql.Column
-import org.gradoop.spark.expressions.filter.FilterExpressions
+import org.gradoop.spark.expressions.FilterExpressions
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy.Strategy
 import org.gradoop.spark.model.impl.operators.subgraph.gve.GveSubgraph
 import org.gradoop.spark.model.impl.operators.subgraph.tfl.TflSubgraph

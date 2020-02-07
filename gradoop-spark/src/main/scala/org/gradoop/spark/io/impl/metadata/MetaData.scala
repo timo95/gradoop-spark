@@ -4,7 +4,7 @@ import org.apache.spark.sql.{Column, Dataset, Row, SparkSession}
 import org.gradoop.common.model.api.elements.AttributedElement
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.ColumnNames
-import org.gradoop.spark.expressions.filter.FilterExpressions
+import org.gradoop.spark.expressions.FilterExpressions
 import org.gradoop.spark.model.api.graph.{GraphCollection, LogicalGraph}
 import org.gradoop.spark.model.api.layouts.gve.GveLayout
 import org.gradoop.spark.model.api.layouts.tfl.TflLayout

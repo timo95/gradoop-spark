@@ -1,8 +1,8 @@
 package org.gradoop.spark.model.impl.operators.subgraph
 
 import org.apache.spark.sql.Column
+import org.gradoop.spark.expressions.FilterExpressions
 import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}
-import org.gradoop.spark.expressions.filter.FilterExpressions
 import org.scalatest.FunSpec
 
 trait SubgraphBehaviors extends EpgmGradoopSparkTestBase {

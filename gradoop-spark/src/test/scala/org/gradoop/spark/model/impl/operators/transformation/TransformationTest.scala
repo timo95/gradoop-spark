@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.impl.operators.transformation
 
 import org.gradoop.spark.EpgmGradoopSparkTestBase
-import org.gradoop.spark.expressions.transformation.TransformationFunctions
+import org.gradoop.spark.transformation.TransformationFunctions
 
 class TransformationTest extends EpgmGradoopSparkTestBase {
 

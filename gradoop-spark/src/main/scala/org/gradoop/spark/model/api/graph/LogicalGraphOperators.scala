@@ -3,6 +3,7 @@ package org.gradoop.spark.model.api.graph
 import org.apache.spark.sql.Column
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.operators._
+import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
 import org.gradoop.spark.model.impl.types.{Gve, LayoutType, Tfl}
 
 trait LogicalGraphOperators[L <: LayoutType[L]] {
@@ -26,6 +27,8 @@ trait LogicalGraphOperators[L <: LayoutType[L]] {
   def equalsByElementData(other: L#LG): Boolean
 
   def equalsByData(other: L#LG): Boolean
+
+  def groupBy(builder: GroupingBuilder): L#LG
 
   def subgraph(vertexFilterExpression: Column, edgeFilterExpression: Column): L#LG
 

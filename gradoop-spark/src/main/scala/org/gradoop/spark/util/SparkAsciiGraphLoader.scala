@@ -3,7 +3,7 @@ package org.gradoop.spark.util
 import java.io.InputStream
 
 import org.gradoop.common.util.{AsciiGraphLoader, GradoopConstants}
-import org.gradoop.spark.expressions.transformation.TransformationFunctions
+import org.gradoop.spark.transformation.TransformationFunctions
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.impl.types.Gve
 

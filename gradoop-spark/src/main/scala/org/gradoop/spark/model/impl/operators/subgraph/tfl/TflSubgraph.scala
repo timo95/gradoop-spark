@@ -3,7 +3,7 @@ package org.gradoop.spark.model.impl.operators.subgraph.tfl
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions._
 import org.gradoop.common.util.ColumnNames
-import org.gradoop.spark.expressions.filter.FilterExpressions
+import org.gradoop.spark.expressions.FilterExpressions
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy.Strategy
 import org.gradoop.spark.model.impl.operators.subgraph.{Strategy, Subgraph}
 import org.gradoop.spark.model.impl.types.Tfl

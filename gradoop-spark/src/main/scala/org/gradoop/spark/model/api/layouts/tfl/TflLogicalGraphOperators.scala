@@ -1,15 +1,17 @@
 package org.gradoop.spark.model.api.layouts.tfl
 
 import org.apache.spark.sql.Column
-import org.gradoop.spark.expressions.transformation.TransformationFunctions
-import org.gradoop.spark.expressions.transformation.TransformationFunctions.TransformationFunction
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.graph.LogicalGraphOperators
 import org.gradoop.spark.model.impl.operators.changelayout.TflToGve
+import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
+import org.gradoop.spark.model.impl.operators.grouping.tfl.TflGrouping
 import org.gradoop.spark.model.impl.operators.setgraph.tfl.{TflCombination, TflExclusion, TflOverlap}
 import org.gradoop.spark.model.impl.operators.subgraph.tfl.TflSubgraph
 import org.gradoop.spark.model.impl.operators.verify.tfl.TflVerify
 import org.gradoop.spark.model.impl.types.{Gve, Tfl}
+import org.gradoop.spark.transformation.TransformationFunctions
+import org.gradoop.spark.transformation.TransformationFunctions.TransformationFunction
 
 trait TflLogicalGraphOperators[L <: Tfl[L]] extends LogicalGraphOperators[L] {
   this: L#LG =>
@@ -38,6 +40,10 @@ trait TflLogicalGraphOperators[L <: Tfl[L]] extends LogicalGraphOperators[L] {
 
   override def equalsByData(other: L#LG): Boolean = {
     throw new RuntimeException("Not implemented")
+  }
+
+  override def groupBy(builder: GroupingBuilder): L#LG = {
+    callForGraph(TflGrouping[L](builder))
   }
 
   override def subgraph(vertexFilterExpression: Column, edgeFilterExpression: Column): L#LG = {

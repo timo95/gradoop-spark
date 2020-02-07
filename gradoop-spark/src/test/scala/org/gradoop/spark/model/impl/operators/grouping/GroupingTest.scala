@@ -1,0 +1,21 @@
+package org.gradoop.spark.model.impl.operators.grouping
+
+class GroupingTest extends GroupingBehaviors {
+
+  describe("GveGrouping") {
+    it should behave like grouping((graph, builder) => graph.groupBy(builder))
+  }
+
+  describe("GroupingUtil") {
+    it("getAlias") {
+      import org.apache.spark.sql.functions._
+
+      val col1 = max(col("df")).getField("AS ").alias("abc").isNotNull
+        .alias("result")
+      assert(GroupingUtil.getAlias(col1) == "result")
+
+      val col2 = map_from_entries(col("AS df" + col("adsf")))
+      assertThrows[IllegalArgumentException](GroupingUtil.getAlias(col2))
+    }
+  }
+}

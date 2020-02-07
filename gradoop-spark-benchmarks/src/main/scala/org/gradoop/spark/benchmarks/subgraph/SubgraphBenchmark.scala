@@ -2,7 +2,7 @@ package org.gradoop.spark.benchmarks.subgraph
 
 import org.apache.spark.sql.{Column, SaveMode, SparkSession}
 import org.gradoop.spark.benchmarks.BaseBenchmark
-import org.gradoop.spark.expressions.filter.FilterExpressions
+import org.gradoop.spark.expressions.FilterExpressions
 import org.gradoop.spark.io.impl.csv.{CsvDataSink, CsvDataSource}
 import org.gradoop.spark.model.impl.types.LayoutType
 import org.rogach.scallop.{ScallopConf, ScallopOption}

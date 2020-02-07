@@ -1,10 +1,13 @@
-package org.gradoop.spark.expressions.filter
+package org.gradoop.spark.expressions
 
 import org.apache.spark.sql.Column
-import org.gradoop.common.util.ColumnNames
 import org.apache.spark.sql.functions._
 import org.gradoop.common.properties.PropertyValue
+import org.gradoop.common.util.ColumnNames
 
+/**
+ * Boolean column expressions
+ */
 object FilterExpressions {
   val any: Column = lit(true)
   val none: Column = lit(false)
