@@ -4,7 +4,7 @@ import java.time.{LocalDate, LocalDateTime, LocalTime}
 
 import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.strategies.PropertyValueStrategy
-import org.gradoop.common.util.Type
+import org.gradoop.common.util.{GradoopConstants, Type}
 import org.gradoop.common.util.Type.PrimitiveType
 
 import scala.math.ScalaNumber
@@ -32,7 +32,7 @@ case class PropertyValue(bytes: Array[Byte]) {
 
   override def toString: String = {
     val value = get
-    val string = if(value == null) Type.NULL.string else value.toString
+    val string = if(value == null) GradoopConstants.NULL_STRING else value.toString
     "%s:%s".format(string, getExactType.string)
   }
 

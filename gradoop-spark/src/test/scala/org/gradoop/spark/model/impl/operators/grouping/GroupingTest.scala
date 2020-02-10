@@ -3,7 +3,9 @@ package org.gradoop.spark.model.impl.operators.grouping
 class GroupingTest extends GroupingBehaviors {
 
   describe("GveGrouping") {
-    it should behave like grouping((graph, builder) => graph.groupBy(builder))
+    it should behave like groupingOnlyProperty((graph, builder) => graph.groupBy(builder))
+    it should behave like groupingWithLabel((graph, builder) => graph.groupBy(builder))
+    it should behave like groupingAggFunctions((graph, builder) => graph.groupBy(builder))
   }
 
   describe("GroupingUtil") {

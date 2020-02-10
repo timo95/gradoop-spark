@@ -1,12 +1,13 @@
 package org.gradoop.spark.model.impl.operators.grouping.tfl
 
 import org.apache.spark.sql.Column
+import org.gradoop.spark.functions.KeyFunction
 import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
 import org.gradoop.spark.model.impl.types.Tfl
 
-class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[Column], vertexAggFunctions: Seq[Column],
-  edgeGroupingKeys: Seq[Column], edgeAggFunctions: Seq[Column])
+class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFunctions: Seq[Column],
+  edgeGroupingKeys: Seq[KeyFunction], edgeAggFunctions: Seq[Column])
   extends UnaryLogicalGraphToLogicalGraphOperator[L#LG] {
 
   override def execute(graph: L#LG): L#LG = {
