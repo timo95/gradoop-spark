@@ -69,7 +69,7 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
       superVerticesDF = superVerticesDF
         .withColumn(ColumnNames.PROPERTIES, map_from_arrays(
           array(vertexAggNames.map(n => lit(n)): _*),
-          array(vertexAggNames.map(n => toProp(col(n))): _*)))
+          array(vertexAggNames.map(n => col(n)): _*)))
         .drop(vertexAggNames: _*)
     }
 
@@ -124,7 +124,7 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
       superEdgesDF = superEdgesDF
         .withColumn(ColumnNames.PROPERTIES, map_from_arrays(
           array(edgeAggNames.map(n => lit(n)): _*),
-          array(edgeAggNames.map(n => toProp(col(n))): _*)))
+          array(edgeAggNames.map(n => col(n)): _*)))
         .drop(edgeAggNames: _*)
     }
 

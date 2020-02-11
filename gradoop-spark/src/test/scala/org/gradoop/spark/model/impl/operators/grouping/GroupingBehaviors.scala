@@ -389,8 +389,262 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
 
-    // TODO add missing label tests
+    it("testVertexLabelAndSingleEdgePropertyWithAbsentValue", OperatorTest) {
+      val loader = getSocialNetworkLoader
+      val graph = loader.getLogicalGraph
+      loader.appendToDatabaseFromString("expected[" +
+        "(p:Person  {count : 6L})" +
+        "(t:Tag     {count : 3L})" +
+        "(f:Forum   {count : 2L})" +
+        "(p)-[{since : 2014, count : 4L}]->(p)" +
+        "(p)-[{since : 2013, count : 3L}]->(p)" +
+        "(p)-[{since : 2015, count : 3L}]->(p)" +
+        "(f)-[{since : 2013, count : 1L}]->(p)" +
+        "(p)-[{since : " + NULL_STRING + ", count : 4L}]->(t)" +
+        "(f)-[{since : " + NULL_STRING + ", count : 4L}]->(t)" +
+        "(f)-[{since : " + NULL_STRING + ", count : 5L}]->(p)" +
+        "]")
 
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.edgeGroupingKeys = Seq(new PropertyKeyFunction("since"))
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.count)
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.count)
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testVertexLabelAndSingleVertexAndSingleEdgeProperty", OperatorTest) {
+      val loader = getSocialNetworkLoader
+      loader.appendToDatabaseFromString("expected[" +
+        "(l:Person {city : \"Leipzig\", count : 2L})" +
+        "(d:Person {city : \"Dresden\", count : 3L})" +
+        "(b:Person {city : \"Berlin\",  count : 1L})" +
+        "(d)-[{since : 2014, count : 2L}]->(d)" +
+        "(d)-[{since : 2013, count : 2L}]->(l)" +
+        "(d)-[{since : 2015, count : 1L}]->(l)" +
+        "(l)-[{since : 2014, count : 2L}]->(l)" +
+        "(l)-[{since : 2013, count : 1L}]->(d)" +
+        "(b)-[{since : 2015, count : 2L}]->(d)" +
+        "]")
+
+      val graph = loader.getLogicalGraphByVariable("g0")
+        .combine(loader.getLogicalGraphByVariable("g1"))
+        .combine(loader.getLogicalGraphByVariable("g2"))
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("city"))
+      groupingBuilder.edgeGroupingKeys = Seq(new PropertyKeyFunction("since"))
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.count)
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.count)
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testVertexAndEdgeLabel", OperatorTest) {
+      val loader = getSocialNetworkLoader
+      val graph = loader.getLogicalGraph
+      loader.appendToDatabaseFromString("expected[" +
+        "(p:Person  {count : 6L})" +
+        "(t:Tag     {count : 3L})" +
+        "(f:Forum   {count : 2L})" +
+        "(f)-[:hasModerator {count :  2L}]->(p)" +
+        "(p)-[:hasInterest  {count :  4L}]->(t)" +
+        "(f)-[:hasMember    {count :  4L}]->(p)" +
+        "(f)-[:hasTag       {count :  4L}]->(t)" +
+        "(p)-[:knows        {count : 10L}]->(p)" +
+        "]")
+
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.edgeGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.count)
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.count)
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testVertexAndEdgeLabelAndSingleVertexProperty", OperatorTest) {
+      val loader = getSocialNetworkLoader
+      loader.appendToDatabaseFromString("expected[" +
+        "(l:Person {city : \"Leipzig\", count : 2L})" +
+        "(d:Person {city : \"Dresden\", count : 3L})" +
+        "(b:Person {city : \"Berlin\",  count : 1L})" +
+        "(d)-[:knows {count : 2L}]->(d)" +
+        "(d)-[:knows {count : 3L}]->(l)" +
+        "(l)-[:knows {count : 2L}]->(l)" +
+        "(l)-[:knows {count : 1L}]->(d)" +
+        "(b)-[:knows {count : 2L}]->(d)" +
+        "]")
+
+      val graph = loader.getLogicalGraphByVariable("g0")
+        .combine(loader.getLogicalGraphByVariable("g1"))
+        .combine(loader.getLogicalGraphByVariable("g2"))
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("city"))
+      groupingBuilder.edgeGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.count)
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.count)
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testVertexAndEdgeLabelAndSingleVertexPropertyWithAbsentValue", OperatorTest) {
+      val loader = getSocialNetworkLoader
+      val graph = loader.getLogicalGraph
+      loader.appendToDatabaseFromString("expected[" +
+        "(pL:Person {city : \"Leipzig\", count : 2L})" +
+        "(pD:Person {city : \"Dresden\", count : 3L})" +
+        "(pB:Person {city : \"Berlin\", count : 1L})" +
+        "(t:Tag   {city : " + NULL_STRING + ", count : 3L})" +
+        "(f:Forum {city : " + NULL_STRING + ", count : 2L})" +
+        "(pD)-[:knows {count : 2L}]->(pD)" +
+        "(pD)-[:knows {count : 3L}]->(pL)" +
+        "(pL)-[:knows {count : 2L}]->(pL)" +
+        "(pL)-[:knows {count : 1L}]->(pD)" +
+        "(pB)-[:knows {count : 2L}]->(pD)" +
+        "(pB)-[:hasInterest {count : 1L}]->(t)" +
+        "(pD)-[:hasInterest {count : 2L}]->(t)" +
+        "(pL)-[:hasInterest {count : 1L}]->(t)" +
+        "(f)-[:hasModerator {count : 1L}]->(pD)" +
+        "(f)-[:hasModerator {count : 1L}]->(pL)" +
+        "(f)-[:hasMember {count : 2L}]->(pD)" +
+        "(f)-[:hasMember {count : 2L}]->(pL)" +
+        "(f)-[:hasTag {count : 4L}]->(t)" +
+        "]")
+
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("city"))
+      groupingBuilder.edgeGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.count)
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.count)
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testVertexAndEdgeLabelAndSingleEdgeProperty", OperatorTest) {
+      val loader = getSocialNetworkLoader
+      loader.appendToDatabaseFromString("expected[" +
+        "(p:Person {count : 6L})" +
+        "(p)-[:knows {since : 2013, count : 3L}]->(p)" +
+        "(p)-[:knows {since : 2014, count : 4L}]->(p)" +
+        "(p)-[:knows {since : 2015, count : 3L}]->(p)" +
+        "]")
+
+      val graph = loader.getLogicalGraphByVariable("g0")
+        .combine(loader.getLogicalGraphByVariable("g1"))
+        .combine(loader.getLogicalGraphByVariable("g2"))
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.edgeGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("since"))
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.count)
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.count)
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testVertexAndEdgeLabelAndSingleEdgePropertyWithAbsentValue", OperatorTest) {
+      val loader = getSocialNetworkLoader
+      val graph = loader.getLogicalGraph
+      loader.appendToDatabaseFromString("expected[" +
+        "(p:Person  {count : 6L})" +
+        "(t:Tag     {count : 3L})" +
+        "(f:Forum   {count : 2L})" +
+        "(p)-[:knows {since : 2014, count : 4L}]->(p)" +
+        "(p)-[:knows {since : 2013, count : 3L}]->(p)" +
+        "(p)-[:knows {since : 2015, count : 3L}]->(p)" +
+        "(f)-[:hasModerator {since : 2013, count : 1L}]->(p)" +
+        "(f)-[:hasModerator {since : " + NULL_STRING + ", count : 1L}]->(p)" +
+        "(p)-[:hasInterest  {since : " + NULL_STRING + ", count : 4L}]->(t)" +
+        "(f)-[:hasMember    {since : " + NULL_STRING + ", count : 4L}]->(p)" +
+        "(f)-[:hasTag       {since : " + NULL_STRING + ", count : 4L}]->(t)" +
+        "]")
+
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.edgeGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("since"))
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.count)
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.count)
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testVertexAndEdgeLabelAndVertexAndSingleEdgeProperty", OperatorTest) {
+      val loader = getSocialNetworkLoader
+      loader.appendToDatabaseFromString("expected[" +
+        "(pL:Person {city : \"Leipzig\", count : 2L})" +
+        "(pD:Person {city : \"Dresden\", count : 3L})" +
+        "(pB:Person {city : \"Berlin\", count : 1L})" +
+        "(pD)-[:knows {since : 2014, count : 2L}]->(pD)" +
+        "(pD)-[:knows {since : 2013, count : 2L}]->(pL)" +
+        "(pD)-[:knows {since : 2015, count : 1L}]->(pL)" +
+        "(pL)-[:knows {since : 2014, count : 2L}]->(pL)" +
+        "(pL)-[:knows {since : 2013, count : 1L}]->(pD)" +
+        "(pB)-[:knows {since : 2015, count : 2L}]->(pD)" +
+        "]")
+
+      val graph = loader.getLogicalGraphByVariable("g0")
+        .combine(loader.getLogicalGraphByVariable("g1"))
+        .combine(loader.getLogicalGraphByVariable("g2"))
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("city"))
+      groupingBuilder.edgeGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("since"))
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.count)
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.count)
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testVertexAndEdgeLabelAndSingleVertexAndSingleEdgePropertyWithAbsentValue", OperatorTest) {
+      val loader = getSocialNetworkLoader
+      val graph = loader.getLogicalGraph
+      loader.appendToDatabaseFromString("expected[" +
+        "(pL:Person {city : \"Leipzig\", count : 2L})" +
+        "(pD:Person {city : \"Dresden\", count : 3L})" +
+        "(pB:Person {city : \"Berlin\", count : 1L})" +
+        "(t:Tag   {city : " + NULL_STRING + ", count : 3L})" +
+        "(f:Forum {city : " + NULL_STRING + ", count : 2L})" +
+        "(pD)-[:knows {since : 2014, count : 2L}]->(pD)" +
+        "(pD)-[:knows {since : 2013, count : 2L}]->(pL)" +
+        "(pD)-[:knows {since : 2015, count : 1L}]->(pL)" +
+        "(pL)-[:knows {since : 2014, count : 2L}]->(pL)" +
+        "(pL)-[:knows {since : 2013, count : 1L}]->(pD)" +
+        "(pB)-[:knows {since : 2015, count : 2L}]->(pD)" +
+        "(pB)-[:hasInterest {since : " + NULL_STRING + ", count : 1L}]->(t)" +
+        "(pD)-[:hasInterest {since : " + NULL_STRING + ", count : 2L}]->(t)" +
+        "(pL)-[:hasInterest {since : " + NULL_STRING + ", count : 1L}]->(t)" +
+        "(f)-[:hasModerator {since : 2013, count : 1L}]->(pD)" +
+        "(f)-[:hasModerator {since : " + NULL_STRING + ", count : 1L}]->(pL)" +
+        "(f)-[:hasMember {since : " + NULL_STRING + ", count : 2L}]->(pD)" +
+        "(f)-[:hasMember {since : " + NULL_STRING + ", count : 2L}]->(pL)" +
+        "(f)-[:hasTag {since : " + NULL_STRING + ", count : 4L}]->(t)" +
+        "]")
+
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("city"))
+      groupingBuilder.edgeGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("since"))
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.count)
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.count)
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
   }
 
   def groupingAggFunctions(runGrouping: (L#LG, GroupingBuilder) => L#LG): Unit = {
@@ -426,6 +680,82 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testCount", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
+        "(v0:Blue {a : 3})" +
+        "(v1:Blue {a : 2})" +
+        "(v2:Blue {a : 4})" +
+        "(v3:Red  {a : 4})" +
+        "(v4:Red  {a : 2})" +
+        "(v5:Red  {a : 4})" +
+        "(v0)-[{b : 2}]->(v1)" +
+        "(v0)-[{b : 1}]->(v2)" +
+        "(v1)-[{b : 2}]->(v2)" +
+        "(v2)-[{b : 3}]->(v3)" +
+        "(v2)-[{b : 1}]->(v3)" +
+        "(v3)-[{b : 3}]->(v4)" +
+        "(v4)-[{b : 1}]->(v5)" +
+        "(v5)-[{b : 1}]->(v3)" +
+        "]")
+
+      val graph = loader.getLogicalGraphByVariable("input")
+
+      loader.appendToDatabaseFromString("expected[" +
+        "(v00:Blue {count : 3L})" +
+        "(v01:Red  {count : 3L})" +
+        "(v00)-[{count : 3L}]->(v00)" +
+        "(v00)-[{count : 2L}]->(v01)" +
+        "(v01)-[{count : 3L}]->(v01)" +
+        "]")
+
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.count)
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.count)
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testSum", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
+        "(v0:Blue {a : 3})" +
+        "(v1:Blue {a : 2})" +
+        "(v2:Blue {a : 4})" +
+        "(v3:Red  {a : 4})" +
+        "(v4:Red  {a : 2})" +
+        "(v5:Red  {a : 4})" +
+        "(v0)-[{b : 2}]->(v1)" +
+        "(v0)-[{b : 1}]->(v2)" +
+        "(v1)-[{b : 2}]->(v2)" +
+        "(v2)-[{b : 3}]->(v3)" +
+        "(v2)-[{b : 1}]->(v3)" +
+        "(v3)-[{b : 3}]->(v4)" +
+        "(v4)-[{b : 1}]->(v5)" +
+        "(v5)-[{b : 1}]->(v3)" +
+        "]")
+
+      val graph = loader.getLogicalGraphByVariable("input")
+
+      loader.appendToDatabaseFromString("expected[" +
+        "(v00:Blue {sumA :  9})" +
+        "(v01:Red  {sumA : 10})" +
+        "(v00)-[{sumB : 5}]->(v00)" +
+        "(v00)-[{sumB : 4}]->(v01)" +
+        "(v01)-[{sumB : 5}]->(v01)" +
+        "]")
+
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.sumProp("a").as("sumA"))
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.sumProp("b").as("sumB"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
