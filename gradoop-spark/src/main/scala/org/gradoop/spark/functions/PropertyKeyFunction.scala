@@ -14,7 +14,7 @@ class PropertyKeyFunction(key: String) extends KeyFunction {
 
   override def extractKey: Column = nullToProp(col(ColumnNames.PROPERTIES).getField(key))
 
-  override def addKeyToElement(dataFrame: DataFrame, column: Column): DataFrame = {
+  override def addKey(dataFrame: DataFrame, column: Column): DataFrame = {
     dataFrame.withColumn(ColumnNames.PROPERTIES,
       map_concat(col(ColumnNames.PROPERTIES), map(lit(name), column)))
   }

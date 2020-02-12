@@ -8,5 +8,5 @@ trait KeyFunction extends Serializable {
 
   def extractKey: Column
 
-  def addKeyToElement(dataFrame: DataFrame, column: Column): DataFrame
+  def addKey(dataFrame: DataFrame, column: Column): DataFrame
 }

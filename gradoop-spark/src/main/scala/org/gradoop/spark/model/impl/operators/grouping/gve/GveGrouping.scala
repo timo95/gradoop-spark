@@ -1,6 +1,7 @@
 package org.gradoop.spark.model.impl.operators.grouping.gve
 
-import org.apache.spark.sql.Column
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.{ColumnNames, GradoopConstants}
@@ -10,33 +11,43 @@ import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOper
 import org.gradoop.spark.model.impl.operators.grouping.{GroupingBuilder, GroupingUtil}
 import org.gradoop.spark.model.impl.types.Gve
 
+/** Gve implementation of the Grouping operator.
+ *
+ * Behavior for empty key lists:
+ * vertices: group all
+ * edges: group source, target
+ *
+ * Behavior for empty aggregation lists:
+ * agg by count, but don't save result
+ *
+ * @param vertexGroupingKeys vertex grouping keys
+ * @param vertexAggFunctions vertex aggregation functions
+ * @param edgeGroupingKeys edge grouping keys
+ * @param edgeAggFunctions edge aggregation functions
+ * @tparam L layout type
+ */
 class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFunctions: Seq[Column],
   edgeGroupingKeys: Seq[KeyFunction], edgeAggFunctions: Seq[Column])
   extends UnaryLogicalGraphToLogicalGraphOperator[L#LG] {
-
-  // Empty key list:
-  // vertices: group all
-  // edges: group source, target
-
-  // Empty agg list:
-  // TODO what about empty agg lists?
-  // for now agg by count, but don't save result
 
   // Column Constants
   val KEYS = "groupingKeys"
   val SUPER_ID = "superId"
   val VERTEX_ID = "vertexId"
 
+  // Default aggregation, used if agg is empty
+  private val defaultAgg = AggregateExpressions.count
+
+  // UDFs
+  private val newId = udf(() => GradoopId.get) // Run .cache after each use [SPARK-11469]
+  private val emptyIdSet = udf(() => Array.empty[GradoopId])
+
   override def execute(graph: L#LG): L#LG = {
     val config = graph.config
-    implicit val sparkSession = config.sparkSession
+    implicit val sparkSession: SparkSession = config.sparkSession
     import org.apache.spark.sql.functions._
     val factory = graph.factory
     import factory.Implicits._
-
-    // UDFs
-    val newId = udf(() => GradoopId.get) // Run .cache after each use [SPARK-11469]
-    val emptyIdSet = udf(() => Array.empty[GradoopId])
 
     // ----- Vertices -----
 
@@ -46,31 +57,20 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     val verticesWithKeys = graph.vertices.withColumn(KEYS, struct(vertexKeys: _*))
 
     // Group and aggregate vertices
-    val vertexAggNames = vertexAggFunctions.map(c => GroupingUtil.getAlias(c))
-    val vertexAgg = if(vertexAggFunctions.isEmpty) Seq(AggregateExpressions.count) else vertexAggFunctions
+    val vertexAgg = if(vertexAggFunctions.isEmpty) Seq(defaultAgg) else vertexAggFunctions
     var superVerticesDF = verticesWithKeys.groupBy(KEYS)
       .agg(vertexAgg.head, vertexAgg.drop(1): _*)
-      .withColumn(ColumnNames.ID, newId()).cache // Prevents multiple evaluations of newId [SPARK-11469]
-      .withColumn(ColumnNames.LABEL, lit(GradoopConstants.DEFAULT_GRAPH_LABEL))
-      .withColumn(ColumnNames.GRAPH_IDS, emptyIdSet())
+
+    // Add default ID, Label and GraphIds
+    superVerticesDF = addDefaultColumns(superVerticesDF)
 
     // Add aggregation result to properties
-    if(vertexAggFunctions.isEmpty) {
-      superVerticesDF = superVerticesDF
-        .withColumn(ColumnNames.PROPERTIES, typedLit(Map.empty[String, PropertyValue]))
-        .drop(vertexAgg.map(n => GroupingUtil.getAlias(n)): _*)
-    } else {
-      superVerticesDF = superVerticesDF
-        .withColumn(ColumnNames.PROPERTIES, map_from_arrays(
-          array(vertexAggNames.map(n => lit(n)): _*),
-          array(vertexAggNames.map(n => col(n)): _*)))
-        .drop(vertexAggNames: _*)
-    }
+    superVerticesDF = columnsToProperties(superVerticesDF, vertexAggFunctions)
 
     // Add grouping keys to result
-    vertexGroupingKeys.foreach(key => {
-      superVerticesDF = key.addKeyToElement(superVerticesDF, col(KEYS + "." + key.name))
-    })
+    for(key <- vertexGroupingKeys) {
+      superVerticesDF = key.addKey(superVerticesDF, col(KEYS + "." + key.name))
+    }
 
     // Transform result to vertex
     val superVertices = superVerticesDF
@@ -100,32 +100,21 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
       .withColumnRenamed(SUPER_ID, ColumnNames.TARGET_ID)
 
     // Group and aggregate edges
-    val edgeAggNames = edgeAggFunctions.map(c => GroupingUtil.getAlias(c))
-    val edgeAgg = if(edgeAggFunctions.isEmpty) Seq(AggregateExpressions.count) else edgeAggFunctions
+    val edgeAgg = if(edgeAggFunctions.isEmpty) Seq(defaultAgg) else edgeAggFunctions
     var superEdgesDF = updatedEdges
       .groupBy(KEYS, ColumnNames.SOURCE_ID, ColumnNames.TARGET_ID)
       .agg(edgeAgg.head, edgeAgg.drop(1): _*)
-      .withColumn(ColumnNames.ID, newId()).cache // Prevents multiple evaluations of newId [SPARK-11469]
-      .withColumn(ColumnNames.LABEL, lit(GradoopConstants.DEFAULT_GRAPH_LABEL))
-      .withColumn(ColumnNames.GRAPH_IDS, emptyIdSet())
+
+    // Add default ID, Label and GraphIds
+    superEdgesDF = addDefaultColumns(superEdgesDF)
 
     // Add aggregation result to properties
-    if(edgeAggFunctions.isEmpty) {
-      superEdgesDF = superEdgesDF
-        .withColumn(ColumnNames.PROPERTIES, typedLit(Map.empty[String, PropertyValue]))
-        .drop(edgeAgg.map(n => GroupingUtil.getAlias(n)): _*)
-    } else {
-      superEdgesDF = superEdgesDF
-        .withColumn(ColumnNames.PROPERTIES, map_from_arrays(
-          array(edgeAggNames.map(n => lit(n)): _*),
-          array(edgeAggNames.map(n => col(n)): _*)))
-        .drop(edgeAggNames: _*)
-    }
+    superEdgesDF = columnsToProperties(superEdgesDF, edgeAggFunctions)
 
     // Add grouping keys to result
-    edgeGroupingKeys.foreach(key => {
-      superEdgesDF = key.addKeyToElement(superEdgesDF, col(KEYS + "." + key.name))
-    })
+    for(key <- edgeGroupingKeys) {
+      superEdgesDF = key.addKey(superEdgesDF, col(KEYS + "." + key.name))
+    }
 
     // Transform result to edge
     val superEdges = superEdgesDF
@@ -133,6 +122,39 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
       .as[L#E]
 
     factory.create(superVertices, superEdges)
+  }
+
+  /** Transforms the given columns to a property map.
+   *
+   * Any previous property map is overwritten.
+   * If the column list is empty, an empty property map is added.
+   *
+   * @param dataFrame dataframe with given columns
+   * @param columns column expressions used for columns
+   * @return dataframe with given columns moved to properties map
+   */
+  private def columnsToProperties(dataFrame: DataFrame, columns: Seq[Column]): DataFrame = {
+    if(columns.isEmpty) {
+      dataFrame.withColumn(ColumnNames.PROPERTIES, typedLit(Map.empty[String, PropertyValue]))
+        .drop(GroupingUtil.getAlias(defaultAgg))
+    } else {
+      val columnNames = columns.map(c => GroupingUtil.getAlias(c))
+      dataFrame.withColumn(ColumnNames.PROPERTIES, map_from_arrays(
+        array(columnNames.map(n => lit(n)): _*),
+        array(columnNames.map(n => col(n)): _*)))
+        .drop(columnNames: _*)
+    }
+  }
+
+  /** Adds default id, label and graphIds to dataframe.
+   *
+   * @param dataFrame dataframe
+   * @return dataframe with new id, default label and empty graph ids
+   */
+  private def addDefaultColumns(dataFrame: DataFrame): DataFrame = {
+    dataFrame.withColumn(ColumnNames.ID, newId()).cache // Prevents multiple evaluations of newId [SPARK-11469]
+      .withColumn(ColumnNames.LABEL, lit(GradoopConstants.DEFAULT_GRAPH_LABEL))
+      .withColumn(ColumnNames.GRAPH_IDS, emptyIdSet())
   }
 }
 

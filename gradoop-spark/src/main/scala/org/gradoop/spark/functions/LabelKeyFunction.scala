@@ -10,7 +10,7 @@ class LabelKeyFunction extends KeyFunction {
 
   override def extractKey: Column = col(ColumnNames.LABEL)
 
-  override def addKeyToElement(dataFrame: DataFrame, column: Column): DataFrame = {
+  override def addKey(dataFrame: DataFrame, column: Column): DataFrame = {
     dataFrame.withColumn(ColumnNames.LABEL, column)
   }
 }
