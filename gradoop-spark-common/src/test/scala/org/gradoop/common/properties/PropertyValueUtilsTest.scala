@@ -6,7 +6,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 
 class PropertyValueUtilsTest extends GradoopSparkCommonTestBase with TableDrivenPropertyChecks {
 
-  val addValues = Table(
+  private val addValues = Table(
     ("left", "right", "result"),
     (PropertyValue(23.asInstanceOf[Short]), PropertyValue(13.asInstanceOf[Short]), PropertyValue(36)),
     (PropertyValue(23.asInstanceOf[Short]), PropertyValue(13), PropertyValue(36)),
@@ -31,7 +31,7 @@ class PropertyValueUtilsTest extends GradoopSparkCommonTestBase with TableDriven
     (PropertyValue(BigDecimal(23.3)), PropertyValue(BigDecimal(13.3)), PropertyValue(BigDecimal(36.6)))
   )
 
-  val multiplyValues = Table(
+  private val multiplyValues = Table(
     ("left", "right", "result"),
     (PropertyValue(23.asInstanceOf[Short]), PropertyValue(3.asInstanceOf[Short]), PropertyValue(69)),
     (PropertyValue(23.asInstanceOf[Short]), PropertyValue(3), PropertyValue(69)),

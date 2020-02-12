@@ -647,26 +647,42 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
   }
 
   def groupingAggFunctions(runGrouping: (L#LG, GroupingBuilder) => L#LG): Unit = {
+    val inputGraph = "input[" +
+      "(v0:Blue {a : 3})" +
+      "(v1:Blue {a : 2})" +
+      "(v2:Blue {a : 4})" +
+      "(v3:Red  {a : 4})" +
+      "(v4:Red  {a : 2})" +
+      "(v5:Red  {a : 4})" +
+      "(v0)-[{b : 2}]->(v1)" +
+      "(v0)-[{b : 1}]->(v2)" +
+      "(v1)-[{b : 2}]->(v2)" +
+      "(v2)-[{b : 3}]->(v3)" +
+      "(v2)-[{b : 1}]->(v3)" +
+      "(v3)-[{b : 3}]->(v4)" +
+      "(v4)-[{b : 1}]->(v5)" +
+      "(v5)-[{b : 1}]->(v3)" +
+      "]"
+
+    val inputGraphMissingValues = "input[" +
+      "(v0:Blue)" +
+      "(v1:Blue)" +
+      "(v2:Blue)" +
+      "(v3:Red)" +
+      "(v4:Red)" +
+      "(v5:Red)" +
+      "(v0)-->(v1)" +
+      "(v0)-->(v2)" +
+      "(v1)-->(v2)" +
+      "(v2)-->(v3)" +
+      "(v2)-->(v3)" +
+      "(v3)-->(v4)" +
+      "(v4)-->(v5)" +
+      "(v5)-->(v3)" +
+      "]"
+
     it("testNoAggregate", OperatorTest) {
-      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
-        "(v0:Blue {a : 3})" +
-        "(v1:Blue {a : 2})" +
-        "(v2:Blue {a : 4})" +
-        "(v3:Red  {a : 4})" +
-        "(v4:Red  {a : 2})" +
-        "(v5:Red  {a : 4})" +
-        "(v0)-[{b : 2}]->(v1)" +
-        "(v0)-[{b : 1}]->(v2)" +
-        "(v1)-[{b : 2}]->(v2)" +
-        "(v2)-[{b : 3}]->(v3)" +
-        "(v2)-[{b : 1}]->(v3)" +
-        "(v3)-[{b : 3}]->(v4)" +
-        "(v4)-[{b : 1}]->(v5)" +
-        "(v5)-[{b : 1}]->(v3)" +
-        "]")
-
-      val graph = loader.getLogicalGraphByVariable("input")
-
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, inputGraph)
       loader.appendToDatabaseFromString("expected[" +
         "(v00:Blue)" +
         "(v01:Red)" +
@@ -675,6 +691,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         "(v01)-->(v01)" +
         "]")
 
+      val graph = loader.getLogicalGraphByVariable("input")
       val expected = loader.getLogicalGraphByVariable("expected")
 
       val groupingBuilder = new GroupingBuilder
@@ -684,25 +701,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
     }
 
     it("testCount", OperatorTest) {
-      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
-        "(v0:Blue {a : 3})" +
-        "(v1:Blue {a : 2})" +
-        "(v2:Blue {a : 4})" +
-        "(v3:Red  {a : 4})" +
-        "(v4:Red  {a : 2})" +
-        "(v5:Red  {a : 4})" +
-        "(v0)-[{b : 2}]->(v1)" +
-        "(v0)-[{b : 1}]->(v2)" +
-        "(v1)-[{b : 2}]->(v2)" +
-        "(v2)-[{b : 3}]->(v3)" +
-        "(v2)-[{b : 1}]->(v3)" +
-        "(v3)-[{b : 3}]->(v4)" +
-        "(v4)-[{b : 1}]->(v5)" +
-        "(v5)-[{b : 1}]->(v3)" +
-        "]")
-
-      val graph = loader.getLogicalGraphByVariable("input")
-
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, inputGraph)
       loader.appendToDatabaseFromString("expected[" +
         "(v00:Blue {count : 3L})" +
         "(v01:Red  {count : 3L})" +
@@ -711,6 +710,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         "(v01)-[{count : 3L}]->(v01)" +
         "]")
 
+      val graph = loader.getLogicalGraphByVariable("input")
       val expected = loader.getLogicalGraphByVariable("expected")
 
       val groupingBuilder = new GroupingBuilder
@@ -722,25 +722,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
     }
 
     it("testSum", OperatorTest) {
-      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
-        "(v0:Blue {a : 3})" +
-        "(v1:Blue {a : 2})" +
-        "(v2:Blue {a : 4})" +
-        "(v3:Red  {a : 4})" +
-        "(v4:Red  {a : 2})" +
-        "(v5:Red  {a : 4})" +
-        "(v0)-[{b : 2}]->(v1)" +
-        "(v0)-[{b : 1}]->(v2)" +
-        "(v1)-[{b : 2}]->(v2)" +
-        "(v2)-[{b : 3}]->(v3)" +
-        "(v2)-[{b : 1}]->(v3)" +
-        "(v3)-[{b : 3}]->(v4)" +
-        "(v4)-[{b : 1}]->(v5)" +
-        "(v5)-[{b : 1}]->(v3)" +
-        "]")
-
-      val graph = loader.getLogicalGraphByVariable("input")
-
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, inputGraph)
       loader.appendToDatabaseFromString("expected[" +
         "(v00:Blue {sumA :  9})" +
         "(v01:Red  {sumA : 10})" +
@@ -749,6 +731,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         "(v01)-[{sumB : 5}]->(v01)" +
         "]")
 
+      val graph = loader.getLogicalGraphByVariable("input")
       val expected = loader.getLogicalGraphByVariable("expected")
 
       val groupingBuilder = new GroupingBuilder
@@ -777,8 +760,6 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         "(v5)-[{b : 1}]->(v3)" +
         "]")
 
-      val graph = loader.getLogicalGraphByVariable("input")
-
       loader.appendToDatabaseFromString("expected[" +
         "(v00:Blue {sumA :  7})" +
         "(v01:Red  {sumA : 10})" +
@@ -787,6 +768,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         "(v01)-[{sumB : 5}]->(v01)" +
         "]")
 
+      val graph = loader.getLogicalGraphByVariable("input")
       val expected = loader.getLogicalGraphByVariable("expected")
 
       val groupingBuilder = new GroupingBuilder
@@ -798,25 +780,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
     }
 
     it("testSumWithMissingValues", OperatorTest) {
-      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
-        "(v0:Blue)" +
-        "(v1:Blue)" +
-        "(v2:Blue)" +
-        "(v3:Red)" +
-        "(v4:Red)" +
-        "(v5:Red)" +
-        "(v0)-->(v1)" +
-        "(v0)-->(v2)" +
-        "(v1)-->(v2)" +
-        "(v2)-->(v3)" +
-        "(v2)-->(v3)" +
-        "(v3)-->(v4)" +
-        "(v4)-->(v5)" +
-        "(v5)-->(v3)" +
-        "]")
-
-      val graph = loader.getLogicalGraphByVariable("input")
-
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, inputGraphMissingValues)
       loader.appendToDatabaseFromString("expected[" +
         "(v00:Blue {sumA :  " + NULL_STRING + "})" +
         "(v01:Red  {sumA :  " + NULL_STRING + "})" +
@@ -825,6 +789,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         "(v01)-[{sumB : " + NULL_STRING + "}]->(v01)" +
         "]")
 
+      val graph = loader.getLogicalGraphByVariable("input")
       val expected = loader.getLogicalGraphByVariable("expected")
 
       val groupingBuilder = new GroupingBuilder
@@ -836,25 +801,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
     }
 
     it("testMin", OperatorTest) {
-      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
-        "(v0:Blue {a : 3})" +
-        "(v1:Blue {a : 2})" +
-        "(v2:Blue {a : 4})" +
-        "(v3:Red  {a : 4})" +
-        "(v4:Red  {a : 2})" +
-        "(v5:Red  {a : 4})" +
-        "(v0)-[{b : 2}]->(v1)" +
-        "(v0)-[{b : 1}]->(v2)" +
-        "(v1)-[{b : 2}]->(v2)" +
-        "(v2)-[{b : 3}]->(v3)" +
-        "(v2)-[{b : 1}]->(v3)" +
-        "(v3)-[{b : 3}]->(v4)" +
-        "(v4)-[{b : 1}]->(v5)" +
-        "(v5)-[{b : 1}]->(v3)" +
-        "]")
-
-      val graph = loader.getLogicalGraphByVariable("input")
-
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, inputGraph)
       loader.appendToDatabaseFromString("expected[" +
         "(v00:Blue {minA : 2})" +
         "(v01:Red  {minA : 2})" +
@@ -863,6 +810,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         "(v01)-[{minB : 1}]->(v01)" +
         "]")
 
+      val graph = loader.getLogicalGraphByVariable("input")
       val expected = loader.getLogicalGraphByVariable("expected")
 
       val groupingBuilder = new GroupingBuilder
@@ -891,8 +839,6 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         "(v5)-[{b : 1}]->(v3)" +
         "]")
 
-      val graph = loader.getLogicalGraphByVariable("input")
-
       loader.appendToDatabaseFromString("expected[" +
         "(v00:Blue {minA : 3})" +
         "(v01:Red  {minA : 4})" +
@@ -901,6 +847,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         "(v01)-[{minB : 1}]->(v01)" +
         "]")
 
+      val graph = loader.getLogicalGraphByVariable("input")
       val expected = loader.getLogicalGraphByVariable("expected")
 
       val groupingBuilder = new GroupingBuilder
@@ -912,25 +859,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
     }
 
     it("testMinWithMissingValues", OperatorTest) {
-      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
-        "(v0:Blue)" +
-        "(v1:Blue)" +
-        "(v2:Blue)" +
-        "(v3:Red)" +
-        "(v4:Red)" +
-        "(v5:Red)" +
-        "(v0)-->(v1)" +
-        "(v0)-->(v2)" +
-        "(v1)-->(v2)" +
-        "(v2)-->(v3)" +
-        "(v2)-->(v3)" +
-        "(v3)-->(v4)" +
-        "(v4)-->(v5)" +
-        "(v5)-->(v3)" +
-        "]")
-
-      val graph = loader.getLogicalGraphByVariable("input")
-
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, inputGraphMissingValues)
       loader.appendToDatabaseFromString("expected[" +
         "(v00:Blue {minA :  " + NULL_STRING + "})" +
         "(v01:Red  {minA :  " + NULL_STRING + "})" +
@@ -939,6 +868,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         "(v01)-[{minB : " + NULL_STRING + "}]->(v01)" +
         "]")
 
+      val graph = loader.getLogicalGraphByVariable("input")
       val expected = loader.getLogicalGraphByVariable("expected")
 
       val groupingBuilder = new GroupingBuilder
@@ -950,25 +880,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
     }
 
     it("testMax", OperatorTest) {
-      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
-        "(v0:Blue {a : 3})" +
-        "(v1:Blue {a : 2})" +
-        "(v2:Blue {a : 4})" +
-        "(v3:Red  {a : 4})" +
-        "(v4:Red  {a : 2})" +
-        "(v5:Red  {a : 4})" +
-        "(v0)-[{b : 2}]->(v1)" +
-        "(v0)-[{b : 1}]->(v2)" +
-        "(v1)-[{b : 2}]->(v2)" +
-        "(v2)-[{b : 3}]->(v3)" +
-        "(v2)-[{b : 1}]->(v3)" +
-        "(v3)-[{b : 3}]->(v4)" +
-        "(v4)-[{b : 1}]->(v5)" +
-        "(v5)-[{b : 1}]->(v3)" +
-        "]")
-
-      val graph = loader.getLogicalGraphByVariable("input")
-
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, inputGraph)
       loader.appendToDatabaseFromString("expected[" +
         "(v00:Blue {maxA : 4})" +
         "(v01:Red  {maxA : 4})" +
@@ -977,6 +889,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         "(v01)-[{maxB : 3}]->(v01)" +
         "]")
 
+      val graph = loader.getLogicalGraphByVariable("input")
       val expected = loader.getLogicalGraphByVariable("expected")
 
       val groupingBuilder = new GroupingBuilder
@@ -1005,8 +918,6 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         "(v5)-[{b : 1}]->(v3)" +
         "]")
 
-      val graph = loader.getLogicalGraphByVariable("input")
-
       loader.appendToDatabaseFromString("expected[" +
         "(v00:Blue {maxA : 3})" +
         "(v01:Red  {maxA : 4})" +
@@ -1015,6 +926,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         "(v01)-[{maxB : 1}]->(v01)" +
         "]")
 
+      val graph = loader.getLogicalGraphByVariable("input")
       val expected = loader.getLogicalGraphByVariable("expected")
 
       val groupingBuilder = new GroupingBuilder
@@ -1026,25 +938,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
     }
 
     it("testMaxWithMissingValues", OperatorTest) {
-      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
-        "(v0:Blue)" +
-        "(v1:Blue)" +
-        "(v2:Blue)" +
-        "(v3:Red)" +
-        "(v4:Red)" +
-        "(v5:Red)" +
-        "(v0)-->(v1)" +
-        "(v0)-->(v2)" +
-        "(v1)-->(v2)" +
-        "(v2)-->(v3)" +
-        "(v2)-->(v3)" +
-        "(v3)-->(v4)" +
-        "(v4)-->(v5)" +
-        "(v5)-->(v3)" +
-        "]")
-
-      val graph = loader.getLogicalGraphByVariable("input")
-
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, inputGraphMissingValues)
       loader.appendToDatabaseFromString("expected[" +
         "(v00:Blue {maxA :  " + NULL_STRING + "})" +
         "(v01:Red  {maxA :  " + NULL_STRING + "})" +
@@ -1053,6 +947,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         "(v01)-[{maxB : " + NULL_STRING + "}]->(v01)" +
         "]")
 
+      val graph = loader.getLogicalGraphByVariable("input")
       val expected = loader.getLogicalGraphByVariable("expected")
 
       val groupingBuilder = new GroupingBuilder
@@ -1064,25 +959,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
     }
 
     it("testMultipleAggregators", OperatorTest) {
-      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
-        "(v0:Blue {a : 3})" +
-        "(v1:Blue {a : 2})" +
-        "(v2:Blue {a : 4})" +
-        "(v3:Red  {a : 4})" +
-        "(v4:Red  {a : 2})" +
-        "(v5:Red  {a : 4})" +
-        "(v0)-[{b : 2}]->(v1)" +
-        "(v0)-[{b : 1}]->(v2)" +
-        "(v1)-[{b : 2}]->(v2)" +
-        "(v2)-[{b : 3}]->(v3)" +
-        "(v2)-[{b : 1}]->(v3)" +
-        "(v3)-[{b : 3}]->(v4)" +
-        "(v4)-[{b : 1}]->(v5)" +
-        "(v5)-[{b : 1}]->(v3)" +
-        "]")
-
-      val graph = loader.getLogicalGraphByVariable("input")
-
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, inputGraph)
       loader.appendToDatabaseFromString("expected[" +
         "(v00:Blue {minA : 2,maxA : 4,sumA : 9,count : 3L})" +
         "(v01:Red  {minA : 2,maxA : 4,sumA : 10,count : 3L})" +
@@ -1091,6 +968,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         "(v01)-[{minB : 1,maxB : 3,sumB : 5,count : 3L}]->(v01)" +
         "]")
 
+      val graph = loader.getLogicalGraphByVariable("input")
       val expected = loader.getLogicalGraphByVariable("expected")
 
       val groupingBuilder = new GroupingBuilder
