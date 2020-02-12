@@ -760,6 +760,362 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
 
-    // TODO add missing aggregation function tests
+    it("testSumWithMissingValue", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
+        "(v0:Blue {a : 3})" +
+        "(v1:Blue)" +
+        "(v2:Blue {a : 4})" +
+        "(v3:Red  {a : 4})" +
+        "(v4:Red  {a : 2})" +
+        "(v5:Red  {a : 4})" +
+        "(v0)-->(v1)" +
+        "(v0)-[{b : 1}]->(v2)" +
+        "(v1)-[{b : 2}]->(v2)" +
+        "(v2)-[{b : 3}]->(v3)" +
+        "(v2)-[{b : 1}]->(v3)" +
+        "(v3)-[{b : 3}]->(v4)" +
+        "(v4)-[{b : 1}]->(v5)" +
+        "(v5)-[{b : 1}]->(v3)" +
+        "]")
+
+      val graph = loader.getLogicalGraphByVariable("input")
+
+      loader.appendToDatabaseFromString("expected[" +
+        "(v00:Blue {sumA :  7})" +
+        "(v01:Red  {sumA : 10})" +
+        "(v00)-[{sumB : 3}]->(v00)" +
+        "(v00)-[{sumB : 4}]->(v01)" +
+        "(v01)-[{sumB : 5}]->(v01)" +
+        "]")
+
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.sumProp("a").as("sumA"))
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.sumProp("b").as("sumB"))
+
+      val mb = new CanonicalAdjacencyMatrixBuilder[L](ElementToString.graphHeadToDataString, ElementToString.vertexToDataString,
+        ElementToString.edgeToDataString, true)
+
+      println("res")
+      println(mb.execute(runGrouping(graph, groupingBuilder)))
+      println("exp")
+      println(mb.execute(expected))
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testSumWithMissingValues", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
+        "(v0:Blue)" +
+        "(v1:Blue)" +
+        "(v2:Blue)" +
+        "(v3:Red)" +
+        "(v4:Red)" +
+        "(v5:Red)" +
+        "(v0)-->(v1)" +
+        "(v0)-->(v2)" +
+        "(v1)-->(v2)" +
+        "(v2)-->(v3)" +
+        "(v2)-->(v3)" +
+        "(v3)-->(v4)" +
+        "(v4)-->(v5)" +
+        "(v5)-->(v3)" +
+        "]")
+
+      val graph = loader.getLogicalGraphByVariable("input")
+
+      loader.appendToDatabaseFromString("expected[" +
+        "(v00:Blue {sumA :  " + NULL_STRING + "})" +
+        "(v01:Red  {sumA :  " + NULL_STRING + "})" +
+        "(v00)-[{sumB : " + NULL_STRING + "}]->(v00)" +
+        "(v00)-[{sumB : " + NULL_STRING + "}]->(v01)" +
+        "(v01)-[{sumB : " + NULL_STRING + "}]->(v01)" +
+        "]")
+
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.sumProp("a").as("sumA"))
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.sumProp("b").as("sumB"))
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testMin", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
+        "(v0:Blue {a : 3})" +
+        "(v1:Blue {a : 2})" +
+        "(v2:Blue {a : 4})" +
+        "(v3:Red  {a : 4})" +
+        "(v4:Red  {a : 2})" +
+        "(v5:Red  {a : 4})" +
+        "(v0)-[{b : 2}]->(v1)" +
+        "(v0)-[{b : 1}]->(v2)" +
+        "(v1)-[{b : 2}]->(v2)" +
+        "(v2)-[{b : 3}]->(v3)" +
+        "(v2)-[{b : 1}]->(v3)" +
+        "(v3)-[{b : 3}]->(v4)" +
+        "(v4)-[{b : 1}]->(v5)" +
+        "(v5)-[{b : 1}]->(v3)" +
+        "]")
+
+      val graph = loader.getLogicalGraphByVariable("input")
+
+      loader.appendToDatabaseFromString("expected[" +
+        "(v00:Blue {minA : 2})" +
+        "(v01:Red  {minA : 2})" +
+        "(v00)-[{minB : 1}]->(v00)" +
+        "(v00)-[{minB : 1}]->(v01)" +
+        "(v01)-[{minB : 1}]->(v01)" +
+        "]")
+
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.minProp("a").as("minA"))
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.minProp("b").as("minB"))
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testMinWithMissingValue", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
+        "(v0:Blue {a : 3})" +
+        "(v1:Blue)" +
+        "(v2:Blue {a : 4})" +
+        "(v3:Red  {a : 4})" +
+        "(v4:Red)" +
+        "(v5:Red  {a : 4})" +
+        "(v0)-[{b : 2}]->(v1)" +
+        "(v0)-->(v2)" +
+        "(v1)-[{b : 2}]->(v2)" +
+        "(v2)-[{b : 3}]->(v3)" +
+        "(v2)-->(v3)" +
+        "(v3)-[{b : 3}]->(v4)" +
+        "(v4)-->(v5)" +
+        "(v5)-[{b : 1}]->(v3)" +
+        "]")
+
+      val graph = loader.getLogicalGraphByVariable("input")
+
+      loader.appendToDatabaseFromString("expected[" +
+        "(v00:Blue {minA : 3})" +
+        "(v01:Red  {minA : 4})" +
+        "(v00)-[{minB : 2}]->(v00)" +
+        "(v00)-[{minB : 3}]->(v01)" +
+        "(v01)-[{minB : 1}]->(v01)" +
+        "]")
+
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.minProp("a").as("minA"))
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.minProp("b").as("minB"))
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testMinWithMissingValues", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
+        "(v0:Blue)" +
+        "(v1:Blue)" +
+        "(v2:Blue)" +
+        "(v3:Red)" +
+        "(v4:Red)" +
+        "(v5:Red)" +
+        "(v0)-->(v1)" +
+        "(v0)-->(v2)" +
+        "(v1)-->(v2)" +
+        "(v2)-->(v3)" +
+        "(v2)-->(v3)" +
+        "(v3)-->(v4)" +
+        "(v4)-->(v5)" +
+        "(v5)-->(v3)" +
+        "]")
+
+      val graph = loader.getLogicalGraphByVariable("input")
+
+      loader.appendToDatabaseFromString("expected[" +
+        "(v00:Blue {minA :  " + NULL_STRING + "})" +
+        "(v01:Red  {minA :  " + NULL_STRING + "})" +
+        "(v00)-[{minB : " + NULL_STRING + "}]->(v00)" +
+        "(v00)-[{minB : " + NULL_STRING + "}]->(v01)" +
+        "(v01)-[{minB : " + NULL_STRING + "}]->(v01)" +
+        "]")
+
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.minProp("a").as("minA"))
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.minProp("b").as("minB"))
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testMax", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
+        "(v0:Blue {a : 3})" +
+        "(v1:Blue {a : 2})" +
+        "(v2:Blue {a : 4})" +
+        "(v3:Red  {a : 4})" +
+        "(v4:Red  {a : 2})" +
+        "(v5:Red  {a : 4})" +
+        "(v0)-[{b : 2}]->(v1)" +
+        "(v0)-[{b : 1}]->(v2)" +
+        "(v1)-[{b : 2}]->(v2)" +
+        "(v2)-[{b : 3}]->(v3)" +
+        "(v2)-[{b : 1}]->(v3)" +
+        "(v3)-[{b : 3}]->(v4)" +
+        "(v4)-[{b : 1}]->(v5)" +
+        "(v5)-[{b : 1}]->(v3)" +
+        "]")
+
+      val graph = loader.getLogicalGraphByVariable("input")
+
+      loader.appendToDatabaseFromString("expected[" +
+        "(v00:Blue {maxA : 4})" +
+        "(v01:Red  {maxA : 4})" +
+        "(v00)-[{maxB : 2}]->(v00)" +
+        "(v00)-[{maxB : 3}]->(v01)" +
+        "(v01)-[{maxB : 3}]->(v01)" +
+        "]")
+
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.maxProp("a").as("maxA"))
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.maxProp("b").as("maxB"))
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testMaxWithMissingValue", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
+        "(v0:Blue {a : 3})" +
+        "(v1:Blue {a : 2})" +
+        "(v2:Blue)" +
+        "(v3:Red)" +
+        "(v4:Red  {a : 2})" +
+        "(v5:Red  {a : 4})" +
+        "(v0)-->(v1)" +
+        "(v0)-[{b : 1}]->(v2)" +
+        "(v1)-[{b : 2}]->(v2)" +
+        "(v2)-->(v3)" +
+        "(v2)-[{b : 1}]->(v3)" +
+        "(v3)-->(v4)" +
+        "(v4)-[{b : 1}]->(v5)" +
+        "(v5)-[{b : 1}]->(v3)" +
+        "]")
+
+      val graph = loader.getLogicalGraphByVariable("input")
+
+      loader.appendToDatabaseFromString("expected[" +
+        "(v00:Blue {maxA : 3})" +
+        "(v01:Red  {maxA : 4})" +
+        "(v00)-[{maxB : 2}]->(v00)" +
+        "(v00)-[{maxB : 1}]->(v01)" +
+        "(v01)-[{maxB : 1}]->(v01)" +
+        "]")
+
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.maxProp("a").as("maxA"))
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.maxProp("b").as("maxB"))
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testMaxWithMissingValues", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
+        "(v0:Blue)" +
+        "(v1:Blue)" +
+        "(v2:Blue)" +
+        "(v3:Red)" +
+        "(v4:Red)" +
+        "(v5:Red)" +
+        "(v0)-->(v1)" +
+        "(v0)-->(v2)" +
+        "(v1)-->(v2)" +
+        "(v2)-->(v3)" +
+        "(v2)-->(v3)" +
+        "(v3)-->(v4)" +
+        "(v4)-->(v5)" +
+        "(v5)-->(v3)" +
+        "]")
+
+      val graph = loader.getLogicalGraphByVariable("input")
+
+      loader.appendToDatabaseFromString("expected[" +
+        "(v00:Blue {maxA :  " + NULL_STRING + "})" +
+        "(v01:Red  {maxA :  " + NULL_STRING + "})" +
+        "(v00)-[{maxB : " + NULL_STRING + "}]->(v00)" +
+        "(v00)-[{maxB : " + NULL_STRING + "}]->(v01)" +
+        "(v01)-[{maxB : " + NULL_STRING + "}]->(v01)" +
+        "]")
+
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.maxProp("a").as("maxA"))
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.maxProp("b").as("maxB"))
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    it("testMultipleAggregators", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "input[" +
+        "(v0:Blue {a : 3})" +
+        "(v1:Blue {a : 2})" +
+        "(v2:Blue {a : 4})" +
+        "(v3:Red  {a : 4})" +
+        "(v4:Red  {a : 2})" +
+        "(v5:Red  {a : 4})" +
+        "(v0)-[{b : 2}]->(v1)" +
+        "(v0)-[{b : 1}]->(v2)" +
+        "(v1)-[{b : 2}]->(v2)" +
+        "(v2)-[{b : 3}]->(v3)" +
+        "(v2)-[{b : 1}]->(v3)" +
+        "(v3)-[{b : 3}]->(v4)" +
+        "(v4)-[{b : 1}]->(v5)" +
+        "(v5)-[{b : 1}]->(v3)" +
+        "]")
+
+      val graph = loader.getLogicalGraphByVariable("input")
+
+      loader.appendToDatabaseFromString("expected[" +
+        "(v00:Blue {minA : 2,maxA : 4,sumA : 9,count : 3L})" +
+        "(v01:Red  {minA : 2,maxA : 4,sumA : 10,count : 3L})" +
+        "(v00)-[{minB : 1,maxB : 2,sumB : 5,count : 3L}]->(v00)" +
+        "(v00)-[{minB : 1,maxB : 3,sumB : 4,count : 2L}]->(v01)" +
+        "(v01)-[{minB : 1,maxB : 3,sumB : 5,count : 3L}]->(v01)" +
+        "]")
+
+      val expected = loader.getLogicalGraphByVariable("expected")
+
+      val groupingBuilder = new GroupingBuilder
+      groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
+      groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.minProp("a").as("minA"),
+        AggregateExpressions.maxProp("a").as("maxA"),
+        AggregateExpressions.sumProp("a").as("sumA"),
+        AggregateExpressions.count)
+      groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.minProp("b").as("minB"),
+        AggregateExpressions.maxProp("b").as("maxB"),
+        AggregateExpressions.sumProp("b").as("sumB"),
+        AggregateExpressions.count)
+
+      assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
+    }
+
+    // TODO add missing aggregation function tests (post aggregate)
   }
 }

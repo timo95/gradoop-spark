@@ -1,8 +1,6 @@
 package org.gradoop.spark.model.impl.operators.grouping.gve
 
-import org.apache.spark.sql.functions.{array, col, lit, map_from_arrays, typedLit}
-import org.apache.spark.sql.{Column, DataFrame}
-import org.apache.spark.sql.types.{DataTypes, MapType, StringType, StructField, StructType}
+import org.apache.spark.sql.Column
 import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.{ColumnNames, GradoopConstants}
@@ -29,9 +27,6 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
   val SUPER_ID = "superId"
   val VERTEX_ID = "vertexId"
 
-  private val propertyType = DataTypes
-    .createMapType(StringType, StructType(StructField("bytes", DataTypes.BinaryType) :: Nil), false)
-
   override def execute(graph: L#LG): L#LG = {
     val config = graph.config
     implicit val sparkSession = config.sparkSession
@@ -42,7 +37,6 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     // UDFs
     val newId = udf(() => GradoopId.get) // Run .cache after each use [SPARK-11469]
     val emptyIdSet = udf(() => Array.empty[GradoopId])
-    val toProp = udf((v: Any) => PropertyValue(v))
 
     // ----- Vertices -----
 

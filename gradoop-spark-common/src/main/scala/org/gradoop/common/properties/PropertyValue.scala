@@ -4,10 +4,8 @@ import java.time.{LocalDate, LocalDateTime, LocalTime}
 
 import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.strategies.PropertyValueStrategy
-import org.gradoop.common.util.{GradoopConstants, Type}
 import org.gradoop.common.util.Type.PrimitiveType
-
-import scala.math.ScalaNumber
+import org.gradoop.common.util.{GradoopConstants, Type}
 
 case class PropertyValue(bytes: Array[Byte]) {
 
@@ -70,7 +68,7 @@ case class PropertyValue(bytes: Array[Byte]) {
     .asInstanceOf[Map[PropertyValue, PropertyValue]]
 
   // Special getter
-  def getNumber: ScalaNumber = get.ensuring(_.isInstanceOf[ScalaNumber]).asInstanceOf[ScalaNumber]
+  def getNumber: Number = get.ensuring(_.isInstanceOf[Number]).asInstanceOf[Number]
 
   // is type
   def isBoolean: Boolean = getTypeByte == Type.BOOLEAN.byte

@@ -1,4 +1,4 @@
-package org.gradoop.spark.expressions
+package org.gradoop.spark.expressions.udaf
 
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.expressions.{MutableAggregationBuffer, UserDefinedAggregateFunction}
@@ -16,10 +16,18 @@ abstract class PropertyValueAggregateFunction extends UserDefinedAggregateFuncti
   override def deterministic: Boolean = true
 
   override def initialize(buffer: MutableAggregationBuffer): Unit = {
-    buffer(0) = PropertyValue(0.asInstanceOf[Short])
+    buffer(0) = null
   }
 
+  override def update(buffer: MutableAggregationBuffer, input: Row): Unit = merge(buffer, input)
+
   override def evaluate(buffer: Row): Any = {
-    new PropertyValue(buffer.getAs[Row](0).getAs[Array[Byte]](0))
+    getProp(buffer).getOrElse(PropertyValue.NULL_VALUE)
+  }
+
+  protected def getProp(input: Row): Option[PropertyValue] = {
+    val value = input.getAs[Row](0)
+    if(value == null) None
+    else Some(new PropertyValue(value.getAs[Array[Byte]](0)))
   }
 }
