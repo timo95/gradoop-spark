@@ -35,7 +35,7 @@ subprojects {
     apply(plugin = "com.github.maiflai.scalatest")
 
     tasks {
-        "test"(Test::class) {
+        "test"(Test::class) { // TODO: Does not do anything
             extensions.get("tags").delegateClosureOf<PatternSet> {
             //"tags".delegateClosureOf<PatternSet> {
                 exclude("org.scalatest.tags.operator")

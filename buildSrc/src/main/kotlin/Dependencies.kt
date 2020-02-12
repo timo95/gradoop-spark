@@ -6,7 +6,7 @@ object Versions {
     var scalaMajor = "2.12"
 
     // -- Dependencies --
-    var spark = "2.4.4"
+    var spark = "2.4.5"
 
     var gdl = "0.3"
 

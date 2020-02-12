@@ -3,7 +3,6 @@ package org.gradoop.spark.model.impl.operators.grouping
 import org.gradoop.common.util.GradoopConstants.NULL_STRING
 import org.gradoop.spark.expressions.AggregateExpressions
 import org.gradoop.spark.functions.{LabelKeyFunction, PropertyKeyFunction}
-import org.gradoop.spark.model.impl.operators.tostring.gve.{CanonicalAdjacencyMatrixBuilder, ElementToString}
 import org.gradoop.spark.util.SparkAsciiGraphLoader
 import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}
 import org.scalatest.FunSpec
@@ -794,14 +793,6 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
       groupingBuilder.vertexAggFunctions = Seq(AggregateExpressions.sumProp("a").as("sumA"))
       groupingBuilder.edgeAggFunctions = Seq(AggregateExpressions.sumProp("b").as("sumB"))
-
-      val mb = new CanonicalAdjacencyMatrixBuilder[L](ElementToString.graphHeadToDataString, ElementToString.vertexToDataString,
-        ElementToString.edgeToDataString, true)
-
-      println("res")
-      println(mb.execute(runGrouping(graph, groupingBuilder)))
-      println("exp")
-      println(mb.execute(expected))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }

@@ -19,7 +19,7 @@ object AggregateExpressions {
     val sumAgg = new SumAggregateFunction
     sumAgg(col(ColumnNames.PROPERTIES).getField(key)).as("sum_" + key)
   }
-  
+
   def minProp(key: String): Column = {
     val minAgg = new MinAggregateFunction
     minAgg(col(ColumnNames.PROPERTIES).getField(key).as("min_" + key))
