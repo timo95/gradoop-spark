@@ -2,13 +2,12 @@ package org.gradoop.spark.model.impl.operators.grouping.gve
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
-import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.{ColumnNames, GradoopConstants}
-import org.gradoop.spark.expressions.AggregateExpressions
 import org.gradoop.spark.functions.KeyFunction
 import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOperator
-import org.gradoop.spark.model.impl.operators.grouping.{GroupingBuilder, GroupingUtil}
+import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
+import org.gradoop.spark.model.impl.operators.grouping.GroupingUtil._
 import org.gradoop.spark.model.impl.types.Gve
 
 /** Gve implementation of the Grouping operator.
@@ -29,18 +28,6 @@ import org.gradoop.spark.model.impl.types.Gve
 class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFunctions: Seq[Column],
   edgeGroupingKeys: Seq[KeyFunction], edgeAggFunctions: Seq[Column])
   extends UnaryLogicalGraphToLogicalGraphOperator[L#LG] {
-
-  // Column Constants
-  val KEYS = "groupingKeys"
-  val SUPER_ID = "superId"
-  val VERTEX_ID = "vertexId"
-
-  // Default aggregation, used if agg is empty
-  private val defaultAgg = AggregateExpressions.count
-
-  // UDFs
-  private val newId = udf(() => GradoopId.get) // Run .cache after each use [SPARK-11469]
-  private val emptyIdSet = udf(() => Array.empty[GradoopId])
 
   override def execute(graph: L#LG): L#LG = {
     val config = graph.config
@@ -85,7 +72,7 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
 
     // ----- Edges -----
 
-    // Compute edge grouping keys (might depend on original source/target ids)
+    // Compute edge grouping keys
     val edgeKeys: Seq[Column] = if(edgeGroupingKeys.isEmpty) Seq(lit(true))
     else edgeGroupingKeys.map(f => f.extractKey.as(f.name))
     val edgesWithKeys = graph.edges.withColumn(KEYS, struct(edgeKeys: _*))
@@ -136,9 +123,9 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
   private def columnsToProperties(dataFrame: DataFrame, columns: Seq[Column]): DataFrame = {
     if(columns.isEmpty) {
       dataFrame.withColumn(ColumnNames.PROPERTIES, typedLit(Map.empty[String, PropertyValue]))
-        .drop(GroupingUtil.getAlias(defaultAgg))
+        .drop(getAlias(defaultAgg))
     } else {
-      val columnNames = columns.map(c => GroupingUtil.getAlias(c))
+      val columnNames = columns.map(c => getAlias(c))
       dataFrame.withColumn(ColumnNames.PROPERTIES, map_from_arrays(
         array(columnNames.map(n => lit(n)): _*),
         array(columnNames.map(n => col(n)): _*)))

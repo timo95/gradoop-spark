@@ -1,5 +1,5 @@
 package org.gradoop.spark.functions
-import org.apache.spark.sql.{Column, DataFrame}
+import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.apache.spark.sql.functions._
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.ColumnNames
@@ -17,5 +17,10 @@ class PropertyKeyFunction(key: String) extends KeyFunction {
   override def addKey(dataFrame: DataFrame, column: Column): DataFrame = {
     dataFrame.withColumn(ColumnNames.PROPERTIES,
       map_concat(col(ColumnNames.PROPERTIES), map(lit(name), column)))
+  }
+
+  override def addKey(dataMap: Map[String, DataFrame], column: Column)(implicit sparkSession: SparkSession):
+  Map[String, DataFrame] = {
+    dataMap.mapValues(e => addKey(e, column))
   }
 }

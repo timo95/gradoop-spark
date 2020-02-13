@@ -1,8 +1,24 @@
 package org.gradoop.spark.model.impl.operators.grouping
 
 import org.apache.spark.sql.Column
+import org.apache.spark.sql.expressions.UserDefinedFunction
+import org.apache.spark.sql.functions.udf
+import org.gradoop.common.id.GradoopId
+import org.gradoop.spark.expressions.AggregateExpressions
 
 object GroupingUtil {
+
+  // Column Constants
+  val KEYS = "groupingKeys"
+  val SUPER_ID = "superId"
+  val VERTEX_ID = "vertexId"
+
+  // Default aggregation, used if agg is empty
+  val defaultAgg: Column = AggregateExpressions.count
+
+  // UDFs
+  val newId: UserDefinedFunction = udf(() => GradoopId.get) // Run .cache after each use [SPARK-11469]
+  val emptyIdSet: UserDefinedFunction = udf(() => Array.empty[GradoopId])
 
   def getAlias(column: Column): String = {
     val regex = """(?<=AS `)[^`]+(?=`$)""".r
