@@ -155,8 +155,8 @@ object GradoopId {
    */
   private def createProcessIdentifier: Short = {
     val processName: String = java.lang.management.ManagementFactory.getRuntimeMXBean.getName
-    if (processName.contains("@")) processName.substring(0, processName.indexOf('@')).toInt.toShort
-    else java.lang.management.ManagementFactory.getRuntimeMXBean.getName.hashCode.toShort
+    if (processName.contains("@")) processName.substring(0, processName.indexOf('@')).toShort
+    else processName.hashCode.toShort
   }
 
   /** Converts a date into the seconds since unix epoch.
@@ -207,6 +207,23 @@ object GradoopId {
     new GradoopId(buffer.array)
   }
 
+  /** Creates a GradoopId using the given unique long. Result is not continuous.
+   *
+   * @param long unique long
+   * @return unique gradoop id
+   */
+  def fromLong(long: Long): GradoopId = {
+    // From 8 byte long
+    val timestamp = long.toInt // 4 bytes (1-4)
+    val counter = (long >> 32).toInt // 3 bytes (5-7)
+    val processIdentifier = (long >> 48).toShort // 2 bytes (7-8), overlapping with counter
+
+    // Unique constant
+    val machineIdentifier = "123  021   2 22   dfs g 2334" // Illegal network interface name
+      .hashCode & 0x00ffffff // 3 byte
+
+    GradoopId(timestamp, machineIdentifier, processIdentifier, counter, false)
+  }
 
   def get: GradoopId = apply(dateToTimestampSeconds(new Date), MACHINE_IDENTIFIER, PROCESS_IDENTIFIER,
     NEXT_COUNTER.getAndIncrement, checkCounter = false)

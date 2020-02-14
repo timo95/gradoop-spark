@@ -17,7 +17,7 @@ object GroupingUtil {
   val defaultAgg: Column = AggregateExpressions.count
 
   // UDFs
-  val newId: UserDefinedFunction = udf(() => GradoopId.get) // Run .cache after each use [SPARK-11469]
+  val longToId: UserDefinedFunction = udf(long => GradoopId.fromLong(long)) // Use this with spark ids
   val emptyIdSet: UserDefinedFunction = udf(() => Array.empty[GradoopId])
 
   def getAlias(column: Column): String = {

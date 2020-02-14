@@ -15,9 +15,9 @@ class TflVerify[L <: Tfl[L]] extends UnaryLogicalGraphToLogicalGraphOperator[L#L
     val vertexUnion = TflFunctions.reduceUnion(graph.vertices.values)
 
     val verifiedEdgesSource = graph.edges.mapValues(e =>
-      e.joinWith(vertexUnion, e.sourceId === vertexUnion.id).map(_._1))
+      e.joinWith(vertexUnion, e.sourceId === vertexUnion.id).select("_1.*").as[L#E])
     val verifiedEdges = verifiedEdgesSource.mapValues(e =>
-      e.joinWith(vertexUnion, e.targetId === vertexUnion.id).map(_._1))
+      e.joinWith(vertexUnion, e.targetId === vertexUnion.id).select("_1.*").as[L#E])
 
     graph.factory.init(graph.graphHead, graph.vertices, verifiedEdges, graph.graphHeadProperties,
       graph.vertexProperties, TflFunctions.inducePropMap(verifiedEdges, graph.edgeProperties))

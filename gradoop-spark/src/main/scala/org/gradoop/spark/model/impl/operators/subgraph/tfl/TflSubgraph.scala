@@ -51,7 +51,7 @@ class TflSubgraph[L <: Tfl[L]](vertexFilterExpression: Column, edgeFilterExpress
         val unionEdges = TflFunctions.reduceUnion(filteredEdges.values) // single dataset
         val inducedVertices = graph.vertices.mapValues(v =>
           v.joinWith(unionEdges, v.id isin(col(ColumnNames.SOURCE_ID), col(ColumnNames.TARGET_ID)))
-            .map(t => t._1)
+            .select("_1.*").as[L#V]
             .dropDuplicates(ColumnNames.ID))
 
         // Induce properties from elements

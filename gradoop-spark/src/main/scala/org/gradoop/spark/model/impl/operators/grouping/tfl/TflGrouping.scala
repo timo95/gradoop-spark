@@ -28,9 +28,7 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     val vertexKeys: Seq[Column] = if(vertexGroupingKeys.isEmpty) Seq(lit(true))
     else vertexGroupingKeys.map(f => f.extractKey.as(f.name))
     val verticesWithKeys = graph.verticesWithProperties
-      .mapValues(_.withColumn(KEYS, struct(vertexKeys: _*)).cache) // the optimizer fails without cache
-    // When the only by label is the only key, then the constant label gets optimized too much
-    // -> Detected implicit cartesian product for INNER join between logical plans
+      .mapValues(_.withColumn(KEYS, struct(vertexKeys: _*)))
 
     // Group and aggregate vertices
     val vertexAgg = if(vertexAggFunctions.isEmpty) Seq(defaultAgg) else vertexAggFunctions
@@ -53,11 +51,10 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
 
     // Extract vertex id -> superId mapping (needed for edges)
     val unionSuperVertexIds = reduceUnion(superVerticesDF.values)
-      .select(col(KEYS), col(ColumnNames.ID).as(SUPER_ID))
+      .select(col(KEYS).as("superKeys"), col(ColumnNames.ID).as(SUPER_ID))
     val vertexIdMap = reduceUnion(verticesWithKeys.values.map(
-      _.select(KEYS, ColumnNames.ID)
-        .join(unionSuperVertexIds, KEYS)
-        .select(ColumnNames.ID, SUPER_ID)
+      _.joinWith(unionSuperVertexIds, unionSuperVertexIds("superKeys") === col(KEYS))
+        .select(col("_1." + ColumnNames.ID), col("_2." + SUPER_ID))
         .withColumnRenamed(ColumnNames.ID, VERTEX_ID)))
 
     // ----- Edges -----
@@ -66,7 +63,7 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     val edgeKeys: Seq[Column] = if(edgeGroupingKeys.isEmpty) Seq(lit(true))
     else edgeGroupingKeys.map(f => f.extractKey.as(f.name))
     val edgesWithKeys = graph.edgesWithProperties
-      .mapValues(_.withColumn(KEYS, struct(edgeKeys: _*)).cache) // optimizer fails without cache
+      .mapValues(_.withColumn(KEYS, struct(edgeKeys: _*)))
 
     // Update edges with vertex super ids
     val updatedEdges = edgesWithKeys.mapValues(
@@ -128,7 +125,7 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
    * @return dataframe with new id, default label and empty graph ids
    */
   private def addDefaultColumns(dataMap: Map[String, DataFrame]): Map[String, DataFrame] = {
-    dataMap.transform((l, df) => df.withColumn(ColumnNames.ID, newId()).cache // Prevents multiple evaluations of newId [SPARK-11469]
+    dataMap.transform((l, df) => df.withColumn(ColumnNames.ID, longToId(monotonically_increasing_id()))
       .withColumn(ColumnNames.LABEL, lit(l))
       .withColumn(ColumnNames.GRAPH_IDS, emptyIdSet()))
   }

@@ -29,7 +29,7 @@ class GveSubgraph[L <: Gve[L]](vertexFilterExpression: Column, edgeFilterExpress
         val filteredEdges = graph.edges.filter(edgeFilterExpression)
         val inducedVertices = graph.vertices
           .joinWith(filteredEdges, graph.vertices.id isin (filteredEdges.sourceId, filteredEdges.targetId))
-          .map(t => t._1)
+          .select("_1.*").as[L#V]
           .dropDuplicates(ColumnNames.ID)
         graph.factory.init(graph.graphHead, inducedVertices, filteredEdges)
     }

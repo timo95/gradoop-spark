@@ -139,7 +139,7 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
    * @return dataframe with new id, default label and empty graph ids
    */
   private def addDefaultColumns(dataFrame: DataFrame): DataFrame = {
-    dataFrame.withColumn(ColumnNames.ID, newId()).cache // Prevents multiple evaluations of newId [SPARK-11469]
+    dataFrame.withColumn(ColumnNames.ID, longToId(monotonically_increasing_id()))
       .withColumn(ColumnNames.LABEL, lit(GradoopConstants.DEFAULT_GRAPH_LABEL))
       .withColumn(ColumnNames.GRAPH_IDS, emptyIdSet())
   }
