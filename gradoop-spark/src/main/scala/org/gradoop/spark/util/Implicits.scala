@@ -6,11 +6,11 @@ import org.gradoop.spark.model.api.layouts.gve.GveLayout
 import org.gradoop.spark.model.api.layouts.tfl.TflLayout
 import org.gradoop.spark.model.impl.types.{Gve, Tfl}
 
-trait Implicits extends Serializable {
+trait Implicits extends ImplicitTypedColumnSelector {
+
   // Wrappers
-  implicit def columnSelector[T](dataset: Dataset[T]): ColumnSelector[T] = new ColumnSelector[T](dataset)
-  implicit def displayConverter(dataset: Dataset[_]): DisplayConverter = new DisplayConverter(dataset.toDF)
-  implicit def displayConverterDF(dataFrame: DataFrame): DisplayConverter = new DisplayConverter(dataFrame)
+  implicit def readableWrapper(dataset: Dataset[_]): ReadableWrapper = new ReadableWrapper(dataset.toDF)
+  implicit def readableWrapperDF(dataFrame: DataFrame): ReadableWrapper = new ReadableWrapper(dataFrame)
 
   // Get Layout
   implicit def getGveLayout[L <: Gve[L]](graph: BaseGraph[L]): GveLayout[L] = graph.layout

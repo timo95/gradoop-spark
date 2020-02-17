@@ -11,10 +11,9 @@ class TflIntersection[L <: Tfl[L]] extends BinaryGraphCollectionToGraphCollectio
     val factory = left.factory
     import factory.Implicits._
     implicit val sparkSession = factory.sparkSession
-    import sparkSession.implicits._
 
-    val leftGraphIds = left.graphHeads.mapValues(v => v.select(v.id))
-    val rightGraphIdsUnion = TflFunctions.reduceUnion(right.graphHeads.values.map(v => v.select(v.id)))
+    val leftGraphIds = left.graphHeads.mapValues(_.select(ColumnNames.ID))
+    val rightGraphIdsUnion = TflFunctions.reduceUnion(right.graphHeads.values.map(_.select(ColumnNames.ID)))
 
     val remainingIds = leftGraphIds.mapValues(v => v.intersect(rightGraphIdsUnion))
     val resGraphHeads = left.graphHeads.transform((k, v) =>

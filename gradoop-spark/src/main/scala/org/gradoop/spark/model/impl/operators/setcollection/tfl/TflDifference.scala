@@ -1,6 +1,6 @@
 package org.gradoop.spark.model.impl.operators.setcollection.tfl
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, Dataset}
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.model.api.operators.BinaryGraphCollectionToGraphCollectionOperator
 import org.gradoop.spark.model.impl.types.Tfl
@@ -12,14 +12,13 @@ class TflDifference[L <: Tfl[L]] extends BinaryGraphCollectionToGraphCollectionO
     val factory = left.factory
     import factory.Implicits._
     implicit val sparkSession = factory.sparkSession
-    import sparkSession.implicits._
 
-    val leftGraphIds = left.graphHeads.mapValues(v => v.select(v.id))
-    val rightGraphIdsUnion = TflFunctions.reduceUnion(right.graphHeads.values.map(v => v.select(v.id)))
+    val leftGraphIds = left.graphHeads.mapValues(_.select(ColumnNames.ID))
+    val rightGraphIdsUnion = TflFunctions.reduceUnion(right.graphHeads.values.map(_.select(ColumnNames.ID)))
 
-    val remainingIds = leftGraphIds.mapValues(v => v.except(rightGraphIdsUnion))
-    val resGraphHeads = TflFunctions.mergeMapsInner(left.graphHeads.mapValues(_.toDF),
-      remainingIds, (l: DataFrame, r: DataFrame) => l.join(r, ColumnNames.ID)).mapValues(_.as[L#G])
+    val remainingIds = leftGraphIds.mapValues(_.except(rightGraphIdsUnion))
+    val resGraphHeads = TflFunctions.mergeMapsInner(left.graphHeads, remainingIds,
+      (g: Dataset[L#G], id: DataFrame) => g.join(id, ColumnNames.ID).as[L#G])
 
     val remainingIdsUnion = TflFunctions.reduceUnion(remainingIds.values)
     val resVertices = removeUncontainedElements(left.vertices, remainingIdsUnion)

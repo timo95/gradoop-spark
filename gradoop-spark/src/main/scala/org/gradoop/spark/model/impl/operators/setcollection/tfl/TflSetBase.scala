@@ -12,12 +12,15 @@ trait TflSetBase {
     import org.gradoop.spark.util.Implicits._
     import sparkSession.implicits._
 
-    val elementContainment = elements
-      .mapValues(e => e.select(e.id, explode(e.graphIds).as("graphId")))
+    val GRAPH_ID = "graphId"
 
-    val remainingElementIds = elementContainment.mapValues(e =>
-      e.join(graphIds.withColumnRenamed(ColumnNames.ID, "graphId"), "graphId")
-        .select(ColumnNames.ID).distinct)
+    val elementContainment = elements
+      .mapValues(e => e.select(col(ColumnNames.ID), explode(e.graphIds).as(GRAPH_ID)))
+
+    val remainingElementIds = elementContainment.mapValues(
+      _.join(graphIds.withColumnRenamed(ColumnNames.ID, GRAPH_ID), GRAPH_ID)
+        .select(ColumnNames.ID)
+        .distinct)
 
     elements.transform((k, v) => v.join(remainingElementIds(k), ColumnNames.ID).as[EL])
   }

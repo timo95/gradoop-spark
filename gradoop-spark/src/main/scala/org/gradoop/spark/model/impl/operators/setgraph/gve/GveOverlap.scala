@@ -8,15 +8,13 @@ class GveOverlap[L <: Gve[L]] extends BinaryLogicalGraphToLogicalGraphOperator[L
 
   override def execute(left: L#LG, right: L#LG): L#LG = {
     val factory = left.factory
-    val sparkSession = factory.sparkSession
     import factory.Implicits._
-    import sparkSession.implicits._
 
-    val rightVertexIds = right.vertices.select(right.vertices.id)
+    val rightVertexIds = right.vertices.select(ColumnNames.ID)
     val resVertices = left.vertices
       .join(rightVertexIds, ColumnNames.ID).as[L#V]
 
-    val rightEdgeIds = right.edges.select(right.edges.id)
+    val rightEdgeIds = right.edges.select(ColumnNames.ID)
     val resEdges = left.edges
       .join(rightEdgeIds, ColumnNames.ID).as[L#E]
 

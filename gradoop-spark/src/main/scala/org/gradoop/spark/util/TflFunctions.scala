@@ -24,7 +24,7 @@ object TflFunctions {
   }
 
   /** Merge two maps while applying the merge function. Inner. */
-  def mergeMapsInner[A, B](left: Map[String, A], right: Map[String, A], merge: (A, A) => B): Map[String, B] = {
+  def mergeMapsInner[L, R, O](left: Map[String, L], right: Map[String, R], merge: (L, R) => O): Map[String, O] = {
     left.flatMap(e => right.get(e._1) match {
       case Some(v) => Traversable((e._1, merge(e._2, v)))
       case None => Traversable.empty

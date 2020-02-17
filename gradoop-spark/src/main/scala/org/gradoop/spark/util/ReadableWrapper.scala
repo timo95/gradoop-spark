@@ -5,11 +5,11 @@ import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.ColumnNames
 
-class DisplayConverter(val dataFrame: DataFrame) {
+class ReadableWrapper(val dataFrame: DataFrame) {
 
   private val idCols = Seq(ColumnNames.ID, ColumnNames.SOURCE_ID, ColumnNames.TARGET_ID, "superId", "vertexId")
   private val idsCols = Seq(ColumnNames.GRAPH_IDS)
-  private val propCols = Seq("count", "minB", "maxB", "sumB")
+  private val propCols = Seq("count", "minA", "maxA", "sumA", "minB", "maxB", "sumB")
   private val propsCols = Seq(ColumnNames.PROPERTIES)
 
   def readable: DataFrame = {
@@ -28,10 +28,10 @@ class DisplayConverter(val dataFrame: DataFrame) {
     val cols = dataFrame.columns
     var result = dataFrame
 
-    idCols.filter(s => cols.contains(s)).foreach(s => result = result.withColumn(s, idToString(col(s))))
-    idsCols.filter(s => cols.contains(s)).foreach(s => result = result.withColumn(s, idsToString(col(s))))
-    propCols.filter(s => cols.contains(s)).foreach(s => result = result.withColumn(s, propToString(col(s))))
-    propsCols.filter(s => cols.contains(s)).foreach(s => result = {
+    idCols.filter(cols.contains).foreach(s => result = result.withColumn(s, idToString(col(s))))
+    idsCols.filter(cols.contains).foreach(s => result = result.withColumn(s, idsToString(col(s))))
+    propCols.filter(cols.contains).foreach(s => result = result.withColumn(s, propToString(col(s))))
+    propsCols.filter(cols.contains).foreach(s => result = {
       result.withColumn(ColumnNames.PROPERTIES, map_from_arrays(map_keys(col(s)),
         propsToString(map_values(dataFrame(ColumnNames.PROPERTIES)))))
     })

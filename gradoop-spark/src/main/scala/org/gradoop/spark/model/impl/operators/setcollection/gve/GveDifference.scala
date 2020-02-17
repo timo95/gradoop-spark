@@ -10,10 +10,9 @@ class GveDifference[L <: Gve[L]] extends BinaryGraphCollectionToGraphCollectionO
     val factory = left.factory
     import factory.Implicits._
     implicit val sparkSession = factory.sparkSession
-    import sparkSession.implicits._
 
-    val leftGraphIds = left.graphHeads.select(left.graphHeads.id)
-    val rightGraphIds = right.graphHeads.select(right.graphHeads.id)
+    val leftGraphIds = left.graphHeads.select(ColumnNames.ID)
+    val rightGraphIds = right.graphHeads.select(ColumnNames.ID)
 
     // difference on graph head ids
     val differenceIds = leftGraphIds.except(rightGraphIds)

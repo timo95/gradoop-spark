@@ -6,16 +6,18 @@ import org.gradoop.common.util.ColumnNames
 
 trait GveSetBase {
 
-  def removeUncontainedElements[EL <: GraphElement](elements: Dataset[EL], graphIds: DataFrame)
+  protected def removeUncontainedElements[EL <: GraphElement](elements: Dataset[EL], graphIds: DataFrame)
     (implicit sparkSession: SparkSession, encoder: Encoder[EL]): Dataset[EL] = {
     import org.apache.spark.sql.functions._
     import org.gradoop.spark.util.Implicits._
     import sparkSession.implicits._
 
-    val elementContainment = elements.select(elements.id, explode(elements.graphIds).as("graphId"))
+    val GRAPH_ID = "graphId"
+
+    val elementContainment = elements.select(col(ColumnNames.ID), explode(elements.graphIds).as(GRAPH_ID))
 
     val remainingElementIds = elementContainment
-      .join(graphIds.withColumnRenamed(ColumnNames.ID, "graphId"), "graphId")
+      .join(graphIds.withColumnRenamed(ColumnNames.ID, GRAPH_ID), GRAPH_ID)
       .select(ColumnNames.ID)
       .distinct
 

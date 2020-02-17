@@ -11,13 +11,14 @@ class GveGraphCollectionEqualityByGraphIds[L <: Gve[L]] extends BinaryGraphColle
     import config.sparkSession.implicits._
     import org.apache.spark.sql.functions._
 
-    val leftIds = left.graphHeads.select(left.graphHeads.id).dropDuplicates
-      .withColumnRenamed("id", "left")
-    val rightIds = right.graphHeads.select(right.graphHeads.id).dropDuplicates
-      .withColumnRenamed("id", "right")
+    val LEFT = "left"
+    val RIGHT = "right"
 
-    leftIds.join(rightIds, leftIds("left") === rightIds("right"), "outer")
-      .where(isnull(col("left")) || isnull(col("right")))
+    val leftIds = left.graphHeads.select(left.graphHeads.id.as(LEFT)).dropDuplicates
+    val rightIds = right.graphHeads.select(right.graphHeads.id.as(RIGHT)).dropDuplicates
+
+    leftIds.join(rightIds, leftIds(LEFT) === rightIds(RIGHT), "outer")
+      .where(isnull(col(LEFT)) || isnull(col(RIGHT)))
       .isEmpty
   }
 }
