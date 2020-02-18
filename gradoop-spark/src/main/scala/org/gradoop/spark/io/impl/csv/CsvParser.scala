@@ -28,9 +28,9 @@ object CsvParser extends Serializable {
     if(propertiesString == null) Seq.empty[(String, PropertyValue)]
     else {
       val propertyStrings = StringEscaper.split(propertiesString, CsvConstants.VALUE_DELIMITER)
-      if(propertyStrings.length != metaData.length) {
-        println(s"Number of Properties for '${label}' is different from the provided metadata." +
-          "Properties with no corresponding metadata will me ignored.")
+      if(propertyStrings.length > metaData.length) {
+        println(s"Number of Properties (${propertyStrings.length}) for label '$label' is higher than the provided" +
+          s"metadata '${metaData.mkString(", ")}'.\nProperties with no corresponding metadata will me ignored.")
       }
 
       val length = propertyStrings.length min metaData.length // only parse when metadata exists for it

@@ -1,9 +1,9 @@
 package org.gradoop.spark.io.api
 
 import org.apache.spark.sql.SaveMode
-import org.gradoop.spark.model.impl.types.Gve
+import org.gradoop.spark.model.impl.types.LayoutType
 
-trait DataSink[L <: Gve[L]] {
+trait DataSink[L <: LayoutType[L]] {
 
   /** Writes a logical graph to the data sink.
    *

@@ -8,7 +8,7 @@ class CsvDataSourceTest extends CsvTestBase {
   describe("CsvDataSource") {
     val config = getConfig
 
-    it("reads logical graph with extended properties", IoTest) {
+    it("Read logical graph with extended properties", IoTest) {
       val csvPath = getClass.getResource("/data/csv/input_extended_properties").getFile
       val csvDataSource = CsvDataSource(csvPath, config)
       val graph = csvDataSource.readLogicalGraph
@@ -18,7 +18,7 @@ class CsvDataSourceTest extends CsvTestBase {
       assert(graph.equalsByData(expected))
     }
 
-    it("reads graph collection", IoTest) {
+    it("Read graph collection", IoTest) {
       val csvPath = getClass.getResource("/data/csv/input_graph_collection").getFile
       val csvDataSource = CsvDataSource(csvPath, config)
       val collection = csvDataSource.readGraphCollection

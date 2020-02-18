@@ -1,6 +1,7 @@
 package org.gradoop.spark.io.impl.metadata
 
-import org.apache.spark.sql.{Column, Dataset, Row, SparkSession}
+import org.apache.spark.sql.functions.col
+import org.apache.spark.sql._
 import org.gradoop.common.model.api.elements.AttributedElement
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.ColumnNames
@@ -15,16 +16,28 @@ class MetaData(val graphHeadMetaData: Dataset[ElementMetaData],
                val vertexMetaData: Dataset[ElementMetaData],
                val edgeMetaData: Dataset[ElementMetaData]) extends Serializable {
 
-  def getGraphHeadMetaData(label: String): Dataset[ElementMetaData] = {
+  def graphHeadMetaData(label: String): Dataset[ElementMetaData] = {
     graphHeadMetaData.filter(FilterExpressions.hasLabel(label))
   }
 
-  def getVertexMetaData(label: String): Dataset[ElementMetaData] = {
+  def vertexMetaData(label: String): Dataset[ElementMetaData] = {
     vertexMetaData.filter(FilterExpressions.hasLabel(label))
   }
 
-  def getEdgeMetaData(label: String): Dataset[ElementMetaData] = {
+  def edgeMetaData(label: String): Dataset[ElementMetaData] = {
     edgeMetaData.filter(FilterExpressions.hasLabel(label))
+  }
+
+  def graphHeadLabels(implicit encoder: Encoder[String]): Dataset[String] = {
+    graphHeadMetaData.select(col(ElementMetaData.label).as[String])
+  }
+
+  def vertexLabels(implicit encoder: Encoder[String]): Dataset[String] = {
+    vertexMetaData.select(col(ElementMetaData.label).as[String])
+  }
+
+  def edgeLabels(implicit encoder: Encoder[String]): Dataset[String] = {
+    edgeMetaData.select(col(ElementMetaData.label).as[String])
   }
 }
 
