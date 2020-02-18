@@ -81,15 +81,5 @@ object MetaData {
       // aggregate property structs to a set per label
       .agg(collect_set("propertyType").as(ElementMetaData.metaData))
       .as[ElementMetaData]
-
-    /*
-    // Version without explode, might be faster with many properties per row or rows per group TODO Benchmark
-    val propToMeta = new PropertyMetaDataUnion
-
-    dataset
-      .groupBy(LABEL)
-      .agg(propToMeta(col(PROPERTIES)).as(ElementMetaData.metaData))
-      .as[ElementMetaData]
-    */
   }
 }
