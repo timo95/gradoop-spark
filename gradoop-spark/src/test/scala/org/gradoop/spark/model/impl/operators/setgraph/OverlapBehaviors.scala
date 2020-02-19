@@ -9,7 +9,7 @@ import org.scalatest.FunSpec
 trait OverlapBehaviors extends EpgmGradoopSparkTestBase {
   this: FunSpec =>
 
-  def overlap(runOverlap: (L#LG, L#LG) => L#LG) {
+  def overlap(runOverlap: (LGve#LG, LGve#LG) => LGve#LG) {
     it("Overlapping graphs", OperatorTest) {
       val loader = getSocialNetworkLoader
       loader.appendToDatabaseFromString("expected[(alice)-[akb]->(bob)-[bka]->(alice)]")

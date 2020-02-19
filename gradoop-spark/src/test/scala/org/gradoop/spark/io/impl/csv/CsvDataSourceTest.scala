@@ -13,9 +13,7 @@ class CsvDataSourceTest extends CsvTestBase {
       val csvDataSource = CsvDataSource(csvPath, config)
       val graph = csvDataSource.readLogicalGraph
 
-      val expected = getExtendedLogicalGraph(config.logicalGraphFactory)
-
-      assert(graph.equalsByData(expected))
+      assert(graph.equalsByData(getExtendedLogicalGraph))
     }
 
     it("Read graph collection", IoTest) {

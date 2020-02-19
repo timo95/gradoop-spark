@@ -25,10 +25,15 @@ object TransformationFunctions {
 
   def addGraphId[A <: Contained](graphId: GradoopId)
     (implicit sparkSession: SparkSession, encoder: Encoder[A]): TransformationFunction[A] = {
+    addGraphIds(Iterable(graphId))
+  }
+
+  def addGraphIds[A <: Contained](graphIds: Iterable[GradoopId])
+    (implicit sparkSession: SparkSession, encoder: Encoder[A]): TransformationFunction[A] = {
     def transformationFunction(dataset: Dataset[A])
       (implicit sparkSession: SparkSession, encoder: Encoder[A]): Dataset[A] = {
       dataset.map((e: A) => {
-        e.addGraphId(graphId)
+        e.graphIds = e.graphIds ++ graphIds
         e
       })
     }

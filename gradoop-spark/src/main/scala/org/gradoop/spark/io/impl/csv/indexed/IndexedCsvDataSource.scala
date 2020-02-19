@@ -1,5 +1,6 @@
 package org.gradoop.spark.io.impl.csv.indexed
 
+import org.gradoop.spark.expressions.FilterExpressions
 import org.gradoop.spark.io.api.DataSource
 import org.gradoop.spark.io.impl.csv.CsvConstants._
 import org.gradoop.spark.io.impl.csv.CsvDataSourceBase
@@ -15,28 +16,29 @@ class IndexedCsvDataSource[L <: Tfl[L]](csvPath: String, config: GradoopSparkCon
   import sparkSession.implicits._
 
   override def readLogicalGraph: L#LG = {
-    val meta = getMetaData
-
-    // TODO replace metadata.labels with filesystem list folders
-    val (graphHeads, graphHeadProp) = TflFunctions.splitGraphHeadMap(meta.graphHeadLabels.collect.map(l =>
-      (l, readGraphHeads(indexedCsvPath(GRAPH_HEAD_PATH, l), meta.graphHeadMetaData(l)))).toMap)
-    val (vertices, vertexProp) = TflFunctions.splitVertexMap(meta.vertexLabels.collect.map(l =>
-      (l, readVertices(indexedCsvPath(VERTEX_PATH, l), meta.vertexMetaData(l)))).toMap)
-    val (edges, edgeProp) = TflFunctions.splitEdgeMap(meta.edgeLabels.collect.map(l =>
-      (l, readEdges(indexedCsvPath(EDGE_PATH, l), meta.edgeMetaData(l)))).toMap)
+    val (graphHeads, graphHeadProp) = TflFunctions.splitGraphHeadMap(getMetaData.graphHeadLabels.collect.map(l =>
+      (l, readGraphHeads(indexedCsvPath(GRAPH_HEAD_PATH, l), getMetaData.graphHeadMetaData(l))
+        .filter(FilterExpressions.hasLabel(l)))).toMap) // filter vs duplicates on label->directory collisions
+    val (vertices, vertexProp) = TflFunctions.splitVertexMap(getMetaData.vertexLabels.collect.map(l =>
+      (l, readVertices(indexedCsvPath(VERTEX_PATH, l), getMetaData.vertexMetaData(l))
+        .filter(FilterExpressions.hasLabel(l)))).toMap)
+    val (edges, edgeProp) = TflFunctions.splitEdgeMap(getMetaData.edgeLabels.collect.map(l =>
+      (l, readEdges(indexedCsvPath(EDGE_PATH, l), getMetaData.edgeMetaData(l))
+        .filter(FilterExpressions.hasLabel(l)))).toMap)
 
     config.logicalGraphFactory.init(graphHeads, vertices, edges, graphHeadProp, vertexProp, edgeProp)
   }
 
   override def readGraphCollection: L#GC = {
-    val meta = getMetaData
-
-    val (graphHeads, graphHeadProp) = TflFunctions.splitGraphHeadMap(meta.graphHeadLabels.collect.map(l =>
-      (l, readGraphHeads(indexedCsvPath(GRAPH_HEAD_PATH, l), meta.graphHeadMetaData(l)))).toMap)
-    val (vertices, vertexProp) = TflFunctions.splitVertexMap(meta.vertexLabels.collect.map(l =>
-      (l, readVertices(indexedCsvPath(VERTEX_PATH, l), meta.vertexMetaData(l)))).toMap)
-    val (edges, edgeProp) = TflFunctions.splitEdgeMap(meta.edgeLabels.collect.map(l =>
-      (l, readEdges(indexedCsvPath(EDGE_PATH, l), meta.edgeMetaData(l)))).toMap)
+    val (graphHeads, graphHeadProp) = TflFunctions.splitGraphHeadMap(getMetaData.graphHeadLabels.collect.map(l =>
+      (l, readGraphHeads(indexedCsvPath(GRAPH_HEAD_PATH, l), getMetaData.graphHeadMetaData(l))
+        .filter(FilterExpressions.hasLabel(l)))).toMap)
+    val (vertices, vertexProp) = TflFunctions.splitVertexMap(getMetaData.vertexLabels.collect.map(l =>
+      (l, readVertices(indexedCsvPath(VERTEX_PATH, l), getMetaData.vertexMetaData(l))
+        .filter(FilterExpressions.hasLabel(l)))).toMap)
+    val (edges, edgeProp) = TflFunctions.splitEdgeMap(getMetaData.edgeLabels.collect.map(l =>
+      (l, readEdges(indexedCsvPath(EDGE_PATH, l), getMetaData.edgeMetaData(l))
+        .filter(FilterExpressions.hasLabel(l)))).toMap)
 
     config.graphCollectionFactory.init(graphHeads, vertices, edges, graphHeadProp, vertexProp, edgeProp)
   }

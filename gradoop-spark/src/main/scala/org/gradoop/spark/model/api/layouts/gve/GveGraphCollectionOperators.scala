@@ -7,6 +7,8 @@ import org.gradoop.spark.model.impl.operators.equality.gve.{GveEquals, GveGraphC
 import org.gradoop.spark.model.impl.operators.setcollection.gve.{GveDifference, GveIntersection, GveUnion}
 import org.gradoop.spark.model.impl.operators.tostring.gve.ElementToString
 import org.gradoop.spark.model.impl.types.{Gve, Tfl}
+import org.gradoop.spark.transformation.TransformationFunctions
+import org.gradoop.spark.transformation.TransformationFunctions.TransformationFunction
 
 trait GveGraphCollectionOperators[L <: Gve[L]] extends GraphCollectionOperators[L] {
   this: L#GC =>
@@ -40,6 +42,26 @@ trait GveGraphCollectionOperators[L <: Gve[L]] extends GraphCollectionOperators[
   override def equalsByGraphData(other: L#GC): Boolean = {
     callForValue(new GveEquals(ElementToString.graphHeadToDataString, ElementToString.vertexToDataString,
       ElementToString.edgeToDataString, true), other)
+  }
+
+  def transform(graphHeadTransformationFunction: TransformationFunction[L#G],
+    vertexTransformationFunction: TransformationFunction[L#V],
+    edgeTransformationFunction: TransformationFunction[L#E]): L#GC = {
+    factory.init(graphHeadTransformationFunction(layout.graphHead),
+      vertexTransformationFunction(layout.vertices),
+      edgeTransformationFunction(layout.edges))
+  }
+
+  def transformGraphHead(graphHeadTransformationFunction: TransformationFunction[L#G]): L#GC = {
+    transform(graphHeadTransformationFunction, TransformationFunctions.identity, TransformationFunctions.identity)
+  }
+
+  def transformVertices(vertexTransformationFunction: TransformationFunction[L#V]): L#GC = {
+    transform(TransformationFunctions.identity, vertexTransformationFunction, TransformationFunctions.identity)
+  }
+
+  def transformEdges(edgeTransformationFunction: TransformationFunction[L#E]): L#GC = {
+    transform(TransformationFunctions.identity, TransformationFunctions.identity, edgeTransformationFunction)
   }
 
   // Change layout

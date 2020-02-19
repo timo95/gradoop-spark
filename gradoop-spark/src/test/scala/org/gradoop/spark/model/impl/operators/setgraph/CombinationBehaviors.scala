@@ -9,7 +9,7 @@ import org.scalatest.FunSpec
 trait CombinationBehaviors extends EpgmGradoopSparkTestBase {
   this: FunSpec =>
 
-  def combination(runCombination: (L#LG, L#LG) => L#LG) {
+  def combination(runCombination: (LGve#LG, LGve#LG) => LGve#LG) {
     it("Overlapping graphs", OperatorTest) {
       val loader = getSocialNetworkLoader
       loader.appendToDatabaseFromString("expected[" +

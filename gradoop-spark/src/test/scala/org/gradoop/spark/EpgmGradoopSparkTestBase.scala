@@ -6,5 +6,5 @@ import org.gradoop.spark.util.EpgmConfigs
 
 trait EpgmGradoopSparkTestBase extends GradoopSparkTestBase[EpgmGve] with EpgmConfigs {
 
-  override def getConfig: GradoopSparkConfig[L] = gveConfig
+  override def getConfig: GradoopSparkConfig[LGve] = gveConfig
 }

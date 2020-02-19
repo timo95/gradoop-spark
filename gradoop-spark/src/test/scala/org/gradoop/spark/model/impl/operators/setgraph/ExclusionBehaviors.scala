@@ -10,7 +10,7 @@ import org.scalatest.FunSpec
 trait ExclusionBehaviors extends EpgmGradoopSparkTestBase {
   this: FunSpec =>
 
-  def exclusion(runExclusion: (L#LG, L#LG) => L#LG) {
+  def exclusion(runExclusion: (LGve#LG, LGve#LG) => LGve#LG) {
     it("Overlapping graphs", OperatorTest) {
       val loader = getSocialNetworkLoader
       loader.appendToDatabaseFromString("expected1:Community {interest:\"Databases\", vertexCount:3}" +

@@ -62,7 +62,15 @@ object TflFunctions {
 
   def joinPropMap[EL <: MainElement, P <: MainElement](left: Map[String, Dataset[EL]], right: Map[String, Dataset[P]],
     joinType: String): Map[String, DataFrame] = {
-    left.transform((k, v) => v.join(right(k), Seq(ColumnNames.ID, ColumnNames.LABEL), joinType))
+    left.transform((k, v) => {
+      // Workaround for selfjoin. Alias or joinWith alone don't work, both are needed.
+      val prop = right(k).drop(ColumnNames.LABEL)
+      val propCols = (prop.columns.toSet - ColumnNames.ID).map(s => col("_2." + s))
+      val cols = v.columns.map(s => col("_1." + s)) ++ propCols
+      v.as("l").joinWith(prop.as("r"),
+        col(s"l.${ColumnNames.ID}") === col(s"r.${ColumnNames.ID}"), joinType)
+        .select(cols: _*)
+    })
   }
 
   def splitGraphHeadMap[L <: Tfl[L]](graphHeadMap: Map[String, DataFrame])(implicit pEncoder: Encoder[L#P],

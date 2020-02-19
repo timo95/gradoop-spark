@@ -6,7 +6,7 @@ import org.scalatest.FunSpec
 trait IntersectionBehaviors extends EpgmGradoopSparkTestBase {
   this: FunSpec =>
 
-  def intersection(runIntersection: (L#GC, L#GC) => L#GC) {
+  def intersection(runIntersection: (LGve#GC, LGve#GC) => LGve#GC) {
     it("Overlapping graph collections", OperatorTest) {
       val loader = getSocialNetworkLoader
       val col02 = loader.getGraphCollectionByVariables("g0", "g2")

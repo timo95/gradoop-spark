@@ -35,7 +35,7 @@ class EqualityTest extends EpgmGradoopSparkTestBase with TableDrivenPropertyChec
     "(a1)-[:p]->(b1)" +
     "(b1)-[cyc1]->(b2)-[cyc2]->(b3)-[cyc3]->(b1)]"
 
-  val loader: SparkAsciiGraphLoader[L] = SparkAsciiGraphLoader.fromString(getConfig, asciiGraphs)
+  val loader: SparkAsciiGraphLoader[LGve] = SparkAsciiGraphLoader.fromString(getConfig, asciiGraphs)
 
   describe("Equality GraphCollection") {
 
@@ -136,7 +136,7 @@ class EqualityTest extends EpgmGradoopSparkTestBase with TableDrivenPropertyChec
       forEvery(logicalGraphs) { (left, right, _, _, _, equal) =>
         val leftGraph = loader.getLogicalGraphByVariable(left)
         val rightGraph = loader.getLogicalGraphByVariable(right)
-        val operator = new GveEquals[L](ElementToString.graphHeadToDataString, ElementToString.vertexToDataString,
+        val operator = new GveEquals[LGve](ElementToString.graphHeadToDataString, ElementToString.vertexToDataString,
           ElementToString.edgeToDataString, false)
         assert(leftGraph.callForValue(operator, rightGraph) == equal)
       }

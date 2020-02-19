@@ -8,7 +8,7 @@ import org.scalatest.FunSpec
 trait SubgraphBehaviors extends EpgmGradoopSparkTestBase {
   this: FunSpec =>
 
-  def subgraphBoth(runSubgraphBoth: (L#LG, Column, Column) => L#LG) {
+  def subgraphBoth(runSubgraphBoth: (LGve#LG, Column, Column) => LGve#LG) {
     it("SocialNetworkGraph both", OperatorTest) {
       val loader = getSocialNetworkLoader
       loader.appendToDatabaseFromString("expected:_DB[" +
@@ -59,7 +59,7 @@ trait SubgraphBehaviors extends EpgmGradoopSparkTestBase {
     }
   }
 
-  def subgraphVertexInduced(runSubgraphVertexInduced: (L#LG, Column) => L#LG) {
+  def subgraphVertexInduced(runSubgraphVertexInduced: (LGve#LG, Column) => LGve#LG) {
     it("SocialNetworkGraph vertex induced", OperatorTest) {
       val loader = getSocialNetworkLoader
       loader.appendToDatabaseFromString("expected:_DB[" +
@@ -76,7 +76,7 @@ trait SubgraphBehaviors extends EpgmGradoopSparkTestBase {
     }
   }
 
-  def subgraphEdgeInduced(runSubgraphEdgeInduced: (L#LG, Column) => L#LG) {
+  def subgraphEdgeInduced(runSubgraphEdgeInduced: (LGve#LG, Column) => LGve#LG) {
     it("SocialNetworkGraph edge induced", OperatorTest) {
       val loader = getSocialNetworkLoader
       loader.appendToDatabaseFromString("expected:_DB[" +

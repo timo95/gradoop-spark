@@ -11,14 +11,14 @@ import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}
 import scala.io.Source
 
 class CanonicalAdjacencyMatrixBuilderTest extends EpgmGradoopSparkTestBase {
-  val config: GradoopSparkConfig[L] = getConfig
+  val config: GradoopSparkConfig[LGve] = getConfig
   val gdlPath: String = getClass.getResource("/data/gdl/cam_test.gdl").getFile
-  val loader: SparkAsciiGraphLoader[L] = SparkAsciiGraphLoader.fromFile(getConfig, gdlPath)
-  val collection: GraphCollection[L#T] with GveGraphCollectionOperators[L#T] = loader.getGraphCollection
+  val loader: SparkAsciiGraphLoader[LGve] = SparkAsciiGraphLoader.fromFile(getConfig, gdlPath)
+  val collection: GraphCollection[LGve#T] with GveGraphCollectionOperators[LGve#T] = loader.getGraphCollection
 
   describe("CanonicalAdjacencyMatrixBuilder test") {
     it("Directed", OperatorTest) {
-      val cam = new CanonicalAdjacencyMatrixBuilder[L](graphHeadToDataString,
+      val cam = new CanonicalAdjacencyMatrixBuilder[LGve](graphHeadToDataString,
         vertexToDataString, edgeToDataString,true)
       val result = collection.callForValue(cam)
       val stringPath = getClass.getResource("/data/string/cam_test_directed").getFile
@@ -28,7 +28,7 @@ class CanonicalAdjacencyMatrixBuilderTest extends EpgmGradoopSparkTestBase {
     }
 
     it("Undirected", OperatorTest) {
-      val cam = new CanonicalAdjacencyMatrixBuilder[L](graphHeadToDataString,
+      val cam = new CanonicalAdjacencyMatrixBuilder[LGve](graphHeadToDataString,
         vertexToDataString, edgeToDataString,false)
       val result = collection.callForValue(cam)
       val stringPath = getClass.getResource("/data/string/cam_test_undirected").getFile

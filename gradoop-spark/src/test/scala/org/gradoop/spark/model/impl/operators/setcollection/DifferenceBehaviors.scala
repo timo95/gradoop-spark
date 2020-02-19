@@ -6,7 +6,7 @@ import org.scalatest.FunSpec
 trait DifferenceBehaviors extends EpgmGradoopSparkTestBase {
   this: FunSpec =>
 
-  def difference(runDifference: (L#GC, L#GC) => L#GC) {
+  def difference(runDifference: (LGve#GC, LGve#GC) => LGve#GC) {
     it("Overlapping graph collections", OperatorTest) {
       val loader = getSocialNetworkLoader
       val col02 = loader.getGraphCollectionByVariables("g0", "g2")

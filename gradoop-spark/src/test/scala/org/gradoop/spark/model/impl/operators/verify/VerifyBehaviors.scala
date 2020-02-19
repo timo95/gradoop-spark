@@ -10,7 +10,7 @@ import org.scalatest.FunSpec
 trait VerifyBehaviors extends EpgmGradoopSparkTestBase {
   this: FunSpec =>
 
-  def verify(runVerify: L#LG => L#LG): Unit = {
+  def verify(runVerify: LGve#LG => LGve#LG): Unit = {
     it("Verify with Subgraph", OperatorTest) {
       val loader = getSocialNetworkLoader
       loader.appendToDatabaseFromString("expected:Community {interest : \"Databases\", vertexCount : 3}[" +
@@ -38,7 +38,7 @@ trait VerifyBehaviors extends EpgmGradoopSparkTestBase {
     }
   }
 
-  private def getDanglingEdges(graph: L#LG): Seq[L#E] = {
+  private def getDanglingEdges(graph: LGve#LG): Seq[LGve#E] = {
     import graph.config.Implicits._
     val ids = graph.vertices.collect.map(_.id)
     graph.edges.collect.filter(e => !ids.contains(e.sourceId) || !ids.contains(e.targetId))

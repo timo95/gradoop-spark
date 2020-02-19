@@ -21,13 +21,13 @@ class SubgraphTest extends SubgraphBehaviors {
     it should behave like subgraphEdgeInduced(runTflSubgraph(_, FilterExpressions.any, _, Strategy.EDGE_INDUCED))
   }
 
-  def runGveSubgraph(graph: L#LG, vertexFilterExpression: Column, edgeFilterExpression: Column,
-    strategy: Strategy): L#LG = {
-    graph.callForGraph(new GveSubgraph[L](vertexFilterExpression, edgeFilterExpression, strategy))
+  def runGveSubgraph(graph: LGve#LG, vertexFilterExpression: Column, edgeFilterExpression: Column,
+    strategy: Strategy): LGve#LG = {
+    graph.callForGraph(new GveSubgraph[LGve](vertexFilterExpression, edgeFilterExpression, strategy))
   }
 
-  def runTflSubgraph(graph: L#LG, vertexFilterExpression: Column, edgeFilterExpression: Column,
-    strategy: Strategy): L#LG = {
+  def runTflSubgraph(graph: LGve#LG, vertexFilterExpression: Column, edgeFilterExpression: Column,
+    strategy: Strategy): LGve#LG = {
     graph.asTfl(tflConfig)
       .callForGraph(new TflSubgraph[EpgmTfl](vertexFilterExpression, edgeFilterExpression, strategy))
       .asGve(graph.config)

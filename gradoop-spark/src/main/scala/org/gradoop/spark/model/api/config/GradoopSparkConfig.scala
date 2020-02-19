@@ -10,6 +10,6 @@ class GradoopSparkConfig[L <: LayoutType[L]](val logicalGraphFactory: L#LGF, val
 
   object Implicits extends Implicits with ComponentTypes {
     // Spark session
-    implicit def implicitSparkSession: SparkSession = sparkSession
+    implicit val implicitSparkSession = sparkSession
   }
 }

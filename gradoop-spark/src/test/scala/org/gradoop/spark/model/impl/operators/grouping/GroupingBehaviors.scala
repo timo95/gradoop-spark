@@ -10,7 +10,7 @@ import org.scalatest.FunSpec
 trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
   this: FunSpec =>
 
-  def groupingOnlyProperty(runGrouping: (L#LG, GroupingBuilder) => L#LG): Unit = {
+  def groupingOnlyProperty(runGrouping: (LGve#LG, GroupingBuilder) => LGve#LG): Unit = {
     it("testVertexPropertySymmetricGraph", OperatorTest) {
       val loader = getSocialNetworkLoader
       loader.appendToDatabaseFromString("expected[" +
@@ -283,7 +283,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
     }
   }
 
-  def groupingWithLabel(runGrouping: (L#LG, GroupingBuilder) => L#LG): Unit = {
+  def groupingWithLabel(runGrouping: (LGve#LG, GroupingBuilder) => LGve#LG): Unit = {
     it("testVertexLabel", OperatorTest) {
       val loader = getSocialNetworkLoader
       val graph = loader.getLogicalGraph
@@ -646,7 +646,7 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
     }
   }
 
-  def groupingAggFunctions(runGrouping: (L#LG, GroupingBuilder) => L#LG): Unit = {
+  def groupingAggFunctions(runGrouping: (LGve#LG, GroupingBuilder) => LGve#LG): Unit = {
     val inputGraph = "input[" +
       "(v0:Blue {a : 3})" +
       "(v1:Blue {a : 2})" +

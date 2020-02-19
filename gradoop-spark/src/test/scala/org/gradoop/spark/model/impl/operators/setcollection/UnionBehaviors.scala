@@ -6,7 +6,7 @@ import org.scalatest.FunSpec
 trait UnionBehaviors extends EpgmGradoopSparkTestBase {
   this: FunSpec =>
 
-  def union(runUnion: (L#GC, L#GC) => L#GC) {
+  def union(runUnion: (LGve#GC, LGve#GC) => LGve#GC) {
     it("Overlapping graph collections", OperatorTest) {
       val loader = getSocialNetworkLoader
       val col02 = loader.getGraphCollectionByVariables("g0", "g2")

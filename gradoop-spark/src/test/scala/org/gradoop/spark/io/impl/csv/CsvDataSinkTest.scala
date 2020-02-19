@@ -3,7 +3,6 @@ package org.gradoop.spark.io.impl.csv
 import java.nio.file.Files
 
 import org.apache.spark.sql.SaveMode
-import org.gradoop.common.properties.PropertyValue
 import org.gradoop.spark.IoTest
 import org.gradoop.spark.util.SparkAsciiGraphLoader
 
@@ -50,58 +49,21 @@ class CsvDataSinkTest extends CsvTestBase {
       testCsvWrite(loader.getLogicalGraphByVariable("multiple"))    }
 
     it("logical graph with extended properties", IoTest) {
-      testCsvWrite(getExtendedLogicalGraph(config.logicalGraphFactory))
+      testCsvWrite(getExtendedLogicalGraph)
     }
 
     it("logical graph containing delimiters", IoTest) {
-      val string1 = "abc;,|:\n=\\ def"
-      val string2 = "def;,|:\n=\\ ghi"
-      val list = Seq(PropertyValue(string2), PropertyValue(string1))
-      val set = list.toSet
-      val map1 = Map(
-        PropertyValue(string1) -> PropertyValue(string2),
-        PropertyValue("key") -> PropertyValue(string1)
-      )
-      val map2 = Map(
-        PropertyValue(string1) -> PropertyValue(1),
-        PropertyValue("key") -> PropertyValue(2)
-      )
-      val map3 = Map(
-        PropertyValue(1) -> PropertyValue(string2),
-        PropertyValue(2) -> PropertyValue(string1)
-      )
-      val props = Map(
-        string1 -> PropertyValue(string2),
-        string2 -> PropertyValue(true),
-        "key3" -> PropertyValue(string2),
-        "key4" -> PropertyValue(list),
-        "key5" -> PropertyValue(set),
-        "key6" -> PropertyValue(map1),
-        "key6" -> PropertyValue(map2),
-        "key6" -> PropertyValue(map3)
-      )
-
-      val factory = config.logicalGraphFactory
-      import config.sparkSession.implicits._
-
-      val graphHead = factory.graphHeadFactory.create(string1, props)
-      val graphHeads = factory.createDataset(Seq(graphHead))
-      val vertex = factory.vertexFactory.create(string1, props, Set(graphHead.id))
-      val vertices = factory.createDataset(Seq(vertex))
-      val edge = factory.edgeFactory.create(string1, vertex.id, vertex.id, props, Set(graphHead.id))
-      val edges = factory.createDataset(Seq(edge))
-
-      testCsvWrite(factory.init(graphHeads, vertices, edges))
+      testCsvWrite(getLogicalGraphWithDelimiters)
     }
   }
 
-  private def testCsvWrite(graph: L#LG): Unit = {
+  private def testCsvWrite(graph: LGve#LG): Unit = {
     CsvDataSink(tempDir, getConfig).write(graph, SaveMode.Overwrite)
     val writtenGraph = CsvDataSource(tempDir, getConfig).readLogicalGraph
     assert(graph.equalsByData(writtenGraph))
   }
 
-  private def testCsvWrite(collection: L#GC): Unit = {
+  private def testCsvWrite(collection: LGve#GC): Unit = {
     CsvDataSink(tempDir, getConfig).write(collection, SaveMode.Overwrite)
     val writtenCollection = CsvDataSource(tempDir, getConfig).readGraphCollection
     assert(collection.equalsByGraphData(writtenCollection))
