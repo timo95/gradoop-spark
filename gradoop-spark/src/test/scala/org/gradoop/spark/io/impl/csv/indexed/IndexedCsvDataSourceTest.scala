@@ -6,7 +6,7 @@ import org.gradoop.spark.{EpgmGradoopSparkTestBase, IoTest}
 class IndexedCsvDataSourceTest extends EpgmGradoopSparkTestBase {
 
   it("Read indexed graph collection", IoTest) {
-    val csvPath = getClass.getResource("/data/csv/input_indexed_collection").getFile
+    val csvPath = getClass.getResource("/data/csv/input_indexed_graph_collection").getFile
     val gdlPath = getClass.getResource("/data/gdl/csv_source_expected/expected_graph_collection.gdl").getFile
 
     val dataSource = new IndexedCsvDataSource(csvPath, tflConfig)
@@ -32,7 +32,7 @@ class IndexedCsvDataSourceTest extends EpgmGradoopSparkTestBase {
   }
 
   it("Read indexed graph collection with empty edges", IoTest) {
-    val csvPath = getClass.getResource("/data/csv/input_indexed_collection_no_edges").getFile
+    val csvPath = getClass.getResource("/data/csv/input_indexed_graph_collection_no_edges").getFile
     val gdlPath = getClass.getResource("/data/gdl/csv_source_expected/expected_no_edges.gdl").getFile
 
     val dataSource = new IndexedCsvDataSource(csvPath, tflConfig)

@@ -24,3 +24,7 @@ class PropertyKeyFunction(key: String) extends KeyFunction {
     dataMap.mapValues(e => addKey(e, column))
   }
 }
+
+object PropertyKeyFunction {
+  def apply(key: String): PropertyKeyFunction = new PropertyKeyFunction(key)
+}

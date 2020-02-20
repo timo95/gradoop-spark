@@ -14,12 +14,16 @@ class LabelKeyFunction extends KeyFunction {
     dataFrame.withColumn(ColumnNames.LABEL, column)
   }
 
-  override def addKey(dataMap: Map[String, DataFrame], column: Column)(implicit sparkSession: SparkSession):
-  Map[String, DataFrame] = {
+  override def addKey(dataMap: Map[String, DataFrame], column: Column)
+    (implicit sparkSession: SparkSession): Map[String, DataFrame] = {
     import sparkSession.implicits._
     dataMap.flatMap(e => {
       val labels = e._2.select(column).distinct.as[String].collect
       labels.map(l => (l, addKey(e._2, column).filter(col(ColumnNames.LABEL) === lit(l)).toDF)).toTraversable
     })
   }
+}
+
+object LabelKeyFunction {
+  def apply(): LabelKeyFunction = new LabelKeyFunction()
 }
