@@ -12,9 +12,9 @@ class CsvMetaDataSink(csvPath: String)(implicit sparkSession: SparkSession) exte
     "quote" -> null) // default is '"' but we don't support quoting and don't escape quotes
 
   override def write(metaData: MetaData, saveMode: SaveMode): Unit = {
-    val stringRows = getRows(CsvConstants.GRAPH_TYPE, metaData.graphHeadMetaData).union(
-      getRows(CsvConstants.VERTEX_TYPE, metaData.vertexMetaData)).union(
-      getRows(CsvConstants.EDGE_TYPE, metaData.edgeMetaData))
+    val stringRows = getStrings(CsvConstants.GRAPH_TYPE, metaData.graphHeadMetaData).union(
+      getStrings(CsvConstants.VERTEX_TYPE, metaData.vertexMetaData)).union(
+      getStrings(CsvConstants.EDGE_TYPE, metaData.edgeMetaData))
 
     stringRows
       .write
@@ -23,19 +23,19 @@ class CsvMetaDataSink(csvPath: String)(implicit sparkSession: SparkSession) exte
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.METADATA_FILE)
   }
 
-  private def getRows(elementType: String, metaData: Dataset[ElementMetaData]): DataFrame = {
+  private def getStrings(elementType: String, metaData: Dataset[ElementMetaData]): DataFrame = {
     import org.apache.spark.sql.functions._
 
-    val composeLabel = udf((l: String) => StringEscaper.escape(l, CsvConstants.ESCAPED_CHARS))
-    val composeMetaData = udf((meta: Seq[Row]) => {
-      meta.map(m => StringEscaper.escape(m(0).asInstanceOf[String], CsvConstants.ESCAPED_CHARS) +
-        CsvConstants.PROPERTY_TOKEN_DELIMITER + m(1))
+    val labelToString = udf((l: String) => StringEscaper.escape(l, CsvConstants.ESCAPED_CHARS))
+    val metaDataToString = udf((eleMeta: Seq[Row]) => {
+      eleMeta.map(propMeta => StringEscaper.escape(propMeta(0).asInstanceOf[String], CsvConstants.ESCAPED_CHARS) +
+        CsvConstants.PROPERTY_TOKEN_DELIMITER + propMeta(1))
         .mkString(CsvConstants.LIST_DELIMITER)
     })
 
     metaData.select(lit(elementType),
-      composeLabel(col(ElementMetaData.label)),
-      composeMetaData(col(ElementMetaData.metaData)))
+      labelToString(col(ElementMetaData.label)),
+      metaDataToString(col(ElementMetaData.metaData)))
   }
 }
 

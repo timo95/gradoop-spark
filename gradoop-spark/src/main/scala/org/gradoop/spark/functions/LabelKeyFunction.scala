@@ -6,6 +6,9 @@ import org.gradoop.common.util.ColumnNames
 
 class LabelKeyFunction extends KeyFunction {
 
+  /* Used to improve performance with tfl layout */
+  var labelOpt: Option[Array[String]] = None
+
   override def name: String = ":label"
 
   override def extractKey: Column = col(ColumnNames.LABEL)
@@ -18,8 +21,9 @@ class LabelKeyFunction extends KeyFunction {
     (implicit sparkSession: SparkSession): Map[String, DataFrame] = {
     import sparkSession.implicits._
     dataMap.flatMap(e => {
-      val labels = e._2.select(column).distinct.as[String].collect
-      labels.map(l => (l, addKey(e._2, column).filter(col(ColumnNames.LABEL) === lit(l)).toDF)).toTraversable
+      val df = if(labelOpt.isDefined) e._2 else e._2.cache.toDF
+      val labels = labelOpt.getOrElse(df.select(column).distinct.as[String].collect)
+      labels.map(l => (l, addKey(df, column).filter(col(ColumnNames.LABEL) === lit(l)).toDF)).toTraversable
     })
   }
 }

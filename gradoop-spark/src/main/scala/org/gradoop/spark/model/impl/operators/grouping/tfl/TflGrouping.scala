@@ -5,7 +5,7 @@ import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.{ColumnNames, GradoopConstants}
-import org.gradoop.spark.functions.KeyFunction
+import org.gradoop.spark.functions.{KeyFunction, LabelKeyFunction}
 import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
 import org.gradoop.spark.model.impl.operators.grouping.GroupingUtil._
@@ -43,7 +43,13 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     superVerticesDF = columnsToProperties(superVerticesDF, vertexAggFunctions)
 
     // Add grouping keys to result
+    val vertexLabels = verticesWithKeys.keys.toArray
     for(key <- vertexGroupingKeys) {
+      // Add labels to label key functions
+      key match {
+        case labelFunc: LabelKeyFunction => labelFunc.labelOpt = Some(vertexLabels)
+        case _ => // do nothing
+      }
       superVerticesDF = key.addKey(superVerticesDF, col(KEYS + "." + key.name))
     }
 
@@ -91,7 +97,13 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     superEdgesDF = columnsToProperties(superEdgesDF, edgeAggFunctions)
 
     // Add grouping keys to result
+    val edgeLabels = edgesWithKeys.keys.toArray
     for(key <- edgeGroupingKeys) {
+      // Add labels to label key functions
+      key match {
+        case labelFunc: LabelKeyFunction => labelFunc.labelOpt = Some(edgeLabels)
+        case _ => // do nothing
+      }
       superEdgesDF = key.addKey(superEdgesDF, col(KEYS + "." + key.name))
     }
 
