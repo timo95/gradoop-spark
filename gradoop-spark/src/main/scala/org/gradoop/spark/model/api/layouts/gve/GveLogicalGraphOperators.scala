@@ -65,6 +65,10 @@ trait GveLogicalGraphOperators[L <: Gve[L]] extends LogicalGraphOperators[L] {
 
   override def verify: L#LG = callForGraph(new GveVerify[L])
 
+  override def cache: L#LG = {
+    factory.init(layout.graphHeads.cache, layout.vertices.cache, layout.edges.cache)
+  }
+
   def transform(graphHeadTransformationFunction: TransformationFunction[L#G],
                 vertexTransformationFunction: TransformationFunction[L#V],
                 edgeTransformationFunction: TransformationFunction[L#E]): L#LG = {

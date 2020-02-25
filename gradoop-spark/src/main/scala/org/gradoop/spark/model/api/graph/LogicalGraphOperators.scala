@@ -38,6 +38,8 @@ trait LogicalGraphOperators[L <: LayoutType[L]] {
 
   def verify: L#LG
 
+  def cache: L#LG
+
   // Change layout
 
   def asGve[L2 <: Gve[L2]](config: GradoopSparkConfig[L2]): L2#LG

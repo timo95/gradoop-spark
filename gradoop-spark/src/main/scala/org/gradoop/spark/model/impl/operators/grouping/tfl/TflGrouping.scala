@@ -2,6 +2,7 @@ package org.gradoop.spark.model.impl.operators.grouping.tfl
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
+import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.{ColumnNames, GradoopConstants}
 import org.gradoop.spark.functions.KeyFunction
@@ -28,7 +29,7 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     val vertexKeys: Seq[Column] = if(vertexGroupingKeys.isEmpty) Seq(lit(true))
     else vertexGroupingKeys.map(f => f.extractKey.as(f.name))
     val verticesWithKeys = graph.verticesWithProperties
-      .mapValues(_.withColumn(KEYS, struct(vertexKeys: _*)))
+      .mapValues(_.withColumn(KEYS, struct(vertexKeys: _*)).cache)
 
     // Group and aggregate vertices
     val vertexAgg = if(vertexAggFunctions.isEmpty) Seq(defaultAgg) else vertexAggFunctions
@@ -46,16 +47,19 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
       superVerticesDF = key.addKey(superVerticesDF, col(KEYS + "." + key.name))
     }
 
+    // Cache grouping result
+    superVerticesDF = superVerticesDF.mapValues(_.cache)
+
     // Transform result to vertex and property maps
     val (superVertices, superVertexProperties) = splitVertexMap(superVerticesDF.mapValues(_.drop(KEYS)))
 
     // Extract vertex id -> superId mapping (needed for edges)
+    // The join uses joinWith and alias to enable selfjoin without the optimizer failing
     val unionSuperVertexIds = reduceUnion(superVerticesDF.values)
       .select(col(KEYS).as("superKeys"), col(ColumnNames.ID).as(SUPER_ID))
     val vertexIdMap = reduceUnion(verticesWithKeys.values.map(
       _.joinWith(unionSuperVertexIds, unionSuperVertexIds("superKeys") === col(KEYS))
-        .select(col("_1." + ColumnNames.ID), col("_2." + SUPER_ID))
-        .withColumnRenamed(ColumnNames.ID, VERTEX_ID)))
+        .select(col("_1." + ColumnNames.ID).as(VERTEX_ID), col("_2." + SUPER_ID))))
 
     // ----- Edges -----
 
@@ -125,9 +129,11 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
    * @return dataframe with new id, default label and empty graph ids
    */
   private def addDefaultColumns(dataMap: Map[String, DataFrame]): Map[String, DataFrame] = {
-    dataMap.transform((l, df) => df.withColumn(ColumnNames.ID, longToId(monotonically_increasing_id()))
-      .withColumn(ColumnNames.LABEL, lit(l))
-      .withColumn(ColumnNames.GRAPH_IDS, emptyIdSet()))
+    dataMap.transform((l, df) => df.select(df("*"),
+      longToId(monotonically_increasing_id()).as(ColumnNames.ID),
+      lit(l).as(ColumnNames.LABEL),
+      typedLit[Array[GradoopId]](Array.empty).as(ColumnNames.GRAPH_IDS)
+    ))
   }
 }
 

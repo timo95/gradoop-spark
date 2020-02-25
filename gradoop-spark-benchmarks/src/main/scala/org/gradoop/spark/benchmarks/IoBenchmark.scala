@@ -16,26 +16,26 @@ trait IoBenchmark extends EpgmConfigs {
     verify()
   }
 
-  /** Reads a csv graph as gve, runs the function and writes the result as csv.
+  /** Reads csv graph as gve, runs function and writes result as csv.
    *
    * @param cmdConf command line config with input and output paths
    * @param run benchmark function
    * @param sparkSession spark session
    */
-  protected def runGve(cmdConf: IoConf, run: LGve#LG => LGve#LG)(implicit sparkSession: SparkSession): Unit = {
+  protected def runGveCsv(cmdConf: IoConf, run: LGve#LG => LGve#LG)(implicit sparkSession: SparkSession): Unit = {
     val source = CsvDataSource(cmdConf.input(), gveConfig)
     val graph = source.readLogicalGraph
     val sink = CsvDataSink(cmdConf.output(), gveConfig)
     sink.write(run(graph), SaveMode.Overwrite)
   }
 
-  /** Reads a indexed csv graph as tfl, runs the function and writes the result as indexed csv.
+  /** Reads indexed csv graph as tfl, runs function and writes result as indexed csv.
    *
    * @param cmdConf command line config with input and output paths
    * @param run benchmark function
    * @param sparkSession spark session
    */
-  protected def runTfl(cmdConf: IoConf, run: LTfl#LG => LTfl#LG)(implicit sparkSession: SparkSession): Unit = {
+  protected def runTflIndexed(cmdConf: IoConf, run: LTfl#LG => LTfl#LG)(implicit sparkSession: SparkSession): Unit = {
     val source = IndexedCsvDataSource(cmdConf.input(), tflConfig)
     val graph = source.readLogicalGraph
     val sink = IndexedCsvDataSink(cmdConf.output(), tflConfig)

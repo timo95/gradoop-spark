@@ -35,11 +35,10 @@ class EqualityTest extends EpgmGradoopSparkTestBase with TableDrivenPropertyChec
     "(a1)-[:p]->(b1)" +
     "(b1)-[cyc1]->(b2)-[cyc2]->(b3)-[cyc3]->(b1)]"
 
-  val loader: SparkAsciiGraphLoader[LGve] = SparkAsciiGraphLoader.fromString(getConfig, asciiGraphs)
-
   describe("Equality GraphCollection") {
 
     it("equals by graph ids - directed", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, asciiGraphs)
       val graphCollections = Table(
         ("left", "right", "equals"),
         ("gRef", "gRef", true),
@@ -54,6 +53,7 @@ class EqualityTest extends EpgmGradoopSparkTestBase with TableDrivenPropertyChec
     }
 
     it("equals by graph element ids - directed", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, asciiGraphs)
       val graphCollections = Table(
         ("left", "right", "equals"),
         (Seq("gRef", "gClone", "gEmpty"), Seq("gClone", "gRef", "gEmpty"), true),
@@ -69,6 +69,7 @@ class EqualityTest extends EpgmGradoopSparkTestBase with TableDrivenPropertyChec
     }
 
     it("equals by graph element data - directed", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, asciiGraphs)
       val graphCollections = Table(
         ("left", "right", "equals"),
         (Seq("gRef", "gClone", "gEmpty"), Seq("gClone", "gRef", "gEmpty"), true),
@@ -84,6 +85,7 @@ class EqualityTest extends EpgmGradoopSparkTestBase with TableDrivenPropertyChec
     }
 
     it("equals by graph data - directed", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, asciiGraphs)
       val graphCollections = Table(
         ("left", "right", "equals"),
         (Seq("gRef", "gEmpty"), Seq("gDiffId", "gEmpty"), true),
@@ -112,6 +114,7 @@ class EqualityTest extends EpgmGradoopSparkTestBase with TableDrivenPropertyChec
 
   describe("Equality LogicalGraph") {
     it("equals by element id - directed", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, asciiGraphs)
       forEvery(logicalGraphs) { (left, right, equal, _, _, _) =>
         val leftGraph = loader.getLogicalGraphByVariable(left)
         val rightGraph = loader.getLogicalGraphByVariable(right)
@@ -119,6 +122,7 @@ class EqualityTest extends EpgmGradoopSparkTestBase with TableDrivenPropertyChec
       }
     }
     it("equals by element data - directed", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, asciiGraphs)
       forEvery(logicalGraphs) { (left, right, _, equal, _, _) =>
         val leftGraph = loader.getLogicalGraphByVariable(left)
         val rightGraph = loader.getLogicalGraphByVariable(right)
@@ -126,6 +130,7 @@ class EqualityTest extends EpgmGradoopSparkTestBase with TableDrivenPropertyChec
       }
     }
     it("equals by data - directed", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, asciiGraphs)
       forEvery(logicalGraphs) { (left, right, _, _, equal, _) =>
         val leftGraph = loader.getLogicalGraphByVariable(left)
         val rightGraph = loader.getLogicalGraphByVariable(right)
@@ -133,6 +138,7 @@ class EqualityTest extends EpgmGradoopSparkTestBase with TableDrivenPropertyChec
       }
     }
     it("equals by data - undirected", OperatorTest) {
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, asciiGraphs)
       forEvery(logicalGraphs) { (left, right, _, _, _, equal) =>
         val leftGraph = loader.getLogicalGraphByVariable(left)
         val rightGraph = loader.getLogicalGraphByVariable(right)

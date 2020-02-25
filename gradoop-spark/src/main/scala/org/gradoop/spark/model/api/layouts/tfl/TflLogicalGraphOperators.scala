@@ -60,22 +60,10 @@ trait TflLogicalGraphOperators[L <: Tfl[L]] extends LogicalGraphOperators[L] {
 
   override def verify: L#LG = callForGraph(new TflVerify[L])
 
-  def transform(graphHeadTransformationFunction: TransformationFunction[L#G],
-    vertexTransformationFunction: TransformationFunction[L#V],
-    edgeTransformationFunction: TransformationFunction[L#E]): L#LG = {
-    throw new RuntimeException("Not implemented")
-  }
-
-  def transformGraphHead(graphHeadTransformationFunction: TransformationFunction[L#G]): L#LG = {
-    transform(graphHeadTransformationFunction, TransformationFunctions.identity, TransformationFunctions.identity)
-  }
-
-  def transformVertices(vertexTransformationFunction: TransformationFunction[L#V]): L#LG = {
-    transform(TransformationFunctions.identity, vertexTransformationFunction, TransformationFunctions.identity)
-  }
-
-  def transformEdges(edgeTransformationFunction: TransformationFunction[L#E]): L#LG = {
-    transform(TransformationFunctions.identity, TransformationFunctions.identity, edgeTransformationFunction)
+  override def cache: L#LG = {
+    factory.init(layout.graphHeads.mapValues(_.cache), layout.vertices.mapValues(_.cache),
+      layout.edges.mapValues(_.cache), layout.graphHeadProperties.mapValues(_.cache),
+      layout.vertexProperties.mapValues(_.cache), layout.edgeProperties.mapValues(_.cache))
   }
 
   // Change layout

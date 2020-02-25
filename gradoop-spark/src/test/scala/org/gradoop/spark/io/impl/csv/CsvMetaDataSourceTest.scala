@@ -7,30 +7,43 @@ class CsvMetaDataSourceTest extends EpgmGradoopSparkTestBase {
 
   describe("CsvMetaDataSource - graph collection") {
     val path = getClass.getResource("/data/csv/input_graph_collection").getFile
-    val metaDataSource = CsvMetaDataSource(path)
-
-    val metaData = metaDataSource.read
-
-    val graphHeadMetaData = metaData.graphHeadMetaData.collect()
-    val vertexMetaData = metaData.vertexMetaData.collect()
-    val edgeMetaData = metaData.edgeMetaData.collect()
 
     it("correct number of entries", IoTest) {
+      val metaData = CsvMetaDataSource(path).read
+      val graphHeadMetaData = metaData.graphHeadMetaData.collect()
+      val vertexMetaData = metaData.vertexMetaData.collect()
+      val edgeMetaData = metaData.edgeMetaData.collect()
+
       assert(graphHeadMetaData.length == 2)
       assert(vertexMetaData.length == 2)
       assert(edgeMetaData.length == 2)
     }
     it("correct labels", IoTest) {
+      val metaData = CsvMetaDataSource(path).read
+      val graphHeadMetaData = metaData.graphHeadMetaData.collect()
+      val vertexMetaData = metaData.vertexMetaData.collect()
+      val edgeMetaData = metaData.edgeMetaData.collect()
+
       assert(graphHeadMetaData.map(_.label).sorted.sameElements(Array("g1", "g2")))
       assert(vertexMetaData.map(_.label).sorted.sameElements(Array("A", "B")))
       assert(edgeMetaData.map(_.label).sorted.sameElements(Array("a", "b")))
     }
     it("correct number of properties", IoTest) {
+      val metaData = CsvMetaDataSource(path).read
+      val graphHeadMetaData = metaData.graphHeadMetaData.collect()
+      val vertexMetaData = metaData.vertexMetaData.collect()
+      val edgeMetaData = metaData.edgeMetaData.collect()
+
       assert(graphHeadMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(2, 2)))
       assert(vertexMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(4, 3)))
       assert(edgeMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(2, 1)))
     }
     it("correct properties", IoTest) {
+      val metaData = CsvMetaDataSource(path).read
+      val graphHeadMetaData = metaData.graphHeadMetaData.collect()
+      val vertexMetaData = metaData.vertexMetaData.collect()
+      val edgeMetaData = metaData.edgeMetaData.collect()
+
       val propsG1 = Array(PropertyMetaData("a", "string"), PropertyMetaData("b", "double"))
       val propsG2 = Array(PropertyMetaData("a", "string"), PropertyMetaData("b", "int"))
       assert(graphHeadMetaData.sortBy(_.label).map(_.metaData).sameElements(Array(propsG1.deep, propsG2.deep)))
@@ -54,25 +67,33 @@ class CsvMetaDataSourceTest extends EpgmGradoopSparkTestBase {
 
   describe("CsvMetaDataSource - logical graph with extended properties") {
     val path = getClass.getResource("/data/csv/input_extended_properties").getFile
-    val metaDataSource = CsvMetaDataSource(path)
-
-    val metaData = metaDataSource.read
-
-    val graphHeadMetaData = metaData.graphHeadMetaData.collect()
-    val vertexMetaData = metaData.vertexMetaData.collect()
-    val edgeMetaData = metaData.edgeMetaData.collect()
 
     it("correct number of entries", IoTest) {
+      val metaData = CsvMetaDataSource(path).read
+      val graphHeadMetaData = metaData.graphHeadMetaData.collect()
+      val vertexMetaData = metaData.vertexMetaData.collect()
+      val edgeMetaData = metaData.edgeMetaData.collect()
+
       assert(graphHeadMetaData.length == 1)
       assert(vertexMetaData.length == 2)
       assert(edgeMetaData.length == 1)
     }
     it("correct labels", IoTest) {
+      val metaData = CsvMetaDataSource(path).read
+      val graphHeadMetaData = metaData.graphHeadMetaData.collect()
+      val vertexMetaData = metaData.vertexMetaData.collect()
+      val edgeMetaData = metaData.edgeMetaData.collect()
+
       assert(graphHeadMetaData.map(_.label).sorted.sameElements(Array("Forum")))
       assert(vertexMetaData.map(_.label).sorted.sameElements(Array("Post", "User")))
       assert(edgeMetaData.map(_.label).sorted.sameElements(Array("creatorOf")))
     }
     it("correct number of properties", IoTest) {
+      val metaData = CsvMetaDataSource(path).read
+      val graphHeadMetaData = metaData.graphHeadMetaData.collect()
+      val vertexMetaData = metaData.vertexMetaData.collect()
+      val edgeMetaData = metaData.edgeMetaData.collect()
+
       assert(graphHeadMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(18)))
       assert(vertexMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(18, 18)))
       assert(edgeMetaData.sortBy(_.label).map(_.metaData.length).sameElements(Array(18)))
@@ -98,6 +119,11 @@ class CsvMetaDataSourceTest extends EpgmGradoopSparkTestBase {
         PropertyMetaData("keyg", "set:string"),
         PropertyMetaData("keyh", "set:int")
       )
+
+      val metaData = CsvMetaDataSource(path).read
+      val graphHeadMetaData = metaData.graphHeadMetaData.collect()
+      val vertexMetaData = metaData.vertexMetaData.collect()
+      val edgeMetaData = metaData.edgeMetaData.collect()
 
       assert(graphHeadMetaData.sortBy(_.label).map(_.metaData).sameElements(Array(props.deep)))
       assert(vertexMetaData.sortBy(_.label).map(_.metaData).sameElements(Array(props.deep, props.deep)))

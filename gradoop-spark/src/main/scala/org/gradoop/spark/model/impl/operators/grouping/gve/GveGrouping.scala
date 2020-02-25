@@ -2,6 +2,7 @@ package org.gradoop.spark.model.impl.operators.grouping.gve
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
+import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.{ColumnNames, GradoopConstants}
 import org.gradoop.spark.functions.KeyFunction
@@ -41,7 +42,7 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     // Compute vertex grouping keys
     val vertexKeys: Seq[Column] = if(vertexGroupingKeys.isEmpty) Seq(lit(true))
     else vertexGroupingKeys.map(f => f.extractKey.as(f.name))
-    val verticesWithKeys = graph.vertices.withColumn(KEYS, struct(vertexKeys: _*))
+    val verticesWithKeys = graph.vertices.withColumn(KEYS, struct(vertexKeys: _*)).cache
 
     // Group and aggregate vertices
     val vertexAgg = if(vertexAggFunctions.isEmpty) Seq(defaultAgg) else vertexAggFunctions
@@ -59,6 +60,9 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
       superVerticesDF = key.addKey(superVerticesDF, col(KEYS + "." + key.name))
     }
 
+    // Cache grouping result
+    superVerticesDF = superVerticesDF.cache
+
     // Transform result to vertex
     val superVertices = superVerticesDF
       .drop(KEYS)
@@ -67,8 +71,7 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     // Extract vertex id -> superId mapping (needed for edges)
     val vertexIdMap = verticesWithKeys.select(KEYS, ColumnNames.ID)
       .join(superVerticesDF.select(col(KEYS), col(ColumnNames.ID).as(SUPER_ID)), KEYS)
-      .select(ColumnNames.ID, SUPER_ID)
-      .withColumnRenamed(ColumnNames.ID, VERTEX_ID)
+      .select(col(ColumnNames.ID).as(VERTEX_ID), col(SUPER_ID))
 
     // ----- Edges -----
 
@@ -139,9 +142,10 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
    * @return dataframe with new id, default label and empty graph ids
    */
   private def addDefaultColumns(dataFrame: DataFrame): DataFrame = {
-    dataFrame.withColumn(ColumnNames.ID, longToId(monotonically_increasing_id()))
-      .withColumn(ColumnNames.LABEL, lit(GradoopConstants.DEFAULT_GRAPH_LABEL))
-      .withColumn(ColumnNames.GRAPH_IDS, emptyIdSet())
+    dataFrame.select(dataFrame("*"),
+      longToId(monotonically_increasing_id()).as(ColumnNames.ID),
+      lit(GradoopConstants.DEFAULT_GRAPH_LABEL).as(ColumnNames.LABEL),
+      typedLit[Array[GradoopId]](Array.empty).as(ColumnNames.GRAPH_IDS))
   }
 }
 

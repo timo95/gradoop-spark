@@ -31,8 +31,8 @@ object SubgraphBenchmark extends IoBenchmark {
 
     val cmdConf = new CmdConf(args)
     cmdConf.layout() match {
-      case "gve" => runGve(cmdConf, run(_, cmdConf))
-      case "tfl" => runTfl(cmdConf, run(_, cmdConf))
+      case "gve" => runGveCsv(cmdConf, run[LGve](_, cmdConf))
+      case "tfl" => runTflIndexed(cmdConf, run[LTfl](_, cmdConf))
       case layout: Any => throw new IllegalArgumentException("Layout '%s' is not supported.".format(layout))
     }
   }

@@ -18,7 +18,6 @@ object GroupingUtil {
 
   // UDFs
   val longToId: UserDefinedFunction = udf(long => GradoopId.fromLong(long)) // Use this with spark ids
-  val emptyIdSet: UserDefinedFunction = udf(() => Array.empty[GradoopId])
 
   def getAlias(column: Column): String = {
     val regex = """(?<=AS `)[^`]+(?=`$)""".r

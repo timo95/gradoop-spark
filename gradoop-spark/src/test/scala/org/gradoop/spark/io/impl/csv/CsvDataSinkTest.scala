@@ -10,14 +10,12 @@ class CsvDataSinkTest extends CsvTestBase {
   private val tempDir = Files.createTempDirectory("csv").toString
 
   describe("CsvDataSink") {
-    val config = getConfig
-
     it("social network graph collection", IoTest) {
       testCsvWrite(getSocialNetworkLoader.getGraphCollection)
     }
 
     it("logical graph with different property types for the same property name", IoTest) {
-      val loader = SparkAsciiGraphLoader.fromString(config, "vertices[" +
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "vertices[" +
         "(v1:A {keya:1, keyb:2, keyc:\"Foo\"})" +
         "(v2:A {keya:1.2f, keyb:\"Bar\", keyc:2.3f})" +
         "(v3:A {keya:\"Bar\", keyb:true})]" +
@@ -32,7 +30,7 @@ class CsvDataSinkTest extends CsvTestBase {
     }
 
     it("logical graph with the same label for vertices and edges", IoTest) {
-      val loader = SparkAsciiGraphLoader.fromString(config, "single[" +
+      val loader = SparkAsciiGraphLoader.fromString(gveConfig, "single[" +
         "(v1:A {keya:2})" +
         "(v1)-[e1:A {keya:false}]->(v1)]" +
         "multiple[" +
@@ -58,14 +56,14 @@ class CsvDataSinkTest extends CsvTestBase {
   }
 
   private def testCsvWrite(graph: LGve#LG): Unit = {
-    CsvDataSink(tempDir, getConfig).write(graph, SaveMode.Overwrite)
-    val writtenGraph = CsvDataSource(tempDir, getConfig).readLogicalGraph
+    CsvDataSink(tempDir, gveConfig).write(graph, SaveMode.Overwrite)
+    val writtenGraph = CsvDataSource(tempDir, gveConfig).readLogicalGraph
     assert(graph.equalsByData(writtenGraph))
   }
 
   private def testCsvWrite(collection: LGve#GC): Unit = {
-    CsvDataSink(tempDir, getConfig).write(collection, SaveMode.Overwrite)
-    val writtenCollection = CsvDataSource(tempDir, getConfig).readGraphCollection
+    CsvDataSink(tempDir, gveConfig).write(collection, SaveMode.Overwrite)
+    val writtenCollection = CsvDataSource(tempDir, gveConfig).readGraphCollection
     assert(collection.equalsByGraphData(writtenCollection))
   }
 }
