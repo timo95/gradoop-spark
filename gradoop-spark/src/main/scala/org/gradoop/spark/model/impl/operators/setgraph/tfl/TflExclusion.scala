@@ -30,6 +30,6 @@ class TflExclusion[L <: Tfl[L]] extends BinaryLogicalGraphToLogicalGraphOperator
     val resVertexProps = TflFunctions.inducePropMap(resVertices, left.vertexProperties)
     val resEdgeProps = TflFunctions.inducePropMap(resEdges, left.edgeProperties)
 
-    factory.init(left.graphHeads, resVertices, resEdges, left.graphHeadProperties, resVertexProps, resEdgeProps).verify
+    factory.init(left.graphHeads, resVertices, resEdges, left.graphHeadProperties, resVertexProps, resEdgeProps).removeDanglingEdges
   }
 }

@@ -15,8 +15,7 @@ class PropertyKeyFunction(key: String) extends KeyFunction {
   override def extractKey: Column = nullToProp(col(ColumnNames.PROPERTIES).getField(key))
 
   override def addKey(dataFrame: DataFrame, column: Column): DataFrame = {
-    dataFrame.withColumn(ColumnNames.PROPERTIES,
-      map_concat(col(ColumnNames.PROPERTIES), map(lit(name), column)))
+    dataFrame.withColumn(ColumnNames.PROPERTIES, map_concat(col(ColumnNames.PROPERTIES), map(lit(name), column)))
   }
 
   override def addKey(dataMap: Map[String, DataFrame], column: Column)(implicit sparkSession: SparkSession):

@@ -36,7 +36,7 @@ trait LogicalGraphOperators[L <: LayoutType[L]] {
 
   def edgeInducedSubgraph(edgeFilterExpression: Column): L#LG
 
-  def verify: L#LG
+  def removeDanglingEdges: L#LG
 
   def cache: L#LG
 

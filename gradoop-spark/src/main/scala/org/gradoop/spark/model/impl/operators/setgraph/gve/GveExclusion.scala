@@ -18,6 +18,6 @@ class GveExclusion[L <: Gve[L]] extends BinaryLogicalGraphToLogicalGraphOperator
       .except(right.edges.select(ColumnNames.ID)).dropDuplicates(ColumnNames.ID)
     val resEdges = left.edges.join(remainingEdgeIds, ColumnNames.ID).as[L#E]
 
-    factory.init(left.graphHeads, resVertices, resEdges).verify
+    factory.init(left.graphHeads, resVertices, resEdges).removeDanglingEdges
   }
 }

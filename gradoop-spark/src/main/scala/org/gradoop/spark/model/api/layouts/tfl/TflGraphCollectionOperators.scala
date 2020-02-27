@@ -5,6 +5,7 @@ import org.gradoop.spark.model.api.graph.GraphCollectionOperators
 import org.gradoop.spark.model.impl.operators.changelayout.TflToGve
 import org.gradoop.spark.model.impl.operators.setcollection.tfl.{TflDifference, TflIntersection, TflUnion}
 import org.gradoop.spark.model.impl.types.{Gve, Tfl}
+import org.gradoop.spark.util.TflFunctions
 
 trait TflGraphCollectionOperators[L <: Tfl[L]] extends GraphCollectionOperators[L] {
   this: L#GC =>
@@ -35,6 +36,20 @@ trait TflGraphCollectionOperators[L <: Tfl[L]] extends GraphCollectionOperators[
 
   override def equalsByGraphData(other: L#GC): Boolean = {
     throw new RuntimeException("Not implemented")
+  }
+
+  // Tfl only operators
+
+  /** Verifies, if each dataset only contains the correct label.
+   *
+   * Expensive! Only for debugging!
+   *
+   * @return this or IllegalStateException
+   */
+  def verifyLabels: L#GC = {
+    factory.init(TflFunctions.verifyLabels(layout.graphHead), TflFunctions.verifyLabels(layout.vertices),
+      TflFunctions.verifyLabels(layout.edges), TflFunctions.verifyLabels(layout.graphHeadProperties),
+      TflFunctions.verifyLabels(layout.vertexProperties), TflFunctions.verifyLabels(layout.edgeProperties))
   }
 
   // Change layout

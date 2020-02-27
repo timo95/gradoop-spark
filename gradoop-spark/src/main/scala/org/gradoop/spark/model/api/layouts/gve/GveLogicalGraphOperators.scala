@@ -12,7 +12,7 @@ import org.gradoop.spark.model.impl.operators.grouping.gve.GveGrouping
 import org.gradoop.spark.model.impl.operators.setgraph.gve.{GveCombination, GveExclusion, GveOverlap}
 import org.gradoop.spark.model.impl.operators.subgraph.gve.GveSubgraph
 import org.gradoop.spark.model.impl.operators.tostring.gve.ElementToString
-import org.gradoop.spark.model.impl.operators.verify.gve.GveVerify
+import org.gradoop.spark.model.impl.operators.verify.gve.GveRemoveDanglingEdges
 import org.gradoop.spark.model.impl.types.{Gve, Tfl}
 
 trait GveLogicalGraphOperators[L <: Gve[L]] extends LogicalGraphOperators[L] {
@@ -63,7 +63,7 @@ trait GveLogicalGraphOperators[L <: Gve[L]] extends LogicalGraphOperators[L] {
     callForGraph(GveSubgraph.edgeIncuded[L](edgeFilterExpression))
   }
 
-  override def verify: L#LG = callForGraph(new GveVerify[L])
+  override def removeDanglingEdges: L#LG = callForGraph(new GveRemoveDanglingEdges[L])
 
   override def cache: L#LG = {
     factory.init(layout.graphHeads.cache, layout.vertices.cache, layout.edges.cache)

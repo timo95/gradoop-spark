@@ -8,10 +8,9 @@ import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
 import org.gradoop.spark.model.impl.operators.grouping.tfl.TflGrouping
 import org.gradoop.spark.model.impl.operators.setgraph.tfl.{TflCombination, TflExclusion, TflOverlap}
 import org.gradoop.spark.model.impl.operators.subgraph.tfl.TflSubgraph
-import org.gradoop.spark.model.impl.operators.verify.tfl.TflVerify
+import org.gradoop.spark.model.impl.operators.verify.tfl.TflRemoveDanglingEdges
 import org.gradoop.spark.model.impl.types.{Gve, Tfl}
-import org.gradoop.spark.transformation.TransformationFunctions
-import org.gradoop.spark.transformation.TransformationFunctions.TransformationFunction
+import org.gradoop.spark.util.TflFunctions
 
 trait TflLogicalGraphOperators[L <: Tfl[L]] extends LogicalGraphOperators[L] {
   this: L#LG =>
@@ -58,12 +57,26 @@ trait TflLogicalGraphOperators[L <: Tfl[L]] extends LogicalGraphOperators[L] {
     callForGraph(TflSubgraph.edgeIncuded[L](edgeFilterExpression))
   }
 
-  override def verify: L#LG = callForGraph(new TflVerify[L])
+  override def removeDanglingEdges: L#LG = callForGraph(new TflRemoveDanglingEdges[L])
 
   override def cache: L#LG = {
     factory.init(layout.graphHeads.mapValues(_.cache), layout.vertices.mapValues(_.cache),
       layout.edges.mapValues(_.cache), layout.graphHeadProperties.mapValues(_.cache),
       layout.vertexProperties.mapValues(_.cache), layout.edgeProperties.mapValues(_.cache))
+  }
+
+  // Tfl only operators
+
+  /** Verifies, if each dataset only contains the correct label.
+   *
+   * Expensive! Only for debugging!
+   *
+   * @return this or IllegalStateException
+   */
+  def verifyLabels: L#LG = {
+    factory.init(TflFunctions.verifyLabels(layout.graphHead), TflFunctions.verifyLabels(layout.vertices),
+      TflFunctions.verifyLabels(layout.edges), TflFunctions.verifyLabels(layout.graphHeadProperties),
+      TflFunctions.verifyLabels(layout.vertexProperties), TflFunctions.verifyLabels(layout.edgeProperties))
   }
 
   // Change layout

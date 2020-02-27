@@ -2,8 +2,10 @@ package org.gradoop.spark.util
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, Dataset, Encoder, SparkSession}
+import org.gradoop.common.model.api.components.Labeled
 import org.gradoop.common.model.api.elements.MainElement
 import org.gradoop.common.util.ColumnNames
+import org.gradoop.spark.expressions.FilterExpressions
 import org.gradoop.spark.model.impl.types.Tfl
 
 import scala.collection.mutable
@@ -44,7 +46,7 @@ object TflFunctions {
   }
 
   def reduceUnion(it: Iterable[DataFrame])(implicit sparkSession: SparkSession): DataFrame = {
-    it.reduce(_ union _) // TODO find way to keep row data (for empty DF) or eliminate uses
+    it.reduce(_ union _) // TODO find way to keep columns (for empty DF) or eliminate uses
   }
 
   def reduceUnion[A](it: Iterable[Dataset[A]])(implicit sparkSession: SparkSession, encoder: Encoder[A]): Dataset[A] = {
@@ -114,5 +116,18 @@ object TflFunctions {
         lit(k).as(ColumnNames.LABEL),
         col(ColumnNames.PROPERTIES)).as[L#P])
     (resEdge, resEdgeProp)
+  }
+
+  def verifyLabels[EL <: Labeled](map: Map[String, Dataset[EL]]): Map[String, Dataset[EL]] = {
+    val cached = map.mapValues(_.cache)
+    cached.foreach(e => {
+      val filtered = e._2.filter(not(FilterExpressions.hasLabel(e._1)))
+      if(!filtered.isEmpty) {
+        val label = filtered.collect.head.label
+        throw new IllegalStateException("Tfl Dataset for label '%s' contains wrong label '%s'.".format(e._1, label))
+      }
+    })
+    cached.values.foreach(_.explain)
+    cached
   }
 }

@@ -40,7 +40,7 @@ class TflSubgraph[L <: Tfl[L]](vertexFilterExpression: Column, edgeFilterExpress
         // Split element and properties
         val (resVert, resVertProp) = TflFunctions.splitVertexMap(filteredVertices)
         graph.factory.init(graph.graphHead, resVert, graph.edges,
-          graph.graphHeadProperties, resVertProp, graph.edgeProperties).verify
+          graph.graphHeadProperties, resVertProp, graph.edgeProperties).removeDanglingEdges
 
       case Strategy.EDGE_INDUCED =>
         // Filter element + properties combined

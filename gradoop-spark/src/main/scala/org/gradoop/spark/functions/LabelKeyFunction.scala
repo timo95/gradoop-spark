@@ -23,7 +23,7 @@ class LabelKeyFunction extends KeyFunction {
     dataMap.flatMap(e => {
       val df = if(labelOpt.isDefined) e._2 else e._2.cache.toDF
       val labels = labelOpt.getOrElse(df.select(column).distinct.as[String].collect)
-      labels.map(l => (l, addKey(df, column).filter(col(ColumnNames.LABEL) === lit(l)).toDF)).toTraversable
+      labels.map(l => (l, df.filter(column === lit(l)).withColumn(ColumnNames.LABEL, lit(l)).toDF))
     })
   }
 }

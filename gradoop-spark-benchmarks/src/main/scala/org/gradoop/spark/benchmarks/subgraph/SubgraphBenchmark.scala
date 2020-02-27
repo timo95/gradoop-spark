@@ -47,7 +47,7 @@ object SubgraphBenchmark extends IoBenchmark {
       case None => FilterExpressions.any
     }
 
-    if(cmdConf.verifySubgraph()) graph.subgraph(vertexFilterString, edgeFilterString).verify
+    if(cmdConf.verifySubgraph()) graph.subgraph(vertexFilterString, edgeFilterString).removeDanglingEdges
     else graph.subgraph(vertexFilterString, edgeFilterString)
   }
 }
