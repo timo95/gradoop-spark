@@ -1,4 +1,4 @@
-package org.gradoop.spark.model.impl.operators.verify.gve
+package org.gradoop.spark.model.impl.operators.removedanglingedges.gve
 
 import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.types.Gve

@@ -1,4 +1,4 @@
-package org.gradoop.spark.model.impl.operators.verify.tfl
+package org.gradoop.spark.model.impl.operators.removedanglingedges.tfl
 
 import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.types.Tfl

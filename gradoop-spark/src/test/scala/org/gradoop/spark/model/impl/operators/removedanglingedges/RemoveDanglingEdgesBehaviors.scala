@@ -1,4 +1,4 @@
-package org.gradoop.spark.model.impl.operators.verify
+package org.gradoop.spark.model.impl.operators.removedanglingedges
 
 import org.apache.spark.sql.functions._
 import org.gradoop.common.properties.PropertyValue
@@ -30,11 +30,9 @@ trait RemoveDanglingEdgesBehaviors extends EpgmGradoopSparkTestBase {
 
       assert(danglingEdges == expectedDanglingEdges)
 
-      // Now run verify and check if those edges were removed.
-      val verifiedSubgraph = runRemoveDanglingEdges(subgraph)
-      assert(getDanglingEdges(verifiedSubgraph).isEmpty, "Graph contained dangling edges.")
-      // Check if nothing else has been removed (i.e. the result is correct)
-      assert(loader.getLogicalGraphByVariable("expected").equalsByData(verifiedSubgraph))
+      val result = runRemoveDanglingEdges(subgraph)
+      assert(getDanglingEdges(result).isEmpty, "Graph contained dangling edges.")
+      assert(result.equalsByData(loader.getLogicalGraphByVariable("expected")))
     }
   }
 

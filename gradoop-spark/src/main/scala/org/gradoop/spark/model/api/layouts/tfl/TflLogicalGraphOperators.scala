@@ -8,7 +8,7 @@ import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
 import org.gradoop.spark.model.impl.operators.grouping.tfl.TflGrouping
 import org.gradoop.spark.model.impl.operators.setgraph.tfl.{TflCombination, TflExclusion, TflOverlap}
 import org.gradoop.spark.model.impl.operators.subgraph.tfl.TflSubgraph
-import org.gradoop.spark.model.impl.operators.verify.tfl.TflRemoveDanglingEdges
+import org.gradoop.spark.model.impl.operators.removedanglingedges.tfl.TflRemoveDanglingEdges
 import org.gradoop.spark.model.impl.types.{Gve, Tfl}
 import org.gradoop.spark.util.TflFunctions
 

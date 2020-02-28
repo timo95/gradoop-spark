@@ -1,4 +1,4 @@
-package org.gradoop.spark.model.impl.operators.verify
+package org.gradoop.spark.model.impl.operators.removedanglingedges
 
 class RemoveDanglingEdgesTest extends RemoveDanglingEdgesBehaviors {
 

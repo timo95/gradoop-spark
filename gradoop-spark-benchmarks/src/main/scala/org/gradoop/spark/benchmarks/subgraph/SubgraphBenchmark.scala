@@ -15,8 +15,8 @@ object SubgraphBenchmark extends IoBenchmark {
   class CmdConf(arguments: Seq[String]) extends IoConf(arguments) {
     val layout: ScallopOption[String] = opt[String](default = Some("gve"),
       descr = "Graph Layout (gve, tfl)")
-    val verifySubgraph: ScallopOption[Boolean] = toggle(default = Some(false),
-      descrYes = "Verifies the Graph after applying Subgraph")
+    val removeDanglingEdges: ScallopOption[Boolean] = toggle(default = Some(false),
+      descrYes = "Removes dangling edges after applying Subgraph")
     val vertexLabel: ScallopOption[String] = opt[String](name = "vl", noshort = true,
       descr = "Label to filter the vertices")
     val edgeLabel: ScallopOption[String] = opt[String](name = "el", noshort = true,
@@ -47,7 +47,7 @@ object SubgraphBenchmark extends IoBenchmark {
       case None => FilterExpressions.any
     }
 
-    if(cmdConf.verifySubgraph()) graph.subgraph(vertexFilterString, edgeFilterString).removeDanglingEdges
+    if(cmdConf.removeDanglingEdges()) graph.subgraph(vertexFilterString, edgeFilterString).removeDanglingEdges
     else graph.subgraph(vertexFilterString, edgeFilterString)
   }
 }

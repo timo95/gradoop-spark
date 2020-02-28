@@ -23,7 +23,7 @@ class GveSubgraph[L <: Gve[L]](vertexFilterExpression: Column, edgeFilterExpress
 
       case Strategy.VERTEX_INDUCED =>
         val filteredVertices = graph.vertices.filter(vertexFilterExpression)
-        graph.factory.init(graph.graphHead, filteredVertices, graph.edges).removeDanglingEdges // verify induces the edges
+        graph.factory.init(graph.graphHead, filteredVertices, graph.edges).removeDanglingEdges
 
       case Strategy.EDGE_INDUCED =>
         val filteredEdges = graph.edges.filter(edgeFilterExpression)
