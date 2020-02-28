@@ -6,16 +6,16 @@ import org.gradoop.spark.model.api.graph.LogicalGraphOperators
 import org.gradoop.spark.model.impl.operators.changelayout.TflToGve
 import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
 import org.gradoop.spark.model.impl.operators.grouping.tfl.TflGrouping
+import org.gradoop.spark.model.impl.operators.removedanglingedges.tfl.TflRemoveDanglingEdges
 import org.gradoop.spark.model.impl.operators.setgraph.tfl.{TflCombination, TflExclusion, TflOverlap}
 import org.gradoop.spark.model.impl.operators.subgraph.tfl.TflSubgraph
-import org.gradoop.spark.model.impl.operators.removedanglingedges.tfl.TflRemoveDanglingEdges
 import org.gradoop.spark.model.impl.types.{Gve, Tfl}
 import org.gradoop.spark.util.TflFunctions
 
 trait TflLogicalGraphOperators[L <: Tfl[L]] extends LogicalGraphOperators[L] {
   this: L#LG =>
 
-  // General operators
+  // ----- General operators -----
 
   override def combine(other: L#LG): L#LG = {
     callForGraph(new TflCombination[L], other)
@@ -65,11 +65,11 @@ trait TflLogicalGraphOperators[L <: Tfl[L]] extends LogicalGraphOperators[L] {
       layout.vertexProperties.mapValues(_.cache), layout.edgeProperties.mapValues(_.cache))
   }
 
-  // Tfl only operators
+  // ----- Tfl only operators -----
 
   /** Verifies, if each dataset only contains the correct label.
    *
-   * Expensive! Only for debugging!
+   * Expensive! Only for debugging/testing!
    *
    * @return this or IllegalStateException
    */
@@ -79,13 +79,13 @@ trait TflLogicalGraphOperators[L <: Tfl[L]] extends LogicalGraphOperators[L] {
       TflFunctions.verifyLabels(layout.vertexProperties), TflFunctions.verifyLabels(layout.edgeProperties))
   }
 
-  // Change layout
+  // ----- Change layout -----
 
   def asGve[L2 <: Gve[L2]](config: GradoopSparkConfig[L2]): L2#LG = {
     callForValue(new TflToGve[L, L2](config))
   }
 
   def asTfl[L2 <: Tfl[L2]](config: GradoopSparkConfig[L2]): L2#LG = {
-    this.asInstanceOf[L2#LG] // only works, if L2 has the same ModelType
+    this.asInstanceOf[L2#LG] // only works, if L2 == L
   }
 }

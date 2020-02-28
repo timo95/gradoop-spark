@@ -3,12 +3,13 @@ package org.gradoop.spark.model.impl.operators.subgraph.gve
 import org.apache.spark.sql.Column
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.expressions.FilterExpressions
+import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOperator
+import org.gradoop.spark.model.impl.operators.subgraph.Strategy
 import org.gradoop.spark.model.impl.operators.subgraph.Strategy.Strategy
-import org.gradoop.spark.model.impl.operators.subgraph.{Strategy, Subgraph}
 import org.gradoop.spark.model.impl.types.Gve
 
 class GveSubgraph[L <: Gve[L]](vertexFilterExpression: Column, edgeFilterExpression: Column, strategy: Strategy)
-  extends Subgraph[L] {
+  extends UnaryLogicalGraphToLogicalGraphOperator[L#LG] {
 
   override def execute(graph: L#LG): L#LG = {
     val factory = graph.factory

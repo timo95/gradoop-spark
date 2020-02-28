@@ -12,7 +12,7 @@ import scala.collection.mutable
 
 object TflFunctions {
 
-  // General map functions
+  // ----- General map functions -----
 
   /** Merge two maps while applying the merge function. Outer. */
   def mergeMapsOuter[A](left: Map[String, A], right: Map[String, A], merge: (A, A) => A): Map[String, A] = {
@@ -41,20 +41,31 @@ object TflFunctions {
     })
   }
 
+  // ----- Tfl specific functions -----
+
+  /** Apply union between two tfl maps. */
   def unionMaps[A](left: Map[String, Dataset[A]], right: Map[String, Dataset[A]]): Map[String, Dataset[A]] = {
     mergeMapsOuter[Dataset[A]](left, right, _ union _)
   }
 
-  def reduceUnion(it: Iterable[DataFrame])(implicit sparkSession: SparkSession): DataFrame = {
-    it.reduce(_ union _) // TODO find way to keep columns (for empty DF) or eliminate uses
+  /** Reduces tfl map to single dataframe using union.
+   *
+   * Fails when dataFrames is empty. Prefer using datasets when possible.
+   *
+   * @param dataFrames iterable of dataframes
+   * @param sparkSession spark session
+   * @return union of dataframes
+   */
+  def reduceUnion(dataFrames: Iterable[DataFrame])(implicit sparkSession: SparkSession): DataFrame = {
+    dataFrames.reduce(_ union _)
   }
 
-  def reduceUnion[A](it: Iterable[Dataset[A]])(implicit sparkSession: SparkSession, encoder: Encoder[A]): Dataset[A] = {
-    it.reduceOption(_ union _).getOrElse(sparkSession.emptyDataset[A])
+  /** Reduces tfl map to single dataframe using union. */
+  def reduceUnion[A](datasets: Iterable[Dataset[A]])(implicit sparkSession: SparkSession, encoder: Encoder[A]): Dataset[A] = {
+    datasets.reduceOption(_ union _).getOrElse(sparkSession.emptyDataset[A])
   }
 
-  // Properties map functions
-
+  /** Remove properties of missing elements. */
   def inducePropMap[EL <: MainElement, P <: MainElement](element: Map[String, Dataset[EL]], prop: Map[String, Dataset[P]])
     (implicit pEncoder: Encoder[P]): Map[String, Dataset[P]] = {
     joinPropMap(element, prop, "left").transform((k, v) => v.select(col(ColumnNames.ID),
@@ -62,6 +73,7 @@ object TflFunctions {
       col(ColumnNames.PROPERTIES)).as[P])
   }
 
+  /** Join property map to element map. */
   def joinPropMap[EL <: MainElement, P <: MainElement](left: Map[String, Dataset[EL]], right: Map[String, Dataset[P]],
     joinType: String): Map[String, DataFrame] = {
     left.transform((k, v) => {
@@ -75,6 +87,7 @@ object TflFunctions {
     })
   }
 
+  /** Split map in element map and property map. */
   def splitGraphHeadMap[L <: Tfl[L]](graphHeadMap: Map[String, DataFrame])(implicit pEncoder: Encoder[L#P],
     gEncoder: Encoder[L#G]): (Map[String, Dataset[L#G]], Map[String, Dataset[L#P]]) = {
     // Split map in main element and property maps. Use constant as label.
@@ -88,6 +101,7 @@ object TflFunctions {
     (resGrap, resGrapProp)
   }
 
+  /** Split map in element map and property map. */
   def splitVertexMap[L <: Tfl[L]](vertexMap: Map[String, DataFrame])(implicit pEncoder: Encoder[L#P],
     vEncoder: Encoder[L#V]): (Map[String, Dataset[L#V]], Map[String, Dataset[L#P]]) = {
     // Split map in main element and property maps. Use constant as label.
@@ -102,6 +116,7 @@ object TflFunctions {
     (resVert, resVertProp)
   }
 
+  /** Split map in element map and property map. */
   def splitEdgeMap[L <: Tfl[L]](edgeMap: Map[String, DataFrame])(implicit pEncoder: Encoder[L#P],
     eEncoder: Encoder[L#E]): (Map[String, Dataset[L#E]], Map[String, Dataset[L#P]]) = {
     // Split map in main element and property maps. Use constant as label.
@@ -118,6 +133,7 @@ object TflFunctions {
     (resEdge, resEdgeProp)
   }
 
+  /** Verify that datasets only contain the map key as label. */
   def verifyLabels[EL <: Labeled](map: Map[String, Dataset[EL]]): Map[String, Dataset[EL]] = {
     val cached = map.mapValues(_.cache)
     cached.foreach(e => {
@@ -127,7 +143,6 @@ object TflFunctions {
         throw new IllegalStateException("Tfl Dataset for label '%s' contains wrong label '%s'.".format(e._1, label))
       }
     })
-    cached.values.foreach(_.explain)
     cached
   }
 }

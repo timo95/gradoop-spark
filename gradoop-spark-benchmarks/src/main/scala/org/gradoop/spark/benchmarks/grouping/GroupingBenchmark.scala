@@ -2,7 +2,7 @@ package org.gradoop.spark.benchmarks.grouping
 
 import org.apache.spark.sql.{Column, SparkSession}
 import org.gradoop.spark.benchmarks.IoBenchmark
-import org.gradoop.spark.expressions.AggregateExpressions
+import org.gradoop.spark.expressions.AggregationExpressions
 import org.gradoop.spark.functions.{LabelKeyFunction, PropertyKeyFunction}
 import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
 import org.gradoop.spark.model.impl.types.LayoutType
@@ -79,10 +79,10 @@ class GroupingBenchmark extends IoBenchmark {
     var agg = Seq.empty[Column]
     while(it.hasNext) {
       it.next match {
-        case COUNT => agg = agg :+ AggregateExpressions.count
-        case MIN => agg = agg :+ AggregateExpressions.minProp(it.next)
-        case MAX => agg = agg :+ AggregateExpressions.maxProp(it.next)
-        case SUM => agg = agg :+ AggregateExpressions.sumProp(it.next)
+        case COUNT => agg = agg :+ AggregationExpressions.count
+        case MIN => agg = agg :+ AggregationExpressions.minProp(it.next)
+        case MAX => agg = agg :+ AggregationExpressions.maxProp(it.next)
+        case SUM => agg = agg :+ AggregationExpressions.sumProp(it.next)
         case any: String => throw new IllegalArgumentException("Aggregate function '%s' is not supported".format(any))
       }
     }

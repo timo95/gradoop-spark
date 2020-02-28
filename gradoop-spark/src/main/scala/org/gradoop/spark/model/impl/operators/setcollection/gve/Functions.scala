@@ -4,9 +4,9 @@ import org.apache.spark.sql.{DataFrame, Dataset, Encoder, SparkSession}
 import org.gradoop.common.model.api.elements.GraphElement
 import org.gradoop.common.util.ColumnNames
 
-trait GveSetBase {
+private[gve] object Functions {
 
-  protected def removeUncontainedElements[EL <: GraphElement](elements: Dataset[EL], graphIds: DataFrame)
+  def removeUncontainedElements[EL <: GraphElement](elements: Dataset[EL], graphIds: DataFrame)
     (implicit sparkSession: SparkSession, encoder: Encoder[EL]): Dataset[EL] = {
     import org.apache.spark.sql.functions._
     import org.gradoop.spark.util.Implicits._

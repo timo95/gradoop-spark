@@ -1,14 +1,12 @@
 package org.gradoop.spark.model.impl.operators.grouping.gve
 
-import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{Column, DataFrame, SparkSession}
-import org.gradoop.common.id.GradoopId
-import org.gradoop.common.properties.PropertyValue
-import org.gradoop.common.util.{ColumnNames, GradoopConstants}
+import org.apache.spark.sql.{Column, SparkSession}
+import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.functions.KeyFunction
 import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
-import org.gradoop.spark.model.impl.operators.grouping.GroupingUtil._
+import org.gradoop.spark.model.impl.operators.grouping.Functions._
+import org.gradoop.spark.model.impl.operators.grouping.gve.Functions._
 import org.gradoop.spark.model.impl.types.Gve
 
 /** Gve implementation of the Grouping operator.
@@ -45,7 +43,7 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     val verticesWithKeys = graph.vertices.withColumn(KEYS, struct(vertexKeys: _*)).cache
 
     // Group and aggregate vertices
-    val vertexAgg = if(vertexAggFunctions.isEmpty) Seq(defaultAgg) else vertexAggFunctions
+    val vertexAgg = if(vertexAggFunctions.isEmpty) Seq(DEFAULT_AGG) else vertexAggFunctions
     var superVerticesDF = verticesWithKeys.groupBy(KEYS)
       .agg(vertexAgg.head, vertexAgg.drop(1): _*)
 
@@ -90,7 +88,7 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
       .withColumnRenamed(SUPER_ID, ColumnNames.TARGET_ID)
 
     // Group and aggregate edges
-    val edgeAgg = if(edgeAggFunctions.isEmpty) Seq(defaultAgg) else edgeAggFunctions
+    val edgeAgg = if(edgeAggFunctions.isEmpty) Seq(DEFAULT_AGG) else edgeAggFunctions
     var superEdgesDF = updatedEdges
       .groupBy(KEYS, ColumnNames.SOURCE_ID, ColumnNames.TARGET_ID)
       .agg(edgeAgg.head, edgeAgg.drop(1): _*)
@@ -112,40 +110,6 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
       .as[L#E]
 
     factory.create(superVertices, superEdges)
-  }
-
-  /** Transforms the given columns to a property map.
-   *
-   * Any previous property map is overwritten.
-   * If the column list is empty, an empty property map is added.
-   *
-   * @param dataFrame dataframe with given columns
-   * @param columns column expressions used for columns
-   * @return dataframe with given columns moved to properties map
-   */
-  private def columnsToProperties(dataFrame: DataFrame, columns: Seq[Column]): DataFrame = {
-    if(columns.isEmpty) {
-      dataFrame.withColumn(ColumnNames.PROPERTIES, typedLit(Map.empty[String, PropertyValue]))
-        .drop(getAlias(defaultAgg))
-    } else {
-      val columnNames = columns.map(c => getAlias(c))
-      dataFrame.withColumn(ColumnNames.PROPERTIES, map_from_arrays(
-        array(columnNames.map(n => lit(n)): _*),
-        array(columnNames.map(n => col(n)): _*)))
-        .drop(columnNames: _*)
-    }
-  }
-
-  /** Adds default id, label and graphIds to dataframe.
-   *
-   * @param dataFrame dataframe
-   * @return dataframe with new id, default label and empty graph ids
-   */
-  private def addDefaultColumns(dataFrame: DataFrame): DataFrame = {
-    dataFrame.select(dataFrame("*"),
-      longToId(monotonically_increasing_id()).as(ColumnNames.ID),
-      lit(GradoopConstants.DEFAULT_GRAPH_LABEL).as(ColumnNames.LABEL),
-      typedLit[Array[GradoopId]](Array.empty).as(ColumnNames.GRAPH_IDS))
   }
 }
 

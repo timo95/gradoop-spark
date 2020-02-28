@@ -1,14 +1,12 @@
 package org.gradoop.spark.model.impl.operators.grouping.tfl
 
-import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{Column, DataFrame, SparkSession}
-import org.gradoop.common.id.GradoopId
-import org.gradoop.common.properties.PropertyValue
+import org.apache.spark.sql.{Column, SparkSession}
 import org.gradoop.common.util.{ColumnNames, GradoopConstants}
 import org.gradoop.spark.functions.{KeyFunction, LabelKeyFunction}
 import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
-import org.gradoop.spark.model.impl.operators.grouping.GroupingUtil._
+import org.gradoop.spark.model.impl.operators.grouping.Functions._
+import org.gradoop.spark.model.impl.operators.grouping.tfl.Functions._
 import org.gradoop.spark.model.impl.types.Tfl
 import org.gradoop.spark.util.TflFunctions._
 
@@ -32,7 +30,7 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
       .mapValues(_.withColumn(KEYS, struct(vertexKeys: _*)).cache)
 
     // Group and aggregate vertices
-    val vertexAgg = if(vertexAggFunctions.isEmpty) Seq(defaultAgg) else vertexAggFunctions
+    val vertexAgg = if(vertexAggFunctions.isEmpty) Seq(DEFAULT_AGG) else vertexAggFunctions
     var superVerticesDF = Map(GradoopConstants.DEFAULT_GRAPH_LABEL ->
       reduceUnion(verticesWithKeys.values).groupBy(KEYS).agg(vertexAgg.head, vertexAgg.drop(1): _*))
 
@@ -85,7 +83,7 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
         .withColumnRenamed(SUPER_ID, ColumnNames.TARGET_ID))
 
     // Group and aggregate edges
-    val edgeAgg = if(edgeAggFunctions.isEmpty) Seq(defaultAgg) else edgeAggFunctions
+    val edgeAgg = if(edgeAggFunctions.isEmpty) Seq(DEFAULT_AGG) else edgeAggFunctions
     var superEdgesDF = Map(GradoopConstants.DEFAULT_GRAPH_LABEL -> reduceUnion(updatedEdges.values)
       .groupBy(KEYS, ColumnNames.SOURCE_ID, ColumnNames.TARGET_ID)
       .agg(edgeAgg.head, edgeAgg.drop(1): _*))
@@ -111,41 +109,6 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     val (superEdges, superEdgeProperties) = splitEdgeMap(superEdgesDF.mapValues(_.drop(KEYS)))
 
     factory.create(superVertices, superEdges, superVertexProperties, superEdgeProperties)
-  }
-
-  /** Transforms the given columns to a property map.
-   *
-   * Any previous property map is overwritten.
-   * If the column list is empty, an empty property map is added.
-   *
-   * @param dataMap dataframe with given columns
-   * @param columns column expressions used for columns
-   * @return dataframe with given columns moved to properties map
-   */
-  private def columnsToProperties(dataMap: Map[String, DataFrame], columns: Seq[Column]): Map[String, DataFrame] = {
-    if(columns.isEmpty) {
-      dataMap.mapValues(_.withColumn(ColumnNames.PROPERTIES, typedLit(Map.empty[String, PropertyValue]))
-        .drop(getAlias(defaultAgg)))
-    } else {
-      val columnNames = columns.map(c => getAlias(c))
-      dataMap.mapValues(_.withColumn(ColumnNames.PROPERTIES, map_from_arrays(
-        array(columnNames.map(n => lit(n)): _*),
-        array(columnNames.map(n => col(n)): _*)))
-        .drop(columnNames: _*))
-    }
-  }
-
-  /** Adds default id, label and graphIds to dataframe.
-   *
-   * @param dataMap dataframe
-   * @return dataframe with new id, default label and empty graph ids
-   */
-  private def addDefaultColumns(dataMap: Map[String, DataFrame]): Map[String, DataFrame] = {
-    dataMap.transform((l, df) => df.select(df("*"),
-      longToId(monotonically_increasing_id()).as(ColumnNames.ID),
-      lit(l).as(ColumnNames.LABEL),
-      typedLit[Array[GradoopId]](Array.empty).as(ColumnNames.GRAPH_IDS)
-    ))
   }
 }
 

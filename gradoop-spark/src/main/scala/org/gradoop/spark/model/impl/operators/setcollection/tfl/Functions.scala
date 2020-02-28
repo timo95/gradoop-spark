@@ -4,7 +4,7 @@ import org.apache.spark.sql.{DataFrame, Dataset, Encoder, SparkSession}
 import org.gradoop.common.model.api.elements.GraphElement
 import org.gradoop.common.util.ColumnNames
 
-trait TflSetBase {
+private[tfl] object Functions {
 
   def removeUncontainedElements[EL <: GraphElement](elements: Map[String, Dataset[EL]], graphIds: DataFrame)
     (implicit sparkSession: SparkSession, encoder: Encoder[EL]): Map[String, Dataset[EL]] = {

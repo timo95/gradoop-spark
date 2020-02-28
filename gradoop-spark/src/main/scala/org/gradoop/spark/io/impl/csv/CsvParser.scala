@@ -37,8 +37,8 @@ object CsvParser extends Serializable {
       (0 until length)
         .filter(i => !propertyStrings(i).equals("")) // empty value => no property value
         .map(i => {
-          val key = metaData(i)(0).asInstanceOf[String] // workaround for weird bug, cannot cast to PropertyMetaData
-          val typeString = metaData(i)(1).asInstanceOf[String] // TODO build minimal example (struct + udf)
+          val key = metaData(i)(0).asInstanceOf[String] // udf does not support case class input
+          val typeString = metaData(i)(1).asInstanceOf[String]
           (key, propertyParser(typeString)(propertyStrings(i)))
         })
     }

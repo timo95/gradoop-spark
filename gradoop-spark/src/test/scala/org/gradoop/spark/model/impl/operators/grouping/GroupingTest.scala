@@ -17,16 +17,16 @@ class GroupingTest extends GroupingBehaviors {
       graph.asTfl(tflConfig).groupBy(builder).asGve(gveConfig))
   }
 
-  describe("GroupingUtil") {
+  describe("Functions") {
     it("getAlias") {
       import org.apache.spark.sql.functions._
 
       val col1 = max(col("df")).getField("AS ").alias("abc").isNotNull
         .alias("result")
-      assert(GroupingUtil.getAlias(col1) == "result")
+      assert(Functions.getAlias(col1) == "result")
 
       val col2 = map_from_entries(col("AS df" + col("adsf")))
-      assertThrows[IllegalArgumentException](GroupingUtil.getAlias(col2))
+      assertThrows[IllegalArgumentException](Functions.getAlias(col2))
     }
   }
 }

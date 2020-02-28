@@ -3,10 +3,11 @@ package org.gradoop.spark.model.impl.operators.setcollection.tfl
 import org.apache.spark.sql.{DataFrame, Dataset}
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.model.api.operators.BinaryGraphCollectionToGraphCollectionOperator
+import org.gradoop.spark.model.impl.operators.setcollection.tfl.Functions.removeUncontainedElements
 import org.gradoop.spark.model.impl.types.Tfl
 import org.gradoop.spark.util.TflFunctions
 
-class TflDifference[L <: Tfl[L]] extends BinaryGraphCollectionToGraphCollectionOperator[L#GC] with TflSetBase {
+class TflDifference[L <: Tfl[L]] extends BinaryGraphCollectionToGraphCollectionOperator[L#GC] {
 
   override def execute(left: L#GC, right: L#GC): L#GC = {
     val factory = left.factory

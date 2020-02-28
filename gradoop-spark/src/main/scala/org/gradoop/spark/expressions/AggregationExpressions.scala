@@ -7,9 +7,9 @@ import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.expressions.udaf.{MaxAggregateFunction, MinAggregateFunction, SumAggregateFunction}
 
 /**
- * Aggregation column expressions, returns property value
+ * Aggregation column expressions, result in property values
  */
-object AggregateExpressions {
+object AggregationExpressions {
 
   private val toProp = udf((v: Any) => PropertyValue(v))
 

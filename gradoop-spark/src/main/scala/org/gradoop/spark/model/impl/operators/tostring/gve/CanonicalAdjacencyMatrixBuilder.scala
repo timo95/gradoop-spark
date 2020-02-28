@@ -1,9 +1,9 @@
 package org.gradoop.spark.model.impl.operators.tostring.gve
 
 import org.apache.spark.sql.SparkSession
-import org.gradoop.common.id.GradoopId
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.operators.{UnaryGraphCollectionToValueOperator, UnaryLogicalGraphToValueOperator}
+import org.gradoop.spark.model.impl.operators.tostring.gve.Functions._
 import org.gradoop.spark.model.impl.types.Gve
 
 import scala.collection.TraversableOnce
@@ -21,7 +21,6 @@ class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => Gra
   edgeToString: L#E => TraversableOnce[EdgeString],
   directed: Boolean)
   extends UnaryGraphCollectionToValueOperator[L#GC, String] with UnaryLogicalGraphToValueOperator[L#LG, String] {
-  import CanonicalAdjacencyMatrixBuilder._
 
   override def execute(collection: L#GC): String = {
     getGraphStrings(collection.layout, collection.config)
@@ -106,36 +105,5 @@ class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => Gra
     graphHeadStrings.foreach(g => adjacencyMatrixStrings
       .foreach(am => if(am.id == g.id) g.string += am.string))
     graphHeadStrings.map(_.string)
-  }
-}
-
-object CanonicalAdjacencyMatrixBuilder {
-
-  private def switchSourceTargetIds(edgeString: EdgeString): EdgeString = {
-    EdgeString(edgeString.graphId, edgeString.targetId, edgeString.sourceId,
-      edgeString.sourceString, edgeString.string, edgeString.targetString)
-  }
-
-  private def concatElementStrings[A <: ElementString](values: Array[A], sep: String): A = {
-    val strings = values.toSeq
-    val result = strings.head
-    result.string = strings.map(_.string).sorted.mkString(sep)
-    result
-  }
-
-  private def adjacencyList(edgeStrings: Array[EdgeString],
-    idSelector: EdgeString => GradoopId,
-    toString: EdgeString => String): VertexString = {
-    val strings = edgeStrings.toSeq
-    val first = strings.head
-    val string = strings.map(toString).sorted.mkString
-    VertexString(first.graphId, idSelector(first), string)
-  }
-
-  private def adjacencyMatrix(key: GradoopId, vertexStrings: Array[VertexString]): GraphHeadString = {
-    val strings = vertexStrings.toSeq
-    val first = strings.head
-    val string = strings.map("\n " + _.string).sorted.mkString
-    GraphHeadString(first.graphId, string)
   }
 }
