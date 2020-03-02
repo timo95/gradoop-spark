@@ -8,19 +8,13 @@ import org.rogach.scallop.ScallopOption
 
 object SubgraphBenchmark extends IoBenchmark {
 
-  val VERTEX_LABEL = "forum"
-  val EDGE_LABEL = "hasType"
-  val VERIFICATION = false
-
   class CmdConf(arguments: Seq[String]) extends IoConf(arguments) {
     val layout: ScallopOption[String] = opt[String](default = Some("gve"),
       descr = "Graph Layout (gve, tfl)")
     val removeDanglingEdges: ScallopOption[Boolean] = toggle(default = Some(false),
       descrYes = "Removes dangling edges after applying Subgraph")
-    val vertexLabel: ScallopOption[String] = opt[String](name = "vl", noshort = true,
-      descr = "Label to filter the vertices")
-    val edgeLabel: ScallopOption[String] = opt[String](name = "el", noshort = true,
-      descr = "Label to filter the edges")
+    val vertexLabel: ScallopOption[String] = opt[String](descr = "Label to filter the vertices")
+    val edgeLabel: ScallopOption[String] = opt[String](descr = "Label to filter the edges")
     verify()
   }
 

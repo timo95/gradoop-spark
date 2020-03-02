@@ -1,10 +1,10 @@
 package org.gradoop.spark.io.impl.csv
 
-import org.apache.spark.sql.functions.{col, map_from_entries, udf}
+import org.apache.spark.sql.functions.{col, udf}
 import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
-import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.gradoop.common.util.ColumnNames
-import org.gradoop.spark.io.impl.metadata.{ElementMetaData, MetaData}
+import org.gradoop.spark.io.impl.metadata.MetaData
 
 class CsvDataSourceBase(csvPath: String) {
 
@@ -17,12 +17,8 @@ class CsvDataSourceBase(csvPath: String) {
   private val parseId = udf(s => CsvParser.parseId(s))
   private val parseLabel = udf(s => CsvParser.parseLabel(s))
   private val parseGraphIds = udf(s => CsvParser.parseGraphIds(s))
-  private val parseProperties = udf((s, label, metaData) =>
+  protected val parseProperties = udf((s, label, metaData) =>
     CsvParser.parseProperties(s, label, metaData))
-
-  // Column expressions for parsing csv fields
-  private val parserPropertiesExpression = map_from_entries(parseProperties(col(ColumnNames.PROPERTIES),
-    col(ColumnNames.LABEL), col(ElementMetaData.metaData)))
 
   // Metadata
   private var metaData: Option[MetaData] = None
@@ -35,11 +31,10 @@ class CsvDataSourceBase(csvPath: String) {
   /** Read graph head csv file
    *
    * @param localPath local path in csv path
-   * @param metaData graph head metadata
    * @param sparkSession spark session
    * @return dataframe that contains all gve graphhead fields
    */
-  protected def readGraphHeads(localPath: String, metaData: Dataset[ElementMetaData])
+  protected def readGraphHeads(localPath: String, parseProperties: DataFrame => DataFrame)
     (implicit sparkSession: SparkSession): DataFrame = {
     // read file
     val strings = sparkSession.read
@@ -58,20 +53,16 @@ class CsvDataSourceBase(csvPath: String) {
       col(ColumnNames.PROPERTIES)
     )
 
-    // parse properties
-    partiallyParsed.join(metaData, ColumnNames.LABEL)
-      .withColumn(ColumnNames.PROPERTIES, parserPropertiesExpression.as(ColumnNames.PROPERTIES))
-      .drop(ElementMetaData.metaData)
+    parseProperties(partiallyParsed)
   }
 
   /** Read vertex csv file
    *
    * @param localPath local path in csv path
-   * @param metaData vertex metadata
    * @param sparkSession spark session
    * @return dataframe that contains all gve vertex fields
    */
-  protected def readVertices(localPath: String, metaData: Dataset[ElementMetaData])
+  protected def readVertices(localPath: String, parseProperties: DataFrame => DataFrame)
     (implicit sparkSession: SparkSession): DataFrame = {
     // read file
     val strings = sparkSession.read
@@ -92,20 +83,16 @@ class CsvDataSourceBase(csvPath: String) {
       col(ColumnNames.PROPERTIES)
     )
 
-    // parse properties
-    partiallyParsed.join(metaData, ColumnNames.LABEL)
-      .withColumn(ColumnNames.PROPERTIES, parserPropertiesExpression.as(ColumnNames.PROPERTIES))
-      .drop(ElementMetaData.metaData)
+    parseProperties(partiallyParsed)
   }
 
   /** Read edge csv file
    *
    * @param localPath local path in csv path
-   * @param metaData edge metadata
    * @param sparkSession spark session
    * @return dataframe that contains all gve edge fields
    */
-  protected def readEdges(localPath: String, metaData: Dataset[ElementMetaData])
+  protected def readEdges(localPath: String, parseProperties: DataFrame => DataFrame)
     (implicit sparkSession: SparkSession): DataFrame = {
     // read file
     val strings = sparkSession.read
@@ -130,9 +117,6 @@ class CsvDataSourceBase(csvPath: String) {
       col(ColumnNames.PROPERTIES)
     )
 
-    // parse properties
-    partiallyParsed.join(metaData, ColumnNames.LABEL)
-      .withColumn(ColumnNames.PROPERTIES, parserPropertiesExpression.as(ColumnNames.PROPERTIES))
-      .drop(ElementMetaData.metaData)
+    parseProperties(partiallyParsed)
   }
 }

@@ -1,12 +1,11 @@
 package org.gradoop.spark.io.impl.csv
 
-import org.apache.spark.sql.functions.udf
-import org.apache.spark.sql.{DataFrame, Dataset, Row, SaveMode}
+import org.apache.spark.sql.functions.{col, udf}
+import org.apache.spark.sql.{DataFrame, Row, SaveMode}
 import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.{ColumnNames, GradoopConstants}
 import org.gradoop.spark.io.impl.csv.CsvConstants._
-import org.gradoop.spark.io.impl.metadata.ElementMetaData
 import org.gradoop.spark.util.StringEscaper
 
 class CsvDataSinkBase(csvPath: String) {
@@ -22,16 +21,14 @@ class CsvDataSinkBase(csvPath: String) {
     .map(id => new GradoopId(id(0).asInstanceOf[Array[Byte]]).toString)
     .mkString("[", LIST_DELIMITER, "]"))
   private val labelToStr = udf(label => StringEscaper.escape(label, ESCAPED_CHARS))
-  private val propertiesToStr = udf((properties: Map[String, Row], metaData: Seq[Row]) =>
+  protected val propertiesToStrUdf = udf((properties: Map[String, Row], metaData: Seq[Row]) =>
     CsvDataSinkBase.propertiesToString(properties, metaData))
 
-  protected def writeGraphHeads(localPath: String, graphHeads: DataFrame, metaData: Dataset[ElementMetaData], saveMode: SaveMode): Unit = {
-    val df = graphHeads.join(metaData, ColumnNames.LABEL)
-
-    val strings = df.select(
-      idToStr(df(ColumnNames.ID)),
-      labelToStr(df(ColumnNames.LABEL)),
-      propertiesToStr(df(ColumnNames.PROPERTIES), df(ElementMetaData.metaData)))
+  protected def writeGraphHeads(localPath: String, graphHeads: DataFrame, saveMode: SaveMode): Unit = {
+    val strings = graphHeads.select(
+      idToStr(col(ColumnNames.ID)),
+      labelToStr(col(ColumnNames.LABEL)),
+      col(ColumnNames.PROPERTIES))
 
     strings
       .write
@@ -40,14 +37,12 @@ class CsvDataSinkBase(csvPath: String) {
       .csv(csvPath + DIRECTORY_SEPARATOR + localPath)
   }
 
-  protected def writeVertices(localPath: String, vertices: DataFrame, metaData: Dataset[ElementMetaData], saveMode: SaveMode): Unit = {
-    val df = vertices.join(metaData, ColumnNames.LABEL)
-
-    val strings = df.select(
-      idToStr(df(ColumnNames.ID)),
-      graphIdsToStr(df(ColumnNames.GRAPH_IDS)),
-      labelToStr(df(ColumnNames.LABEL)),
-      propertiesToStr(df(ColumnNames.PROPERTIES), df(ElementMetaData.metaData)))
+  protected def writeVertices(localPath: String, vertices: DataFrame, saveMode: SaveMode): Unit = {
+    val strings = vertices.select(
+      idToStr(col(ColumnNames.ID)),
+      graphIdsToStr(col(ColumnNames.GRAPH_IDS)),
+      labelToStr(col(ColumnNames.LABEL)),
+      col(ColumnNames.PROPERTIES))
 
     strings
       .write
@@ -56,16 +51,14 @@ class CsvDataSinkBase(csvPath: String) {
       .csv(csvPath + DIRECTORY_SEPARATOR + localPath)
   }
 
-  protected def writeEdges(localPath: String, edges: DataFrame, metaData: Dataset[ElementMetaData], saveMode: SaveMode): Unit = {
-    val df = edges.join(metaData, ColumnNames.LABEL)
-
-    val strings = df.select(
-      idToStr(df(ColumnNames.ID)),
-      graphIdsToStr(df(ColumnNames.GRAPH_IDS)),
-      idToStr(df(ColumnNames.SOURCE_ID)),
-      idToStr(df(ColumnNames.TARGET_ID)),
-      labelToStr(df(ColumnNames.LABEL)),
-      propertiesToStr(df(ColumnNames.PROPERTIES), df(ElementMetaData.metaData)))
+  protected def writeEdges(localPath: String, edges: DataFrame, saveMode: SaveMode): Unit = {
+    val strings = edges.select(
+      idToStr(col(ColumnNames.ID)),
+      graphIdsToStr(col(ColumnNames.GRAPH_IDS)),
+      idToStr(col(ColumnNames.SOURCE_ID)),
+      idToStr(col(ColumnNames.TARGET_ID)),
+      labelToStr(col(ColumnNames.LABEL)),
+      col(ColumnNames.PROPERTIES))
 
     strings
       .write

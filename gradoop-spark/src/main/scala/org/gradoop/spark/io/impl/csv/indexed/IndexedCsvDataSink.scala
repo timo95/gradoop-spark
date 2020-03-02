@@ -2,11 +2,13 @@ package org.gradoop.spark.io.impl.csv.indexed
 
 import java.io.IOException
 
-import org.apache.spark.sql.SaveMode
+import org.apache.spark.sql.functions.{col, typedLit}
+import org.apache.spark.sql.{DataFrame, SaveMode}
+import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.io.api.DataSink
 import org.gradoop.spark.io.impl.csv.CsvConstants._
 import org.gradoop.spark.io.impl.csv.{CsvDataSinkBase, CsvMetaDataSink}
-import org.gradoop.spark.io.impl.metadata.MetaData
+import org.gradoop.spark.io.impl.metadata.{ElementMetaData, MetaData, PropertyMetaData}
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.impl.types.Tfl
 import org.gradoop.spark.util.StringEscaper
@@ -18,12 +20,14 @@ class IndexedCsvDataSink[L <: Tfl[L]] private (csvPath: String, config: GradoopS
   override def write(logicalGraph: L#LG, saveMode: SaveMode): Unit = {
     if(handleSavemode(saveMode)) {
       val metaData = metaDataOpt.getOrElse(MetaData(logicalGraph))
-      logicalGraph.graphHeadsWithProperties.foreach(t => writeGraphHeads(indexedCsvPath(GRAPH_HEAD_PATH, t._1), t._2,
-        metaData.graphHeadMetaData(t._1), SaveMode.Append)) // Different labels can have the same directory -> Append
-      logicalGraph.verticesWithProperties.foreach(t => writeVertices(indexedCsvPath(VERTEX_PATH, t._1), t._2,
-        metaData.vertexMetaData(t._1), SaveMode.Append))
-      logicalGraph.edgesWithProperties.foreach(t => writeEdges(indexedCsvPath(EDGE_PATH, t._1), t._2,
-        metaData.edgeMetaData(t._1), SaveMode.Append))
+
+      metaData.graphHeadMetaData.collect.foreach(m => logicalGraph.graphHeadsWithProperties.get(m.label).foreach(ds =>
+        writeGraphHeads(indexedCsvPath(GRAPH_HEAD_PATH, m.label), propertiesToStr(ds, m), SaveMode.Append)))
+      metaData.vertexMetaData.collect.foreach(m => logicalGraph.verticesWithProperties.get(m.label).foreach(ds =>
+        writeVertices(indexedCsvPath(VERTEX_PATH, m.label), propertiesToStr(ds, m), SaveMode.Append)))
+      metaData.edgeMetaData.collect.foreach(m => logicalGraph.edgesWithProperties.get(m.label).foreach(ds =>
+        writeEdges(indexedCsvPath(EDGE_PATH, m.label), propertiesToStr(ds, m), SaveMode.Append)))
+
       CsvMetaDataSink(csvPath).write(metaData, saveMode)
     }
   }
@@ -31,14 +35,21 @@ class IndexedCsvDataSink[L <: Tfl[L]] private (csvPath: String, config: GradoopS
   override def write(graphCollection: L#GC, saveMode: SaveMode): Unit = {
     if(handleSavemode(saveMode)) {
       val metaData = metaDataOpt.getOrElse(MetaData(graphCollection))
-      graphCollection.graphHeadsWithProperties.foreach(t => writeGraphHeads(indexedCsvPath(GRAPH_HEAD_PATH, t._1), t._2,
-        metaData.graphHeadMetaData(t._1), SaveMode.Append))
-      graphCollection.verticesWithProperties.foreach(t => writeVertices(indexedCsvPath(VERTEX_PATH, t._1), t._2,
-        metaData.vertexMetaData(t._1), SaveMode.Append))
-      graphCollection.edgesWithProperties.foreach(t => writeEdges(indexedCsvPath(EDGE_PATH, t._1), t._2,
-        metaData.edgeMetaData(t._1), SaveMode.Append))
+
+      metaData.graphHeadMetaData.collect.foreach(m => graphCollection.graphHeadsWithProperties.get(m.label).foreach(ds =>
+        writeGraphHeads(indexedCsvPath(GRAPH_HEAD_PATH, m.label), propertiesToStr(ds, m), SaveMode.Append)))
+      metaData.vertexMetaData.collect.foreach(m => graphCollection.verticesWithProperties.get(m.label).foreach(ds =>
+        writeVertices(indexedCsvPath(VERTEX_PATH, m.label), propertiesToStr(ds, m), SaveMode.Append)))
+      metaData.edgeMetaData.collect.foreach(m => graphCollection.edgesWithProperties.get(m.label).foreach(ds =>
+        writeEdges(indexedCsvPath(EDGE_PATH, m.label), propertiesToStr(ds, m), SaveMode.Append)))
+
       CsvMetaDataSink(csvPath).write(metaData, saveMode)
     }
+  }
+
+  private def propertiesToStr(dataset: DataFrame, metaData: ElementMetaData): DataFrame = {
+    dataset.withColumn(ColumnNames.PROPERTIES,
+      propertiesToStrUdf(col(ColumnNames.PROPERTIES), typedLit[Seq[PropertyMetaData]](metaData.metaData)))
   }
 
   private def handleSavemode(saveMode: SaveMode): Boolean = {

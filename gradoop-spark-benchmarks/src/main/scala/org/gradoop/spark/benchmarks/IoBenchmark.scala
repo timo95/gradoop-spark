@@ -6,14 +6,16 @@ import org.gradoop.spark.io.impl.csv.{CsvDataSink, CsvDataSource}
 import org.gradoop.spark.util.EpgmConfigs
 import org.rogach.scallop.{ScallopConf, ScallopOption}
 
+/**
+ * Benchmark that reads a (indexed) csv graph, runs some operation and writes the result as (indexed) csv.
+ */
 trait IoBenchmark extends EpgmConfigs {
 
-  class IoConf(arguments: Seq[String]) extends ScallopConf(arguments) {
+  abstract class IoConf(arguments: Seq[String]) extends ScallopConf(arguments) {
     val input: ScallopOption[String] = opt[String](required = true,
       descr = "Input path for a csv graph")
     val output: ScallopOption[String] = opt[String](required = true,
       descr = "Output path for a csv graph")
-    verify()
   }
 
   /** Reads csv graph as gve, runs function and writes result as csv.

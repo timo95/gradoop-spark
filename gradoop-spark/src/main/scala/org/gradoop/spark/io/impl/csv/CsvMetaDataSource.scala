@@ -6,7 +6,7 @@ import org.gradoop.spark.io.api.MetaDataSource
 import org.gradoop.spark.io.impl.metadata.{ElementMetaData, MetaData, PropertyMetaData}
 import org.gradoop.spark.util.StringEscaper
 
-class CsvMetaDataSource(csvPath: String)(implicit session: SparkSession)
+class CsvMetaDataSource(csvPath: String)(implicit sparkSession: SparkSession)
   extends MetaDataSource {
 
   private val options: Map[String, String] = Map(
@@ -21,7 +21,7 @@ class CsvMetaDataSource(csvPath: String)(implicit session: SparkSession)
     StructField(ElementMetaData.metaData, DataTypes.StringType, true)))
 
   override def read: MetaData = {
-    val dataFrame = session.read
+    val dataFrame = sparkSession.read
       .options(options)
       .schema(schema)
       .csv(csvPath + CsvConstants.DIRECTORY_SEPARATOR + CsvConstants.METADATA_FILE)
@@ -32,7 +32,7 @@ class CsvMetaDataSource(csvPath: String)(implicit session: SparkSession)
   }
 
   private def getElementMetaData(dataFrame: DataFrame, elementType: String): Dataset[ElementMetaData] = {
-    import session.implicits._
+    import sparkSession.implicits._
     import org.apache.spark.sql.functions._
 
     dataFrame
