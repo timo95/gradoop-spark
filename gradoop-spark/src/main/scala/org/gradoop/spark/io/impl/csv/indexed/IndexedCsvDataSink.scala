@@ -57,7 +57,9 @@ class IndexedCsvDataSink[L <: Tfl[L]] private (csvPath: String, config: GradoopS
 
     val dirs = Seq(GRAPH_HEAD_PATH, VERTEX_PATH, EDGE_PATH)
     val fs = FileSystem.get(config.sparkSession.sparkContext.hadoopConfiguration)
-    val exists = fs.listStatus(new Path(csvPath))
+
+    val path = new Path(csvPath)
+    val exists = fs.exists(path) && fs.listStatus(path)
       .filter(_.isDirectory)
       .map(_.getPath.getName)
       .exists(dirs.contains)

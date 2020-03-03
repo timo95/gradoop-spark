@@ -9,6 +9,7 @@ import org.rogach.scallop.ScallopOption
 object SubgraphBenchmark extends IoBenchmark {
 
   class CmdConf(arguments: Seq[String]) extends IoConf(arguments) {
+    val title: ScallopOption[String] = opt[String](descr = "Spark job title")
     val layout: ScallopOption[String] = opt[String](default = Some("gve"),
       descr = "Graph Layout (gve, tfl)")
     val removeDanglingEdges: ScallopOption[Boolean] = toggle(default = Some(false),
@@ -19,11 +20,12 @@ object SubgraphBenchmark extends IoBenchmark {
   }
 
   def main(args: Array[String]): Unit = {
+    val cmdConf = new CmdConf(args)
+
     implicit val session: SparkSession = SparkSession.builder
-      .appName("Subgraph Benchmark")//.master("local[1]")
+      .appName(cmdConf.title.getOrElse("Subgraph Benchmark - Layout: %s".format(cmdConf.layout())))//.master("local[1]")
       .getOrCreate()
 
-    val cmdConf = new CmdConf(args)
     cmdConf.layout() match {
       case "gve" => runGveCsv(cmdConf, run[LGve](_, cmdConf))
       case "tfl" => runTflIndexed(cmdConf, run[LTfl](_, cmdConf))
