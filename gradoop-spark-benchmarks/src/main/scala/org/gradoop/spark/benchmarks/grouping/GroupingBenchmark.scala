@@ -1,23 +1,23 @@
 package org.gradoop.spark.benchmarks.grouping
 
-import org.apache.spark.sql.{Column, SparkSession}
+import org.apache.spark.sql.Column
 import org.gradoop.spark.benchmarks.IoBenchmark
+import org.gradoop.spark.benchmarks.IoBenchmark.IoConf
+import org.gradoop.spark.benchmarks.grouping.GroupingBenchmark.GroupingConf
 import org.gradoop.spark.expressions.AggregationExpressions
 import org.gradoop.spark.functions.{LabelKeyFunction, PropertyKeyFunction}
 import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
 import org.gradoop.spark.model.impl.types.LayoutType
 import org.rogach.scallop.ScallopOption
 
-class GroupingBenchmark extends IoBenchmark {
+object GroupingBenchmark extends IoBenchmark[GroupingConf] {
 
   val COUNT = "count"
   val MIN = "min"
   val MAX = "max"
   val SUM = "sum"
 
-  class CmdConf(arguments: Seq[String]) extends IoConf(arguments) {
-    val layout: ScallopOption[String] = opt[String](default = Some("gve"),
-      descr = "Graph Layout (gve, tfl)")
+  class GroupingConf(arguments: Seq[String]) extends IoConf(arguments) {
     val vertexGroupLabel: ScallopOption[Boolean] = toggle(default = Some(false), name = "gvl", noshort = true,
       descrYes = "Group by vertex label")
     val edgeGroupLabel: ScallopOption[Boolean] = toggle(default = Some(false), name = "gel", noshort = true,
@@ -34,7 +34,7 @@ class GroupingBenchmark extends IoBenchmark {
     private def validateAgg(strings: List[String]): Boolean = {
       val withArgs = strings.filter(_ != COUNT) // remove functions without arguments
       if(withArgs.length % 2 == 1) false // every remaining function has 1 argument
-      else { // key agg functions and property keys have to alternate
+      else { // key agg functions and property keys should alternate
         withArgs.zipWithIndex.filter(_._2 % 2 == 0).map(_._1).forall(Set(MIN, MAX, SUM).contains)
       }
     }
@@ -42,33 +42,22 @@ class GroupingBenchmark extends IoBenchmark {
     verify()
   }
 
-  def main(args: Array[String]): Unit = {
-    implicit val session: SparkSession = SparkSession.builder
-      .appName("Grouping Benchmark")//.master("local[1]")
-      .getOrCreate()
+  override def getConf(args: Array[String]): GroupingConf = new GroupingConf(args)
 
-    val cmdConf = new CmdConf(args)
-    cmdConf.layout() match {
-      case "gve" => runGveCsv(cmdConf, run[LGve](_, cmdConf))
-      case "tfl" => runTflIndexed(cmdConf, run[LTfl](_, cmdConf))
-      case layout: Any => throw new IllegalArgumentException("Layout '%s' is not supported.".format(layout))
-    }
-  }
-
-  private def run[L <: LayoutType[L]](graph: L#LG, cmdConf: CmdConf): L#LG = {
+  override def run[L <: LayoutType[L]](conf: GroupingConf, graph: L#LG): L#LG = {
     val groupingBuilder = new GroupingBuilder
 
     // Grouping keys
-    groupingBuilder.vertexGroupingKeys = cmdConf.vertexGroupProperties().map(PropertyKeyFunction.apply)
-    groupingBuilder.edgeGroupingKeys = cmdConf.edgeGroupProperties().map(PropertyKeyFunction.apply)
-    if(cmdConf.vertexGroupLabel()) groupingBuilder.vertexGroupingKeys =
+    groupingBuilder.vertexGroupingKeys = conf.vertexGroupProperties().map(PropertyKeyFunction.apply)
+    groupingBuilder.edgeGroupingKeys = conf.edgeGroupProperties().map(PropertyKeyFunction.apply)
+    if(conf.vertexGroupLabel()) groupingBuilder.vertexGroupingKeys =
       groupingBuilder.vertexGroupingKeys :+ new LabelKeyFunction
-    if(cmdConf.edgeGroupLabel()) groupingBuilder.edgeGroupingKeys =
+    if(conf.edgeGroupLabel()) groupingBuilder.edgeGroupingKeys =
       groupingBuilder.edgeGroupingKeys :+ new LabelKeyFunction
 
     // Aggregation functions
-    groupingBuilder.vertexAggFunctions = parseAggFuncs(cmdConf.vertexAggregation())
-    groupingBuilder.edgeAggFunctions = parseAggFuncs(cmdConf.edgeAggregation())
+    groupingBuilder.vertexAggFunctions = parseAggFuncs(conf.vertexAggregation())
+    groupingBuilder.edgeAggFunctions = parseAggFuncs(conf.edgeAggregation())
 
     // Run
     graph.groupBy(groupingBuilder)
