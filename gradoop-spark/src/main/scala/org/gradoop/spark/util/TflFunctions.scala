@@ -48,7 +48,7 @@ object TflFunctions {
     mergeMapsOuter[Dataset[A]](left, right, _ union _)
   }
 
-  /** Reduces tfl map to single dataframe using union.
+  /** Reduces tfl map to single dataframe using union. TODO change usages: Select needed columns before reduceUnion
    *
    * Fails when dataFrames is empty. Prefer using datasets when possible.
    *
