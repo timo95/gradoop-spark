@@ -1,5 +1,6 @@
 package org.gradoop.spark.benchmarks.subgraph
 
+import org.apache.spark.sql.Column
 import org.gradoop.spark.benchmarks.IoBenchmark
 import org.gradoop.spark.benchmarks.IoBenchmark.IoConf
 import org.gradoop.spark.expressions.FilterExpressions
@@ -11,27 +12,17 @@ object SubgraphBenchmark extends IoBenchmark[SubgraphConf] {
   override def getConf(args: Array[String]): SubgraphConf = new SubgraphConf(args)
 
   override def run[L <: LayoutType[L]](conf: SubgraphConf, graph: L#LG): L#LG = {
-    /*val vertexFilterExpression = conf.vertexLabel.toOption match {
+    val vertexFilterExpression = conf.vertexLabel.toOption match {
       case Some(label) => FilterExpressions.hasLabel(label)
       case None => FilterExpressions.any
     }
     val edgeFilterExpression: Column = conf.edgeLabel.toOption match {
       case Some(label) => FilterExpressions.hasLabel(label)
       case None => FilterExpressions.any
-    }*/
+    }
 
-    val vertexFilterExpression1 = FilterExpressions.hasLabel("person") or
-      FilterExpressions.hasLabel("forum") or FilterExpressions.hasLabel("post") or
-      FilterExpressions.hasLabel("university") or FilterExpressions.hasLabel("city")
-
-    val vertexFilterExpression2 = FilterExpressions.hasLabel("person") or
-      FilterExpressions.hasLabel("forum") or FilterExpressions.hasLabel("post") or
-      FilterExpressions.hasLabel("university") or FilterExpressions.hasLabel("city")
-
-    //if(conf.removeDanglingEdges()) graph.subgraph(vertexFilterExpression, edgeFilterExpression).removeDanglingEdges
-    //else graph.subgraph(vertexFilterExpression, edgeFilterExpression)
-
-    graph.vertexInducedSubgraph(vertexFilterExpression1)
+    if(conf.removeDanglingEdges()) graph.subgraph(vertexFilterExpression, edgeFilterExpression).removeDanglingEdges
+    else graph.subgraph(vertexFilterExpression, edgeFilterExpression)
   }
 }
 

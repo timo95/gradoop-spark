@@ -51,9 +51,9 @@ trait BiIoCollectionBenchmark[A <: BiIoCollectionConf] extends LayoutBenchmark[A
 
 object BiIoCollectionBenchmark {
   abstract class BiIoCollectionConf(arguments: Seq[String]) extends LayoutConf(arguments) {
-    val input1: ScallopOption[String] = opt[String](required = true,
+    val input1: ScallopOption[String] = opt[String](required = true, noshort=true,
       descr = "Input path for left csv graph collection 1")
-    val input2: ScallopOption[String] = opt[String](required = true,
+    val input2: ScallopOption[String] = opt[String](required = true, noshort=true,
       descr = "Input path for csv graph collection 2")
     val output: ScallopOption[String] = opt[String](required = true,
       descr = "Output path for a csv graph collection")
