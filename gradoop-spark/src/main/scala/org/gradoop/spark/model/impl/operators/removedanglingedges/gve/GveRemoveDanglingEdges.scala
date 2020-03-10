@@ -7,9 +7,9 @@ import org.gradoop.spark.model.impl.types.Gve
 class GveRemoveDanglingEdges[L <: Gve[L]] extends UnaryLogicalGraphToLogicalGraphOperator[L#LG] {
 
   override def execute(graph: L#LG): L#LG = {
+    import graph.config.Implicits._
     val factory = graph.factory
     import factory.Implicits._
-    import graph.config.sparkSession.implicits._
 
     val vertexIds = graph.vertices.select(ColumnNames.ID).cache
 

@@ -1,19 +1,17 @@
 package org.gradoop.spark.model.api.layouts.gve
 
 import org.apache.spark.sql.{Dataset, Encoder}
-import org.gradoop.common.model.api.components.ComponentTypes
 import org.gradoop.common.model.api.gve.GveElementFactoryProvider
-import org.gradoop.spark.transformation.TransformationFunctions
 import org.gradoop.spark.model.api.graph.BaseGraph
 import org.gradoop.spark.model.api.layouts.{GraphCollectionLayoutFactory, LogicalGraphLayoutFactory}
 import org.gradoop.spark.model.impl.types.Gve
-import org.gradoop.spark.util.Implicits
+import org.gradoop.spark.transformation.TransformationFunctions
 
 trait GveBaseLayoutFactory[L <: Gve[L], +BG <: BaseGraph[L]] extends LogicalGraphLayoutFactory[L]
   with GraphCollectionLayoutFactory[L]
   with GveElementFactoryProvider[L#G, L#V, L#E] {
 
-  object Implicits extends Implicits with ComponentTypes {
+  object Implicits {
     // Encoder
     implicit def implicitGveGraphHeadEncoder: Encoder[L#G] = graphHeadEncoder
     implicit def impliticGveVertexEncoder: Encoder[L#V] = vertexEncoder

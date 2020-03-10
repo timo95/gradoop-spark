@@ -14,7 +14,7 @@ class GveSubgraph[L <: Gve[L]](vertexFilterExpression: Column, edgeFilterExpress
   override def execute(graph: L#LG): L#LG = {
     val factory = graph.factory
     import factory.Implicits._
-    import graph.config.sparkSession.implicits._
+    import graph.config.Implicits._
 
     strategy match {
       case Strategy.BOTH =>

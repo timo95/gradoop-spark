@@ -9,6 +9,7 @@ class GveExclusion[L <: Gve[L]] extends BinaryLogicalGraphToLogicalGraphOperator
   override def execute(left: L#LG, right: L#LG): L#LG = {
     val factory = left.factory
     import factory.Implicits._
+    import left.config.Implicits._
 
     val remainingVertexIds = left.vertices.select(ColumnNames.ID)
       .except(right.vertices.select(ColumnNames.ID)).dropDuplicates(ColumnNames.ID)

@@ -10,7 +10,7 @@ class GveIntersection[L <: Gve[L]] extends BinaryGraphCollectionToGraphCollectio
   override def execute(left: L#GC, right: L#GC): L#GC = {
     val factory = left.factory
     import factory.Implicits._
-    implicit val sparkSession = factory.sparkSession
+    import left.config.Implicits._
 
     val leftGraphIds = left.graphHeads.select(ColumnNames.ID)
     val rightGraphIds = right.graphHeads.select(ColumnNames.ID)
@@ -19,7 +19,7 @@ class GveIntersection[L <: Gve[L]] extends BinaryGraphCollectionToGraphCollectio
     val intersectIds = leftGraphIds.intersect(rightGraphIds)
     val graphHeads = left.graphHeads.join(intersectIds, ColumnNames.ID).as[L#G]
 
-    left.factory.init(graphHeads,
+    factory.init(graphHeads,
       removeUncontainedElements(left.vertices, intersectIds),
       removeUncontainedElements(left.edges, intersectIds))
   }

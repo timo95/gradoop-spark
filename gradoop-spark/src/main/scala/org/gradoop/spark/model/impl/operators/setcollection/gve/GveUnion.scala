@@ -7,9 +7,7 @@ import org.gradoop.spark.model.impl.types.Gve
 class GveUnion[L <: Gve[L]] extends BinaryGraphCollectionToGraphCollectionOperator[L#GC] {
 
   override def execute(left: L#GC, right: L#GC): L#GC = {
-    val factory = left.factory
-    import factory.Implicits._
-    implicit val sparkSession = factory.sparkSession
+    import left.config.Implicits._
 
     left.factory.init(left.graphHeads.union(right.graphHeads).dropDuplicates(ColumnNames.ID),
       left.vertices.union(right.vertices).dropDuplicates(ColumnNames.ID),

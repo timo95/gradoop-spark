@@ -1,11 +1,11 @@
 package org.gradoop.spark.model.impl.operators.grouping.gve
 
-import org.apache.spark.sql.{Column, SparkSession}
+import org.apache.spark.sql.Column
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.functions.KeyFunction
 import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOperator
-import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
 import org.gradoop.spark.model.impl.operators.grouping.Functions._
+import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
 import org.gradoop.spark.model.impl.operators.grouping.gve.Functions._
 import org.gradoop.spark.model.impl.types.Gve
 
@@ -29,9 +29,9 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
   extends UnaryLogicalGraphToLogicalGraphOperator[L#LG] {
 
   override def execute(graph: L#LG): L#LG = {
-    val config = graph.config
-    implicit val sparkSession: SparkSession = config.sparkSession
     import org.apache.spark.sql.functions._
+    val config = graph.config
+    import config.Implicits._
     val factory = graph.factory
     import factory.Implicits._
 

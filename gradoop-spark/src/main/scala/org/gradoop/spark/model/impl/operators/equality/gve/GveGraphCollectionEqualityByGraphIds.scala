@@ -6,9 +6,7 @@ import org.gradoop.spark.model.impl.types.Gve
 class GveGraphCollectionEqualityByGraphIds[L <: Gve[L]] extends BinaryGraphCollectionToValueOperator[L#GC, Boolean] {
 
   override def execute(left: L#GC, right: L#GC): Boolean = {
-    val config = left.config
-    import config.Implicits._
-    import config.sparkSession.implicits._
+    import left.config.Implicits._
     import org.apache.spark.sql.functions._
 
     val LEFT = "left"

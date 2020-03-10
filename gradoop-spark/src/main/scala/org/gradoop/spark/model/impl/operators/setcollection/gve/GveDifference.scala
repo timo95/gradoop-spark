@@ -8,9 +8,9 @@ import org.gradoop.spark.model.impl.types.Gve
 class GveDifference[L <: Gve[L]] extends BinaryGraphCollectionToGraphCollectionOperator[L#GC] {
 
   override def execute(left: L#GC, right: L#GC): L#GC = {
+    import left.config.Implicits._
     val factory = left.factory
     import factory.Implicits._
-    implicit val sparkSession = factory.sparkSession
 
     val leftGraphIds = left.graphHeads.select(ColumnNames.ID)
     val rightGraphIds = right.graphHeads.select(ColumnNames.ID)
@@ -19,7 +19,7 @@ class GveDifference[L <: Gve[L]] extends BinaryGraphCollectionToGraphCollectionO
     val differenceIds = leftGraphIds.except(rightGraphIds)
     val graphHeads = left.graphHeads.join(differenceIds, ColumnNames.ID).as[L#G]
 
-    left.factory.init(graphHeads,
+    factory.init(graphHeads,
       removeUncontainedElements(left.vertices, differenceIds),
       removeUncontainedElements(left.edges, differenceIds))
   }

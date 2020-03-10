@@ -6,7 +6,7 @@ import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.ColumnNames
 
-class ReadableWrapper(val dataFrame: DataFrame) {
+case class ReadableWrapper(dataFrame: DataFrame) {
 
   // Possible column names for each type
   private val idCols = Seq(ColumnNames.ID, ColumnNames.SOURCE_ID, ColumnNames.TARGET_ID, "superId", "vertexId")
