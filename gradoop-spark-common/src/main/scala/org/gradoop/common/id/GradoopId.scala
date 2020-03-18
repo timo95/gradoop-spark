@@ -155,8 +155,8 @@ object GradoopId {
    */
   private def createProcessIdentifier: Short = {
     val processName: String = java.lang.management.ManagementFactory.getRuntimeMXBean.getName
-    if (processName.contains("@")) processName.substring(0, processName.indexOf('@')).toShort
-    else processName.hashCode.toShort
+    if (processName.contains("@")) processName.substring(0, processName.indexOf('@')).toInt.shortValue
+    else processName.hashCode.shortValue
   }
 
   /** Converts a date into the seconds since unix epoch.
