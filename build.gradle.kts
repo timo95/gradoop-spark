@@ -25,6 +25,12 @@ subprojects {
     apply(plugin = "java-library")
     apply(plugin = "scala")
 
+    // Compatible class version needed for cluster
+    configure<JavaPluginExtension> {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
     // Runs scalatest tests
     apply(plugin = "com.github.maiflai.scalatest")
 
