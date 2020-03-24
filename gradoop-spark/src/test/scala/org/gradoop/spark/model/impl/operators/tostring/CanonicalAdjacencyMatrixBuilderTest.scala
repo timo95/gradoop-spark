@@ -6,10 +6,11 @@ import org.gradoop.spark.model.impl.operators.tostring.gve.CanonicalAdjacencyMat
 import org.gradoop.spark.model.impl.operators.tostring.gve.ElementToString._
 import org.gradoop.spark.util.SparkAsciiGraphLoader
 import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}
+import org.scalatest.Matchers
 
 import scala.io.Source
 
-class CanonicalAdjacencyMatrixBuilderTest extends EpgmGradoopSparkTestBase {
+class CanonicalAdjacencyMatrixBuilderTest extends EpgmGradoopSparkTestBase with Matchers {
 
   describe("CanonicalAdjacencyMatrixBuilder test") {
     val gdlPath: String = getClass.getResource("/data/gdl/cam_test.gdl").getFile
@@ -21,10 +22,11 @@ class CanonicalAdjacencyMatrixBuilderTest extends EpgmGradoopSparkTestBase {
       val cam = new CanonicalAdjacencyMatrixBuilder[LGve](graphHeadToDataString,
         vertexToDataString, edgeToDataString,true)
       val result = collection.callForValue(cam)
-      val stringPath = getClass.getResource("/data/string/cam_test_directed").getFile
-      val expected = Source.fromFile(stringPath)
-      assert(expected.mkString equals result)
-      expected.close
+      val file = Source.fromFile(getClass.getResource("/data/string/cam_test_directed").getFile)
+      val expected = file.getLines.mkString(CanonicalAdjacencyMatrixBuilder.LINE_SEPARATOR)
+      file.close
+
+      result should equal (expected)
     }
 
     it("Undirected", OperatorTest) {
@@ -34,10 +36,11 @@ class CanonicalAdjacencyMatrixBuilderTest extends EpgmGradoopSparkTestBase {
       val cam = new CanonicalAdjacencyMatrixBuilder[LGve](graphHeadToDataString,
         vertexToDataString, edgeToDataString,false)
       val result = collection.callForValue(cam)
-      val stringPath = getClass.getResource("/data/string/cam_test_undirected").getFile
-      val expected = Source.fromFile(stringPath)
-      assert(expected.mkString equals result)
-      expected.close
+      val file = Source.fromFile(getClass.getResource("/data/string/cam_test_undirected").getFile)
+      val expected = file.getLines.mkString(CanonicalAdjacencyMatrixBuilder.LINE_SEPARATOR)
+      file.close
+
+      result should equal (expected)
     }
   }
 }

@@ -1,6 +1,7 @@
 package org.gradoop.spark.model.impl.operators.tostring.gve
 
 import org.gradoop.common.id.GradoopId
+import org.gradoop.spark.model.impl.operators.tostring.gve.CanonicalAdjacencyMatrixBuilder.LINE_SEPARATOR
 
 private[gve] object Functions {
 
@@ -28,7 +29,7 @@ private[gve] object Functions {
   def adjacencyMatrix(key: GradoopId, vertexStrings: Array[VertexString]): GraphHeadString = {
     val strings = vertexStrings.toSeq
     val first = strings.head
-    val string = strings.map("\n " + _.string).sorted.mkString
+    val string = strings.map(LINE_SEPARATOR + " " + _.string).sorted.mkString
     GraphHeadString(first.graphId, string)
   }
 }

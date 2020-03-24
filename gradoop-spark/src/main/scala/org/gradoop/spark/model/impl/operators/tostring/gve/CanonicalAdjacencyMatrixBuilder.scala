@@ -3,6 +3,7 @@ package org.gradoop.spark.model.impl.operators.tostring.gve
 import org.apache.spark.sql.SparkSession
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
 import org.gradoop.spark.model.api.operators.{UnaryGraphCollectionToValueOperator, UnaryLogicalGraphToValueOperator}
+import org.gradoop.spark.model.impl.operators.tostring.gve.CanonicalAdjacencyMatrixBuilder.LINE_SEPARATOR
 import org.gradoop.spark.model.impl.operators.tostring.gve.Functions._
 import org.gradoop.spark.model.impl.types.Gve
 
@@ -24,7 +25,7 @@ class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => Gra
 
   override def execute(collection: L#GC): String = {
     getGraphStrings(collection.layout, collection.config)
-      .sorted.mkString(System.lineSeparator)
+      .sorted.mkString(LINE_SEPARATOR)
   }
 
   override def execute(graph: L#LG): String = {
@@ -57,12 +58,12 @@ class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => Gra
       // 4. extend vertex strings by outgoing vertex+edge strings
       val outgoingAdjacencyListStrings = edgeStrings
         .groupBy(e => e.graphId.toString + e.sourceId.toString).toArray
-        .map(t => adjacencyList(t._2, _.sourceId, e => s"\n  -${e.string}->${e.targetString}"))
+        .map(t => adjacencyList(t._2, _.sourceId, e => s"$LINE_SEPARATOR  -${e.string}->${e.targetString}"))
 
       // 5. extend vertex strings by incoming vertex+edge strings
       val incomingAdjacencyListStrings = edgeStrings
         .groupBy(e => e.graphId.toString + e.targetId.toString).toArray
-        .map(t => adjacencyList(t._2, _.targetId, e => s"\n  <-${e.string}-${e.sourceString}"))
+        .map(t => adjacencyList(t._2, _.targetId, e => s"$LINE_SEPARATOR  <-${e.string}-${e.sourceString}"))
 
       // 6. combine vertex strings (2 left joins, max one match each)
       vertexStrings.foreach(v => {
@@ -84,7 +85,7 @@ class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => Gra
       // 4/5. extend vertex strings by vertex+edge strings
       val adjacencyListStrings = edgeStrings
         .groupBy(e => e.graphId.toString + e.sourceId.toString)
-        .map(t => adjacencyList(t._2, _.sourceId, e => s"\n  -${e.string}-${e.targetString}"))
+        .map(t => adjacencyList(t._2, _.sourceId, e => s"$LINE_SEPARATOR  -${e.string}-${e.targetString}"))
 
       // 6. combine vertex strings (left join, possibly multiple matches)
       vertexStrings = vertexStrings.flatMap(v => {
@@ -106,4 +107,8 @@ class CanonicalAdjacencyMatrixBuilder[L <: Gve[L]](graphHeadToString: L#G => Gra
       .foreach(am => if(am.id == g.id) g.string += am.string))
     graphHeadStrings.map(_.string)
   }
+}
+
+object CanonicalAdjacencyMatrixBuilder {
+  val LINE_SEPARATOR = "\n"
 }
