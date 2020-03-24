@@ -45,19 +45,15 @@ class TflSubgraph[L <: Tfl[L]](vertexFilterExpression: Column, edgeFilterExpress
 
       case Strategy.EDGE_INDUCED =>
         // Filter element + properties combined
-        val filteredEdges = graph.edgesWithProperties
-          .mapValues(_.filter(edgeFilterExpression))
+        val filteredEdges = graph.edgesWithProperties.mapValues(_.filter(edgeFilterExpression))
 
         // Induce vertices from edges
         val unionEdges = TflFunctions.reduceUnion(filteredEdges.values) // single dataset
-        val inducedVertices = graph.vertices.mapValues(v =>
-          v.joinWith(unionEdges, v.id isin(col(ColumnNames.SOURCE_ID), col(ColumnNames.TARGET_ID)))
-            .select("_1.*").as[L#V]
-            .dropDuplicates(ColumnNames.ID))
+        val inducedVertices = graph.vertices.mapValues(v => v.join(unionEdges,
+          v.id isin(col(ColumnNames.SOURCE_ID), col(ColumnNames.TARGET_ID)), "leftsemi").as[L#V])
 
         // Induce properties from elements
-        val inducedVertProp = TflFunctions.inducePropMap(inducedVertices,
-          graph.vertexProperties)
+        val inducedVertProp = TflFunctions.inducePropMap(inducedVertices, graph.vertexProperties)
 
         // Split element and properties
         val (resEdge, resEdgeProp) = TflFunctions.splitEdgeMap(filteredEdges)

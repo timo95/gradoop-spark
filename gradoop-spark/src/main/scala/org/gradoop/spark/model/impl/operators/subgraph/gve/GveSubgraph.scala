@@ -28,10 +28,8 @@ class GveSubgraph[L <: Gve[L]](vertexFilterExpression: Column, edgeFilterExpress
 
       case Strategy.EDGE_INDUCED =>
         val filteredEdges = graph.edges.filter(edgeFilterExpression)
-        val inducedVertices = graph.vertices
-          .joinWith(filteredEdges, graph.vertices.id isin (filteredEdges.sourceId, filteredEdges.targetId))
-          .select("_1.*").as[L#V]
-          .dropDuplicates(ColumnNames.ID)
+        val inducedVertices = graph.vertices.join(filteredEdges,
+          graph.vertices.id isin (filteredEdges.sourceId, filteredEdges.targetId), "leftsemi").as[L#V]
         graph.factory.init(graph.graphHead, inducedVertices, filteredEdges)
     }
   }

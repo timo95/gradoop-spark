@@ -14,7 +14,7 @@ object TflFunctions {
 
   // ----- General map functions -----
 
-  /** Merge two maps while applying the merge function. Outer. */
+  /** Merge two maps while applying the given merge function. Outer. */
   def mergeMapsOuter[A](left: Map[String, A], right: Map[String, A], merge: (A, A) => A): Map[String, A] = {
     val result = mutable.Map(left.toSeq: _*)
     right.foreach(e => if (result.contains(e._1)) {
@@ -25,7 +25,7 @@ object TflFunctions {
     result.toMap
   }
 
-  /** Merge two maps while applying the merge function. Inner. */
+  /** Merge two maps while applying the given merge function. Inner. */
   def mergeMapsInner[L, R, O](left: Map[String, L], right: Map[String, R], merge: (L, R) => O): Map[String, O] = {
     left.flatMap(e => right.get(e._1) match {
       case Some(v) => Traversable((e._1, merge(e._2, v)))
@@ -33,7 +33,7 @@ object TflFunctions {
     })
   }
 
-  /** Merge two maps while applying the merge function. Left. */
+  /** Merge two maps while applying the given merge function. Left. */
   def mergeMapsLeft[A](left: Map[String, A], right: Map[String, A], merge: (A, A) => A): Map[String, A] = {
     left.transform((k, v) => right.get(k) match {
       case Some(v2) => merge(v, v2)
@@ -68,9 +68,13 @@ object TflFunctions {
   /** Remove properties of missing elements. */
   def inducePropMap[EL <: MainElement, P <: MainElement](element: Map[String, Dataset[EL]], prop: Map[String, Dataset[P]])
     (implicit pEncoder: Encoder[P]): Map[String, Dataset[P]] = {
-    joinPropMap(element, prop, "left").transform((k, v) => v.select(col(ColumnNames.ID),
-      lit(k).as(ColumnNames.LABEL),
-      col(ColumnNames.PROPERTIES)).as[P])
+    val elem = element.mapValues(_.withColumnRenamed(ColumnNames.ID, "e_id").as("elem"))
+
+    prop.transform((k, v) => {
+      v.as("prop").join(elem(k),
+        col(s"prop.${ColumnNames.ID}") === col(s"elem.e_id"), "leftsemi")
+        .as[P]
+    })
   }
 
   /** Join property map to element map. */

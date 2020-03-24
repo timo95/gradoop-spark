@@ -63,7 +63,7 @@ object CsvConstants {
   val VALUE_DELIMITER = "|"
 
   /** Used to separate lines in the output CSV files. */
-  val ROW_DELIMITER: String = System.getProperty("line.separator")
+  val ROW_DELIMITER: String = System.lineSeparator
 
   /** Used to separate entries of list types in the CSV files. */
   val LIST_DELIMITER = ","

@@ -5,6 +5,7 @@ import org.gradoop.common.util.Type
 case class PropertyMetaData(key: String, typeString: String)
 
 object PropertyMetaData {
+  // Field names
   val key = "key"
   val typeString = "typeString"
 

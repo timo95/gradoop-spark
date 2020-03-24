@@ -1,6 +1,7 @@
 package org.gradoop.spark.model.impl.operators.setcollection.tfl
 
 import org.apache.spark.sql.{DataFrame, Dataset, Encoder, SparkSession}
+import org.gradoop.common.model.api.components.Identifiable
 import org.gradoop.common.model.api.elements.GraphElement
 import org.gradoop.common.util.ColumnNames
 
@@ -12,16 +13,16 @@ private[tfl] object Functions {
     import org.gradoop.spark.util.Implicits._
     import sparkSession.implicits._
 
-    val GRAPH_ID = "graphId"
+    val containment = elements
+      .mapValues(e => e.select(col(ColumnNames.ID).as("newIds"), explode(e.graphIds).as("graphId")))
 
-    val elementContainment = elements
-      .mapValues(e => e.select(col(ColumnNames.ID), explode(e.graphIds).as(GRAPH_ID)))
+    val newGraphIds = graphIds.withColumnRenamed(ColumnNames.ID, "newGraphId")
 
-    val remainingElementIds = elementContainment.mapValues(
-      _.join(graphIds.withColumnRenamed(ColumnNames.ID, GRAPH_ID), GRAPH_ID)
-        .select(ColumnNames.ID)
+    val newElementIds = containment.mapValues(
+      _.join(newGraphIds, col("graphId") === col("newGraphId"), "leftsemi")
+        .select(col("newIds"))
         .distinct)
 
-    elements.transform((k, v) => v.join(remainingElementIds(k), ColumnNames.ID).as[EL])
+    elements.transform((k, v) => v.join(newElementIds(k), col(ColumnNames.ID) === col("newIds"), "leftsemi").as[EL])
   }
 }

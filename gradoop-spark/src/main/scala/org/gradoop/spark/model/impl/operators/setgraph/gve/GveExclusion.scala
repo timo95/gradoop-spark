@@ -1,6 +1,5 @@
 package org.gradoop.spark.model.impl.operators.setgraph.gve
 
-import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.model.api.operators.BinaryLogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.types.Gve
 
@@ -11,14 +10,9 @@ class GveExclusion[L <: Gve[L]] extends BinaryLogicalGraphToLogicalGraphOperator
     import factory.Implicits._
     import left.config.Implicits._
 
-    val remainingVertexIds = left.vertices.select(ColumnNames.ID)
-      .except(right.vertices.select(ColumnNames.ID)).dropDuplicates(ColumnNames.ID)
-    val resVertices = left.vertices.join(remainingVertexIds, ColumnNames.ID).as[L#V]
+    val vertices = left.vertices.join(right.vertices, left.vertices.id === right.vertices.id, "leftanti").as[L#V]
+    val edges = left.edges.join(right.edges, left.edges.id === right.edges.id, "leftanti").as[L#E]
 
-    val remainingEdgeIds = left.edges.select(ColumnNames.ID)
-      .except(right.edges.select(ColumnNames.ID)).dropDuplicates(ColumnNames.ID)
-    val resEdges = left.edges.join(remainingEdgeIds, ColumnNames.ID).as[L#E]
-
-    factory.init(left.graphHeads, resVertices, resEdges).removeDanglingEdges
+    factory.init(left.graphHeads, vertices, edges).removeDanglingEdges
   }
 }

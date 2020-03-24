@@ -1,6 +1,5 @@
 package org.gradoop.spark.model.impl.operators.setcollection.gve
 
-import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.model.api.operators.BinaryGraphCollectionToGraphCollectionOperator
 import org.gradoop.spark.model.impl.operators.setcollection.gve.Functions.removeUncontainedElements
 import org.gradoop.spark.model.impl.types.Gve
@@ -8,19 +7,14 @@ import org.gradoop.spark.model.impl.types.Gve
 class GveDifference[L <: Gve[L]] extends BinaryGraphCollectionToGraphCollectionOperator[L#GC] {
 
   override def execute(left: L#GC, right: L#GC): L#GC = {
-    import left.config.Implicits._
     val factory = left.factory
     import factory.Implicits._
+    import left.config.Implicits._
 
-    val leftGraphIds = left.graphHeads.select(ColumnNames.ID)
-    val rightGraphIds = right.graphHeads.select(ColumnNames.ID)
-
-    // difference on graph head ids
-    val differenceIds = leftGraphIds.except(rightGraphIds)
-    val graphHeads = left.graphHeads.join(differenceIds, ColumnNames.ID).as[L#G]
+    val graphHeads = left.graphHeads.join(right.graphHeads, left.graphHeads.id === right.graphHeads.id, "leftanti").as[L#G]
 
     factory.init(graphHeads,
-      removeUncontainedElements(left.vertices, differenceIds),
-      removeUncontainedElements(left.edges, differenceIds))
+      removeUncontainedElements(left.vertices, graphHeads.toDF),
+      removeUncontainedElements(left.edges, graphHeads.toDF))
   }
 }

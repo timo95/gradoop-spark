@@ -1,7 +1,9 @@
 package org.gradoop.spark.model.impl.operators.changelayout
 
-import org.apache.spark.sql.{Dataset, Encoder}
+import org.apache.spark.sql.functions.lit
+import org.apache.spark.sql.{DataFrame, Dataset, Encoder}
 import org.gradoop.common.model.api.elements.MainElement
+import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.expressions.FilterExpressions
 import org.gradoop.spark.io.impl.metadata.MetaData
 import org.gradoop.spark.model.api.config.GradoopSparkConfig
@@ -35,21 +37,19 @@ class GveToTfl[L1 <: Gve[L1], L2 <: Tfl[L2]](tflConfig: GradoopSparkConfig[L2],
     val edgeMap = datasetToMap(layout.edges, edgeLabelsOpt)
 
     // Transform gve map to two tfl maps (element, properties)
-    val (resGrap, resGrapProp) = TflFunctions.splitGraphHeadMap(graphHeadMap.mapValues(_.toDF))
-    val (resVert, resVertProp) = TflFunctions.splitVertexMap(vertexMap.mapValues(_.toDF))
-    val (resEdge, resEdgeProp) = TflFunctions.splitEdgeMap(edgeMap.mapValues(_.toDF))
+    val (resGrap, resGrapProp) = TflFunctions.splitGraphHeadMap(graphHeadMap)
+    val (resVert, resVertProp) = TflFunctions.splitVertexMap(vertexMap)
+    val (resEdge, resEdgeProp) = TflFunctions.splitEdgeMap(edgeMap)
 
     tflFactory.init(resGrap, resVert, resEdge, resGrapProp, resVertProp, resEdgeProp)
   }
 
   private def datasetToMap[A <: MainElement](dataset: Dataset[A], labelsOpt: Option[Iterable[String]])
-    (implicit encoder: Encoder[String]): Map[String, Dataset[A]] = {
+    (implicit stringEncoder: Encoder[String]): Map[String, DataFrame] = {
     import org.gradoop.spark.util.Implicits._
 
-    val labels: Iterable[String] = labelsOpt.getOrElse(
-      dataset.select(dataset.label).distinct.collect)
-
-    labels.map(l => (l, dataset.filter(FilterExpressions.hasLabel(l)))).toMap
+    val labels: Iterable[String] = labelsOpt.getOrElse(dataset.select(dataset.label).distinct.collect)
+    labels.map(l => (l, dataset.filter(FilterExpressions.hasLabel(l)).withColumn(ColumnNames.LABEL, lit(l)))).toMap
   }
 }
 

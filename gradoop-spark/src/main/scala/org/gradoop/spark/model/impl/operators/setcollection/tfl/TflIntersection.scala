@@ -1,5 +1,6 @@
 package org.gradoop.spark.model.impl.operators.setcollection.tfl
 
+import org.apache.spark.sql.Dataset
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.model.api.operators.BinaryGraphCollectionToGraphCollectionOperator
 import org.gradoop.spark.model.impl.operators.setcollection.tfl.Functions.removeUncontainedElements
@@ -13,16 +14,13 @@ class TflIntersection[L <: Tfl[L]] extends BinaryGraphCollectionToGraphCollectio
     import factory.Implicits._
     implicit val sparkSession = factory.sparkSession
 
-    val leftGraphIds = left.graphHeads.mapValues(_.select(ColumnNames.ID))
-    val rightGraphIdsUnion = TflFunctions.reduceUnion(right.graphHeads.values.map(_.select(ColumnNames.ID)))
+    val resGraphHeads = TflFunctions.mergeMapsInner(left.graphHeads, right.graphHeads,
+      (l: Dataset[L#G], r: Dataset[L#G]) => l.join(r, l(ColumnNames.ID) === r(ColumnNames.ID), "leftsemi").as[L#G])
 
-    val remainingIds = leftGraphIds.mapValues(v => v.intersect(rightGraphIdsUnion))
-    val resGraphHeads = left.graphHeads.transform((k, v) =>
-      v.join(remainingIds(k), ColumnNames.ID).as[L#G])
+    val graphIds = TflFunctions.reduceUnion(resGraphHeads.values.map(_.select(ColumnNames.ID)))
 
-    val remainingIdsUnion = TflFunctions.reduceUnion(remainingIds.values)
-    val resVertices = removeUncontainedElements(left.vertices, remainingIdsUnion)
-    val resEdges = removeUncontainedElements(left.edges, remainingIdsUnion)
+    val resVertices = removeUncontainedElements(left.vertices, graphIds)
+    val resEdges = removeUncontainedElements(left.edges, graphIds)
 
     left.factory.init(resGraphHeads, resVertices, resEdges,
       TflFunctions.inducePropMap(resGraphHeads, left.graphHeadProperties),

@@ -13,13 +13,13 @@ class TflOverlap[L <: Tfl[L]] extends BinaryLogicalGraphToLogicalGraphOperator[L
     import factory.Implicits._
 
     val resVertices = TflFunctions.mergeMapsInner(left.vertices, right.vertices,
-      (l: Dataset[L#V], r: Dataset[L#V]) => l.join(r.select(ColumnNames.ID), ColumnNames.ID).as[L#V])
+      (l: Dataset[L#V], r: Dataset[L#V]) => l.join(r, l(ColumnNames.ID) === r(ColumnNames.ID), "leftsemi").as[L#V])
     val resEdges = TflFunctions.mergeMapsInner(left.edges, right.edges,
-      (l: Dataset[L#E], r: Dataset[L#E]) => l.join(r.select(ColumnNames.ID), ColumnNames.ID).as[L#E])
+      (l: Dataset[L#E], r: Dataset[L#E]) => l.join(r, l(ColumnNames.ID) === r(ColumnNames.ID), "leftsemi").as[L#E])
     val resVertexProps = TflFunctions.mergeMapsInner(left.vertexProperties, right.vertexProperties,
-      (l: Dataset[L#P], r: Dataset[L#P]) => l.join(r.select(ColumnNames.ID), ColumnNames.ID).as[L#P])
+      (l: Dataset[L#P], r: Dataset[L#P]) => l.join(r, l(ColumnNames.ID) === r(ColumnNames.ID), "leftsemi").as[L#P])
     val resEdgeProps = TflFunctions.mergeMapsInner(left.edgeProperties, right.edgeProperties,
-      (l: Dataset[L#P], r: Dataset[L#P]) => l.join(r.select(ColumnNames.ID), ColumnNames.ID).as[L#P])
+      (l: Dataset[L#P], r: Dataset[L#P]) => l.join(r, l(ColumnNames.ID) === r(ColumnNames.ID), "leftsemi").as[L#P])
 
     factory.init(left.graphHeads, resVertices, resEdges, left.graphHeadProperties, resVertexProps, resEdgeProps)
   }

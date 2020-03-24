@@ -17,9 +17,9 @@ class TflRemoveDanglingEdges[L <: Tfl[L]] extends UnaryLogicalGraphToLogicalGrap
       .map(_.select(ColumnNames.ID).cache))
 
     val filteredEdgesSource = graph.edges.mapValues(e =>
-      e.joinWith(vertexIdUnion, e.sourceId === vertexIdUnion(ColumnNames.ID)).select("_1.*").as[L#E])
+      e.join(vertexIdUnion, e.sourceId === vertexIdUnion(ColumnNames.ID), "leftsemi").as[L#E])
     val filteredEdges = filteredEdgesSource.mapValues(e =>
-      e.joinWith(vertexIdUnion, e.targetId === vertexIdUnion(ColumnNames.ID)).select("_1.*").as[L#E])
+      e.join(vertexIdUnion, e.targetId === vertexIdUnion(ColumnNames.ID), "leftsemi").as[L#E])
 
     graph.factory.init(graph.graphHead, graph.vertices, filteredEdges, graph.graphHeadProperties,
       graph.vertexProperties, TflFunctions.inducePropMap(filteredEdges, graph.edgeProperties))

@@ -1,7 +1,7 @@
 package org.gradoop.spark.io.impl.metadata
 
-import org.apache.spark.sql.functions.col
 import org.apache.spark.sql._
+import org.apache.spark.sql.functions.col
 import org.gradoop.common.model.api.elements.AttributedElement
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.ColumnNames
@@ -83,16 +83,19 @@ object MetaData {
     def structOrNull(cols: Column*): Column = when(cols.map(c => isnull(c)).reduce(_&&_), lit(null))
       .otherwise(struct(cols: _*))
 
+    val PROPERTY = "property"
+    val PROPERTY_TYPE = "propertyType"
+
     dataset
       // one row for each property per element
-      .select(dataset.label, explode_outer(dataset.properties).as(Seq(PropertyMetaData.key, "property")))
+      .select(dataset.label, explode_outer(dataset.properties).as(Seq(PropertyMetaData.key, PROPERTY)))
       // put property key and type in struct
-      .select(col(LABEL), structOrNull(col(PropertyMetaData.key), getTypeString(col(s"property"))
-        .as(PropertyMetaData.typeString)).as("propertyType"))
-      // group by label
+      .select(col(LABEL), structOrNull(col(PropertyMetaData.key), getTypeString(col(PROPERTY))
+        .as(PropertyMetaData.typeString)).as(PROPERTY_TYPE))
+      // metadata is described per label
       .groupBy(LABEL)
       // aggregate property structs to a set per label
-      .agg(collect_set("propertyType").as(ElementMetaData.metaData))
+      .agg(collect_set(PROPERTY_TYPE).as(ElementMetaData.metaData))
       .as[ElementMetaData]
   }
 }
