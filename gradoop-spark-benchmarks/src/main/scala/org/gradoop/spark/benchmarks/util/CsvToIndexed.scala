@@ -13,13 +13,15 @@ object CsvToIndexed extends EpgmConfigs {
       descr = "Input path for a csv graph")
     val output: ScallopOption[String] = opt[String](required = true,
       descr = "Output path for a indexed csv graph")
+
+    verify()
   }
 
   def main(args: Array[String]): Unit = {
     val conf = new Conf(args)
 
     implicit val session: SparkSession = SparkSession.builder
-      .appName("Csv to Indexed Csv")//.master("local[1]")
+      .appName("Csv to Indexed Csv: %s to %s".format(conf.input(), conf.output()))//.master("local[1]")
       .getOrCreate()
 
     val source = CsvDataSource(conf.input(), gveConfig)
