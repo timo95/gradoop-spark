@@ -12,7 +12,7 @@ class TflExclusion[L <: Tfl[L]] extends BinaryLogicalGraphToLogicalGraphOperator
     val factory = left.factory
     import factory.Implicits._
 
-    val vertices = TflFunctions.mergeMapsInner(left.vertices, right.vertices,
+    val vertices = TflFunctions.mergeMapsLeft(left.vertices, right.vertices,
       (l: Dataset[L#V], r: Dataset[L#V]) => l.join(r, l(ColumnNames.ID) === r(ColumnNames.ID), "leftanti").as[L#V])
 
     val edges = TflFunctions.mergeMapsLeft(left.edges, right.edges,
