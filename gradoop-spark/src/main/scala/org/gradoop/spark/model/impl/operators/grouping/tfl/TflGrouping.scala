@@ -51,8 +51,8 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
       superVerticesDF = key.addKey(superVerticesDF, col(KEYS + "." + key.name))
     }
 
-    // Cache grouping result
-    superVerticesDF = superVerticesDF.mapValues(_.cache)
+    // Cache grouping result and add broadcast hint for joins
+    superVerticesDF = superVerticesDF.mapValues(df => broadcast(df.cache))
 
     // Transform result to vertex and property maps
     val (superVertices, superVertexProperties) = splitVertexMap(superVerticesDF.mapValues(_.drop(KEYS)))

@@ -58,8 +58,8 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
       superVerticesDF = key.addKey(superVerticesDF, col(KEYS + "." + key.name))
     }
 
-    // Cache grouping result
-    superVerticesDF = superVerticesDF.cache
+    // Cache grouping result and add broadcast hint for joins
+    superVerticesDF = broadcast(superVerticesDF.cache)
 
     // Transform result to vertex
     val superVertices = superVerticesDF

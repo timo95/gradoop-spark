@@ -70,8 +70,8 @@ object TflFunctions {
     (implicit pEncoder: Encoder[P]): Map[String, Dataset[P]] = {
     val elem = element.mapValues(_.withColumnRenamed(ColumnNames.ID, "e_id").as("elem"))
 
-    elem.transform((k, v) => {
-      prop(k).as("prop").join(v,
+    prop.transform((k, v) => {
+      v.as("prop").join(elem(k),
         col(s"prop.${ColumnNames.ID}") === col(s"elem.e_id"), "leftsemi")
         .as[P]
     })
