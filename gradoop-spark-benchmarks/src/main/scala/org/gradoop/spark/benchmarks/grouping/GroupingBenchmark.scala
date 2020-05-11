@@ -1,10 +1,10 @@
 package org.gradoop.spark.benchmarks.grouping
 
-import org.apache.spark.sql.Column
+
 import org.gradoop.spark.benchmarks.IoBenchmark
 import org.gradoop.spark.benchmarks.IoBenchmark.IoConf
 import org.gradoop.spark.benchmarks.grouping.GroupingBenchmark.{MAX, MIN, SUM}
-import org.gradoop.spark.expressions.AggregationExpressions
+import org.gradoop.spark.functions.aggregation._
 import org.gradoop.spark.functions.{LabelKeyFunction, PropertyKeyFunction}
 import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
 import org.gradoop.spark.model.impl.types.LayoutType
@@ -38,15 +38,15 @@ object GroupingBenchmark extends IoBenchmark[GroupingConf] {
     graph.groupBy(groupingBuilder)
   }
 
-  private def parseAggFuncs(strings: List[String]): Seq[Column] = {
+  private def parseAggFuncs(strings: List[String]): Seq[AggregationFunction] = {
     val it = strings.iterator
-    var agg = Seq.empty[Column]
+    var agg = Seq.empty[AggregationFunction]
     while(it.hasNext) {
       it.next match {
-        case GroupingBenchmark.COUNT => agg = agg :+ AggregationExpressions.count
-        case GroupingBenchmark.MIN => agg = agg :+ AggregationExpressions.minProp(it.next)
-        case GroupingBenchmark.MAX => agg = agg :+ AggregationExpressions.maxProp(it.next)
-        case GroupingBenchmark.SUM => agg = agg :+ AggregationExpressions.sumProp(it.next)
+        case GroupingBenchmark.COUNT => agg = agg :+ Count()
+        case GroupingBenchmark.MIN => agg = agg :+ Min(it.next)
+        case GroupingBenchmark.MAX => agg = agg :+ Max(it.next)
+        case GroupingBenchmark.SUM => agg = agg :+ Sum(it.next)
         case any: String => throw new IllegalArgumentException("Aggregate function '%s' is not supported".format(any))
       }
     }

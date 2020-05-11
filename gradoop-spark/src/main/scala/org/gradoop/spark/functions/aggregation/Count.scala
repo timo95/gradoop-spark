@@ -20,3 +20,8 @@ class Count(val name: String) extends AggregationFunction {
     toProp(sum(col(name))).as(name)
   }
 }
+
+object Count {
+
+  def apply(): Count = new Count("count")
+}

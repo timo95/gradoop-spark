@@ -3,7 +3,7 @@ package org.gradoop.spark.functions.aggregation
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions.col
 import org.gradoop.common.util.ColumnNames
-import org.gradoop.spark.expressions.udaf.SumAggregateFunction
+import org.gradoop.spark.functions.aggregation.udaf.SumAggregateFunction
 
 class Sum(key: String, val name: String) extends AggregationFunction {
   private val sumAgg = new SumAggregateFunction
@@ -19,4 +19,9 @@ class Sum(key: String, val name: String) extends AggregationFunction {
   override def finish(): Column = {
     sumAgg(col(name)).as(name)
   }
+}
+
+object Sum {
+
+  def apply(key: String): Sum = new Sum(key, "sum_" + key)
 }
