@@ -3,6 +3,7 @@ package org.gradoop.spark.model.impl.operators.grouping.gve
 import org.apache.spark.sql.Column
 import org.gradoop.common.util.ColumnNames
 import org.gradoop.spark.functions.KeyFunction
+import org.gradoop.spark.functions.aggregation.AggregationFunction
 import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOperator
 import org.gradoop.spark.model.impl.operators.grouping.Functions._
 import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
@@ -24,8 +25,8 @@ import org.gradoop.spark.model.impl.types.Gve
  * @param edgeAggFunctions edge aggregation functions
  * @tparam L layout type
  */
-class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFunctions: Seq[Column],
-  edgeGroupingKeys: Seq[KeyFunction], edgeAggFunctions: Seq[Column])
+class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFunctions: Seq[AggregationFunction],
+  edgeGroupingKeys: Seq[KeyFunction], edgeAggFunctions: Seq[AggregationFunction])
   extends UnaryLogicalGraphToLogicalGraphOperator[L#LG] {
 
   override def execute(graph: L#LG): L#LG = {
@@ -43,7 +44,7 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     val verticesWithKeys = graph.vertices.withColumn(KEYS, struct(vertexKeys: _*)).cache
 
     // Group and aggregate vertices
-    val vertexAgg = if(vertexAggFunctions.isEmpty) Seq(DEFAULT_AGG) else vertexAggFunctions
+    val vertexAgg = if(vertexAggFunctions.isEmpty) Seq(DEFAULT_AGG.complete()) else vertexAggFunctions.map(_.complete())
     var superVerticesDF = verticesWithKeys.groupBy(KEYS)
       .agg(vertexAgg.head, vertexAgg.drop(1): _*)
 
@@ -51,7 +52,7 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     superVerticesDF = addDefaultColumns(superVerticesDF)
 
     // Add aggregation result to properties
-    superVerticesDF = columnsToProperties(superVerticesDF, vertexAggFunctions)
+    superVerticesDF = columnsToProperties(superVerticesDF, vertexAggFunctions.map(_.name))
 
     // Add grouping keys to result
     for(key <- vertexGroupingKeys) {
@@ -88,7 +89,7 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
       .withColumnRenamed(SUPER_ID, ColumnNames.TARGET_ID)
 
     // Group and aggregate edges
-    val edgeAgg = if(edgeAggFunctions.isEmpty) Seq(DEFAULT_AGG) else edgeAggFunctions
+    val edgeAgg = if(edgeAggFunctions.isEmpty) Seq(DEFAULT_AGG.complete()) else edgeAggFunctions.map(_.complete())
     var superEdgesDF = updatedEdges
       .groupBy(KEYS, ColumnNames.SOURCE_ID, ColumnNames.TARGET_ID)
       .agg(edgeAgg.head, edgeAgg.drop(1): _*)
@@ -97,7 +98,7 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     superEdgesDF = addDefaultColumns(superEdgesDF)
 
     // Add aggregation result to properties
-    superEdgesDF = columnsToProperties(superEdgesDF, edgeAggFunctions)
+    superEdgesDF = columnsToProperties(superEdgesDF, edgeAggFunctions.map(_.name))
 
     // Add grouping keys to result
     for(key <- edgeGroupingKeys) {

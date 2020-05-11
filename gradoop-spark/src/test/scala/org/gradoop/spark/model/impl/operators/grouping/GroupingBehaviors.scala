@@ -1,7 +1,7 @@
 package org.gradoop.spark.model.impl.operators.grouping
 
 import org.gradoop.common.util.GradoopConstants.NULL_STRING
-import org.gradoop.spark.expressions.AggregationExpressions
+import org.gradoop.spark.functions.aggregation.{Count, Max, Min, Sum}
 import org.gradoop.spark.functions.{LabelKeyFunction, PropertyKeyFunction}
 import org.gradoop.spark.util.SparkAsciiGraphLoader
 import org.gradoop.spark.{EpgmGradoopSparkTestBase, OperatorTest}
@@ -27,8 +27,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new PropertyKeyFunction("city"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -53,8 +53,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new PropertyKeyFunction("city"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -86,8 +86,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new PropertyKeyFunction("city"),
         new PropertyKeyFunction("gender"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -106,8 +106,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new PropertyKeyFunction("city"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -129,8 +129,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new PropertyKeyFunction("city"),
         new PropertyKeyFunction("gender"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -157,8 +157,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new PropertyKeyFunction("city"))
       groupingBuilder.edgeGroupingKeys = Seq(new PropertyKeyFunction("since"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -204,8 +204,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       groupingBuilder.vertexGroupingKeys = Seq(new PropertyKeyFunction("a"))
       groupingBuilder.edgeGroupingKeys = Seq(new PropertyKeyFunction("a"),
         new PropertyKeyFunction("b"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -254,8 +254,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
         new PropertyKeyFunction("b"))
       groupingBuilder.edgeGroupingKeys = Seq(new PropertyKeyFunction("a"),
         new PropertyKeyFunction("b"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -276,8 +276,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new PropertyKeyFunction("city"))
       groupingBuilder.edgeGroupingKeys = Seq(new PropertyKeyFunction("since"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -301,8 +301,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -327,8 +327,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("city"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -359,8 +359,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("city"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -382,8 +382,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
       groupingBuilder.edgeGroupingKeys = Seq(new PropertyKeyFunction("since"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -409,8 +409,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
       groupingBuilder.edgeGroupingKeys = Seq(new PropertyKeyFunction("since"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -437,8 +437,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("city"))
       groupingBuilder.edgeGroupingKeys = Seq(new PropertyKeyFunction("since"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -462,8 +462,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
       groupingBuilder.edgeGroupingKeys = Seq(new LabelKeyFunction)
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -489,8 +489,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("city"))
       groupingBuilder.edgeGroupingKeys = Seq(new LabelKeyFunction)
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -524,8 +524,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("city"))
       groupingBuilder.edgeGroupingKeys = Seq(new LabelKeyFunction)
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -547,8 +547,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
       groupingBuilder.edgeGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("since"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -575,8 +575,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
       groupingBuilder.edgeGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("since"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -603,8 +603,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("city"))
       groupingBuilder.edgeGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("since"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -639,8 +639,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("city"))
       groupingBuilder.edgeGroupingKeys = Seq(new LabelKeyFunction, new PropertyKeyFunction("since"))
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -715,8 +715,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -736,8 +736,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.sumProp("a").as("sumA"))
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.sumProp("b").as("sumB"))
+      groupingBuilder.vertexAggFunctions = Seq(new Sum("a", "sumA"))
+      groupingBuilder.edgeAggFunctions = Seq(new Sum("b", "sumB"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -773,8 +773,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.sumProp("a").as("sumA"))
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.sumProp("b").as("sumB"))
+      groupingBuilder.vertexAggFunctions = Seq(new Sum("a", "sumA"))
+      groupingBuilder.edgeAggFunctions = Seq(new Sum("b", "sumB"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -794,8 +794,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.sumProp("a").as("sumA"))
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.sumProp("b").as("sumB"))
+      groupingBuilder.vertexAggFunctions = Seq(new Sum("a", "sumA"))
+      groupingBuilder.edgeAggFunctions = Seq(new Sum("b", "sumB"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -815,8 +815,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.minProp("a").as("minA"))
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.minProp("b").as("minB"))
+      groupingBuilder.vertexAggFunctions = Seq(new Min("a", "minA"))
+      groupingBuilder.edgeAggFunctions = Seq(new Min("b", "minB"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -852,8 +852,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.minProp("a").as("minA"))
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.minProp("b").as("minB"))
+      groupingBuilder.vertexAggFunctions = Seq(new Min("a", "minA"))
+      groupingBuilder.edgeAggFunctions = Seq(new Min("b", "minB"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -873,8 +873,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.minProp("a").as("minA"))
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.minProp("b").as("minB"))
+      groupingBuilder.vertexAggFunctions = Seq(new Min("a", "minA"))
+      groupingBuilder.edgeAggFunctions = Seq(new Min("b", "minB"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -894,8 +894,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.maxProp("a").as("maxA"))
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.maxProp("b").as("maxB"))
+      groupingBuilder.vertexAggFunctions = Seq(new Max("a", "maxA"))
+      groupingBuilder.edgeAggFunctions = Seq(new Max("b", "maxB"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -931,8 +931,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.maxProp("a").as("maxA"))
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.maxProp("b").as("maxB"))
+      groupingBuilder.vertexAggFunctions = Seq(new Max("a", "maxA"))
+      groupingBuilder.edgeAggFunctions = Seq(new Max("b", "maxB"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -952,8 +952,8 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.maxProp("a").as("maxA"))
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.maxProp("b").as("maxB"))
+      groupingBuilder.vertexAggFunctions = Seq(new Max("a", "maxA"))
+      groupingBuilder.edgeAggFunctions = Seq(new Max("b", "maxB"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }
@@ -973,14 +973,14 @@ trait GroupingBehaviors extends EpgmGradoopSparkTestBase {
 
       val groupingBuilder = new GroupingBuilder
       groupingBuilder.vertexGroupingKeys = Seq(new LabelKeyFunction)
-      groupingBuilder.vertexAggFunctions = Seq(AggregationExpressions.minProp("a").as("minA"),
-        AggregationExpressions.maxProp("a").as("maxA"),
-        AggregationExpressions.sumProp("a").as("sumA"),
-        AggregationExpressions.count)
-      groupingBuilder.edgeAggFunctions = Seq(AggregationExpressions.minProp("b").as("minB"),
-        AggregationExpressions.maxProp("b").as("maxB"),
-        AggregationExpressions.sumProp("b").as("sumB"),
-        AggregationExpressions.count)
+      groupingBuilder.vertexAggFunctions = Seq(new Min("a", "minA"),
+        new Max("a", "maxA"),
+        new Sum("a", "sumA"),
+        new Count("count"))
+      groupingBuilder.edgeAggFunctions = Seq(new Min("b", "minB"),
+        new Max("b", "maxB"),
+        new Sum("b", "sumB"),
+        new Count("count"))
 
       assert(runGrouping(graph, groupingBuilder).equalsByData(expected))
     }

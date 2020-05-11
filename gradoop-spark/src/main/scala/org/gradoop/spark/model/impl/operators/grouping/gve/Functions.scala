@@ -1,11 +1,11 @@
 package org.gradoop.spark.model.impl.operators.grouping.gve
 
-import org.apache.spark.sql.{Column, DataFrame}
-import org.apache.spark.sql.functions.{array, col, lit, map_from_arrays, monotonically_increasing_id, typedLit}
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
 import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
 import org.gradoop.common.util.{ColumnNames, GradoopConstants}
-import org.gradoop.spark.model.impl.operators.grouping.Functions.{DEFAULT_AGG, getAlias, longToId}
+import org.gradoop.spark.model.impl.operators.grouping.Functions.{DEFAULT_AGG, longToId}
 
 private[gve] object Functions {
 
@@ -15,15 +15,14 @@ private[gve] object Functions {
    * If the column list is empty, an empty property map is added.
    *
    * @param dataFrame dataframe with given columns
-   * @param columns column expressions used for columns
+   * @param columnNames names used for columns
    * @return dataframe with given columns moved to properties map
    */
-  def columnsToProperties(dataFrame: DataFrame, columns: Seq[Column]): DataFrame = {
-    if(columns.isEmpty) {
+  def columnsToProperties(dataFrame: DataFrame, columnNames: Seq[String]): DataFrame = {
+    if(columnNames.isEmpty) {
       dataFrame.withColumn(ColumnNames.PROPERTIES, typedLit(Map.empty[String, PropertyValue]))
-        .drop(getAlias(DEFAULT_AGG))
+        .drop(DEFAULT_AGG.name)
     } else {
-      val columnNames = columns.map(c => getAlias(c))
       dataFrame.withColumn(ColumnNames.PROPERTIES, map_from_arrays(
         array(columnNames.map(n => lit(n)): _*),
         array(columnNames.map(n => col(n)): _*)))

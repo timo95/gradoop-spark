@@ -2,16 +2,17 @@ package org.gradoop.spark.model.impl.operators.grouping.tfl
 
 import org.apache.spark.sql.{Column, SparkSession}
 import org.gradoop.common.util.{ColumnNames, GradoopConstants}
+import org.gradoop.spark.functions.aggregation.AggregationFunction
 import org.gradoop.spark.functions.{KeyFunction, LabelKeyFunction}
 import org.gradoop.spark.model.api.operators.UnaryLogicalGraphToLogicalGraphOperator
-import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
 import org.gradoop.spark.model.impl.operators.grouping.Functions._
+import org.gradoop.spark.model.impl.operators.grouping.GroupingBuilder
 import org.gradoop.spark.model.impl.operators.grouping.tfl.Functions._
 import org.gradoop.spark.model.impl.types.Tfl
 import org.gradoop.spark.util.TflFunctions._
 
-class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFunctions: Seq[Column],
-  edgeGroupingKeys: Seq[KeyFunction], edgeAggFunctions: Seq[Column])
+class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFunctions: Seq[AggregationFunction],
+  edgeGroupingKeys: Seq[KeyFunction], edgeAggFunctions: Seq[AggregationFunction])
   extends UnaryLogicalGraphToLogicalGraphOperator[L#LG] {
 
   override def execute(graph: L#LG): L#LG = {
@@ -29,16 +30,21 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     val verticesWithKeys = graph.verticesWithProperties
       .mapValues(_.withColumn(KEYS, struct(vertexKeys: _*)).cache)
 
-    // Group and aggregate vertices
-    val vertexAgg = if(vertexAggFunctions.isEmpty) Seq(DEFAULT_AGG) else vertexAggFunctions
+    // Group and aggregate vertices per label
+    val vertexAggBegin = if(vertexAggFunctions.isEmpty) Seq(DEFAULT_AGG.begin()) else vertexAggFunctions.map(_.begin())
+    val superVerticesPerLabel = verticesWithKeys
+      .mapValues(_.groupBy(KEYS).agg(vertexAggBegin.head, vertexAggBegin.drop(1): _*))
+
+    // Union over labels and group and aggregate
+    val vertexAggFinish = if(vertexAggFunctions.isEmpty) Seq(DEFAULT_AGG.finish()) else vertexAggFunctions.map(_.finish())
     var superVerticesDF = Map(GradoopConstants.DEFAULT_GRAPH_LABEL ->
-      reduceUnion(verticesWithKeys.values).groupBy(KEYS).agg(vertexAgg.head, vertexAgg.drop(1): _*))
+      reduceUnion(superVerticesPerLabel.values).groupBy(KEYS).agg(vertexAggFinish.head, vertexAggFinish.drop(1): _*))
 
     // Add default ID, Label and GraphIds
     superVerticesDF = addDefaultColumns(superVerticesDF)
 
     // Add aggregation result to properties
-    superVerticesDF = columnsToProperties(superVerticesDF, vertexAggFunctions)
+    superVerticesDF = columnsToProperties(superVerticesDF, vertexAggFunctions.map(_.name))
 
     // Add grouping keys to result
     val vertexLabels = verticesWithKeys.keys.toArray
@@ -82,17 +88,23 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
         .drop(ColumnNames.TARGET_ID, VERTEX_ID)
         .withColumnRenamed(SUPER_ID, ColumnNames.TARGET_ID))
 
-    // Group and aggregate edges
-    val edgeAgg = if(edgeAggFunctions.isEmpty) Seq(DEFAULT_AGG) else edgeAggFunctions
-    var superEdgesDF = Map(GradoopConstants.DEFAULT_GRAPH_LABEL -> reduceUnion(updatedEdges.values)
+    // Group and aggregate edges per label
+    val edgeAggBegin = if(edgeAggFunctions.isEmpty) Seq(DEFAULT_AGG.begin()) else edgeAggFunctions.map(_.begin())
+    val superEdgesPerLabel = updatedEdges.mapValues(_
       .groupBy(KEYS, ColumnNames.SOURCE_ID, ColumnNames.TARGET_ID)
-      .agg(edgeAgg.head, edgeAgg.drop(1): _*))
+      .agg(edgeAggBegin.head, edgeAggBegin.drop(1): _*))
+
+    // Union over labels and group and aggregate edges
+    val edgeAggFinish = if(edgeAggFunctions.isEmpty) Seq(DEFAULT_AGG.finish()) else edgeAggFunctions.map(_.finish())
+    var superEdgesDF = Map(GradoopConstants.DEFAULT_GRAPH_LABEL -> reduceUnion(superEdgesPerLabel.values)
+      .groupBy(KEYS, ColumnNames.SOURCE_ID, ColumnNames.TARGET_ID)
+      .agg(edgeAggFinish.head, edgeAggFinish.drop(1): _*))
 
     // Add default ID, Label and GraphIds
     superEdgesDF = addDefaultColumns(superEdgesDF)
 
     // Add aggregation result to properties
-    superEdgesDF = columnsToProperties(superEdgesDF, edgeAggFunctions)
+    superEdgesDF = columnsToProperties(superEdgesDF, edgeAggFunctions.map(_.name))
 
     // Add grouping keys to result
     val edgeLabels = edgesWithKeys.keys.toArray
