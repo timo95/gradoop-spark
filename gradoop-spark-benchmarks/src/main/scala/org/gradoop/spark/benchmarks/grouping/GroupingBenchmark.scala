@@ -64,9 +64,9 @@ class GroupingConf(arguments: Seq[String]) extends IoConf(arguments) {
   val edgeGroupProperties: ScallopOption[List[String]] = trailArg[List[String]](default = Some(List.empty),
     name = "gep", required = false, descr = "Group by edge property values")
   val vertexAggregation: ScallopOption[List[String]] = trailArg[List[String]](default = Some(List.empty),
-    name = "ga", required = false, descr = "Vertex Aggregation functions (count, min, max, sum)", validate = validateAgg)
+    name = "gva", required = false, descr = "Vertex Aggregation functions (count, min, max, sum)", validate = validateAgg)
   val edgeAggregation: ScallopOption[List[String]] = trailArg[List[String]](default = Some(List.empty),
-    name = "ga", required = false, descr = "Edge Aggregation functions (count, min, max, sum)", validate = validateAgg)
+    name = "gea", required = false, descr = "Edge Aggregation functions (count, min, max, sum)", validate = validateAgg)
 
   private def validateAgg(strings: List[String]): Boolean = {
     val withArgs = strings.filter(_ != GroupingBenchmark.COUNT) // remove functions without arguments
