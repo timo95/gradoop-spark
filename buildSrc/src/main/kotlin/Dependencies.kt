@@ -18,5 +18,5 @@ object Versions {
     var pegdown = "1.4.2"
 
     // Benchmarks
-    var scallop = "3.2.0"
+    var scallop = "3.4.0"
 }

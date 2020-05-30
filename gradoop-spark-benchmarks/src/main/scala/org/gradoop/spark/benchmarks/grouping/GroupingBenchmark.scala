@@ -34,10 +34,21 @@ object GroupingBenchmark extends IoBenchmark[GroupingConf] {
     groupingBuilder.vertexAggFunctions = parseAggFuncs(conf.vertexAggregation())
     groupingBuilder.edgeAggFunctions = parseAggFuncs(conf.edgeAggregation())
 
+    println(groupingBuilder)
+
     // Run
     graph.groupBy(groupingBuilder)
   }
 
+  /** Parse list of strings as aggregation functions.
+   *  The string list has to be of the form "function1 [, function1 arguments], function2, ..."
+   *  with the aggregation function names and arguments corresponding to the following list:
+   *
+   *  count: -
+   *  min: Property key
+   *  max: Property key
+   *  sum: Property key
+   */
   private def parseAggFuncs(strings: List[String]): Seq[AggregationFunction] = {
     val it = strings.iterator
     var agg = Seq.empty[AggregationFunction]
@@ -55,18 +66,20 @@ object GroupingBenchmark extends IoBenchmark[GroupingConf] {
 }
 
 class GroupingConf(arguments: Seq[String]) extends IoConf(arguments) {
-  val vertexGroupLabel: ScallopOption[Boolean] = toggle(default = Some(false), name = "gvl", noshort = true,
-    descrYes = "Group by vertex label")
-  val edgeGroupLabel: ScallopOption[Boolean] = toggle(default = Some(false), name = "gel", noshort = true,
-    descrYes = "Group by edge label")
-  val vertexGroupProperties: ScallopOption[List[String]] = trailArg[List[String]](default = Some(List.empty),
-    name = "gvp", required = false, descr = "Group by vertex property values")
-  val edgeGroupProperties: ScallopOption[List[String]] = trailArg[List[String]](default = Some(List.empty),
-    name = "gep", required = false, descr = "Group by edge property values")
-  val vertexAggregation: ScallopOption[List[String]] = trailArg[List[String]](default = Some(List.empty),
-    name = "gva", required = false, descr = "Vertex Aggregation functions (count, min, max, sum)", validate = validateAgg)
-  val edgeAggregation: ScallopOption[List[String]] = trailArg[List[String]](default = Some(List.empty),
-    name = "gea", required = false, descr = "Edge Aggregation functions (count, min, max, sum)", validate = validateAgg)
+  val vertexGroupLabel: ScallopOption[Boolean] = toggle(default = Some(false),
+    name = "gvl", noshort = true, descrYes = "Group by vertex label")
+  val edgeGroupLabel: ScallopOption[Boolean] = toggle(default = Some(false),
+    name = "gel", noshort = true, descrYes = "Group by edge label")
+
+  val vertexGroupProperties: ScallopOption[List[String]] = opt[List[String]](default = Some(List.empty),
+    name = "gvp", noshort = true, descr = "Group by vertex property values")
+  val edgeGroupProperties: ScallopOption[List[String]] = opt[List[String]](default = Some(List.empty),
+    name = "gep", noshort = true, descr = "Group by edge property values")
+
+  val vertexAggregation: ScallopOption[List[String]] = opt[List[String]](default = Some(List.empty),
+    name = "gva", noshort = true, descr = "Vertex Aggregation functions (count, min, max, sum)", validate = validateAgg)
+  val edgeAggregation: ScallopOption[List[String]] = opt[List[String]](default = Some(List.empty),
+    name = "gea", noshort = true, descr = "Edge Aggregation functions (count, min, max, sum)", validate = validateAgg)
 
   private def validateAgg(strings: List[String]): Boolean = {
     val withArgs = strings.filter(_ != GroupingBenchmark.COUNT) // remove functions without arguments
