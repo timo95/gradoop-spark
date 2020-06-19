@@ -44,7 +44,7 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     val verticesWithKeys = graph.vertices.withColumn(KEYS, struct(vertexKeys: _*)).cache
 
     // Group and aggregate vertices
-    val vertexAgg = if(vertexAggFunctions.isEmpty) Seq(DEFAULT_AGG.complete()) else vertexAggFunctions.map(_.complete())
+    val vertexAgg = if(vertexAggFunctions.isEmpty) Seq(DEFAULT_AGG.aggregate()) else vertexAggFunctions.map(_.aggregate())
     var superVerticesDF = verticesWithKeys.groupBy(KEYS)
       .agg(vertexAgg.head, vertexAgg.drop(1): _*)
 
@@ -70,7 +70,7 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     // Extract vertex id -> superId mapping (needed for edges)
     val vertexIdMap = verticesWithKeys.select(KEYS, ColumnNames.ID)
       .join(superVerticesDF.select(col(KEYS), col(ColumnNames.ID).as(SUPER_ID)), KEYS)
-      .select(col(ColumnNames.ID).as(VERTEX_ID), col(SUPER_ID))
+      .select(col(ColumnNames.ID).as(VERTEX_ID), col(SUPER_ID)).cache()
 
     // ----- Edges -----
 
@@ -89,7 +89,7 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
       .withColumnRenamed(SUPER_ID, ColumnNames.TARGET_ID)
 
     // Group and aggregate edges
-    val edgeAgg = if(edgeAggFunctions.isEmpty) Seq(DEFAULT_AGG.complete()) else edgeAggFunctions.map(_.complete())
+    val edgeAgg = if(edgeAggFunctions.isEmpty) Seq(DEFAULT_AGG.aggregate()) else edgeAggFunctions.map(_.aggregate())
     var superEdgesDF = updatedEdges
       .groupBy(KEYS, ColumnNames.SOURCE_ID, ColumnNames.TARGET_ID)
       .agg(edgeAgg.head, edgeAgg.drop(1): _*)

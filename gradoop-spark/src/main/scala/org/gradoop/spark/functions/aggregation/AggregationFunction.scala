@@ -6,10 +6,6 @@ abstract class AggregationFunction {
 
   val name: String
 
-  def complete(): Column
-
-  def begin(): Column
-
-  def finish(): Column
+  def aggregate(): Column
 
 }

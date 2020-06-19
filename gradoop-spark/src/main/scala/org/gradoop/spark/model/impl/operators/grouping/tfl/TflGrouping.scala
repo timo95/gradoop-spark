@@ -30,15 +30,10 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     val verticesWithKeys = graph.verticesWithProperties
       .mapValues(_.withColumn(KEYS, struct(vertexKeys: _*)).cache)
 
-    // Group and aggregate vertices per label
-    val vertexAggBegin = if(vertexAggFunctions.isEmpty) Seq(DEFAULT_AGG.begin()) else vertexAggFunctions.map(_.begin())
-    val superVerticesPerLabel = verticesWithKeys
-      .mapValues(_.groupBy(KEYS).agg(vertexAggBegin.head, vertexAggBegin.drop(1): _*))
-
     // Union over labels and group and aggregate
-    val vertexAggFinish = if(vertexAggFunctions.isEmpty) Seq(DEFAULT_AGG.finish()) else vertexAggFunctions.map(_.finish())
+    val vertexAggFinish = if(vertexAggFunctions.isEmpty) Seq(DEFAULT_AGG.aggregate()) else vertexAggFunctions.map(_.aggregate())
     var superVerticesDF = Map(GradoopConstants.DEFAULT_GRAPH_LABEL ->
-      reduceUnion(superVerticesPerLabel.values).groupBy(KEYS).agg(vertexAggFinish.head, vertexAggFinish.drop(1): _*))
+      reduceUnion(verticesWithKeys.values).groupBy(KEYS).agg(vertexAggFinish.head, vertexAggFinish.drop(1): _*))
 
     // Add default ID, Label and GraphIds
     superVerticesDF = addDefaultColumns(superVerticesDF)
@@ -69,7 +64,7 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
       .select(col(KEYS).as("superKeys"), col(ColumnNames.ID).as(SUPER_ID))
     val vertexIdMap = reduceUnion(verticesWithKeys.values.map(
       _.joinWith(unionSuperVertexIds, unionSuperVertexIds("superKeys") === col(KEYS))
-        .select(col("_1." + ColumnNames.ID).as(VERTEX_ID), col("_2." + SUPER_ID))))
+        .select(col("_1." + ColumnNames.ID).as(VERTEX_ID), col("_2." + SUPER_ID)))).cache()
 
     // ----- Edges -----
 
@@ -88,15 +83,9 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
         .drop(ColumnNames.TARGET_ID, VERTEX_ID)
         .withColumnRenamed(SUPER_ID, ColumnNames.TARGET_ID))
 
-    // Group and aggregate edges per label
-    val edgeAggBegin = if(edgeAggFunctions.isEmpty) Seq(DEFAULT_AGG.begin()) else edgeAggFunctions.map(_.begin())
-    val superEdgesPerLabel = updatedEdges.mapValues(_
-      .groupBy(KEYS, ColumnNames.SOURCE_ID, ColumnNames.TARGET_ID)
-      .agg(edgeAggBegin.head, edgeAggBegin.drop(1): _*))
-
     // Union over labels and group and aggregate edges
-    val edgeAggFinish = if(edgeAggFunctions.isEmpty) Seq(DEFAULT_AGG.finish()) else edgeAggFunctions.map(_.finish())
-    var superEdgesDF = Map(GradoopConstants.DEFAULT_GRAPH_LABEL -> reduceUnion(superEdgesPerLabel.values)
+    val edgeAggFinish = if(edgeAggFunctions.isEmpty) Seq(DEFAULT_AGG.aggregate()) else edgeAggFunctions.map(_.aggregate())
+    var superEdgesDF = Map(GradoopConstants.DEFAULT_GRAPH_LABEL -> reduceUnion(updatedEdges.values)
       .groupBy(KEYS, ColumnNames.SOURCE_ID, ColumnNames.TARGET_ID)
       .agg(edgeAggFinish.head, edgeAggFinish.drop(1): _*))
 

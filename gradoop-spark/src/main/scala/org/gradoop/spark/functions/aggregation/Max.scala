@@ -8,17 +8,10 @@ import org.gradoop.spark.functions.aggregation.udaf.MaxAggregateFunction
 class Max(key: String, val name: String) extends AggregationFunction {
   private val maxAgg = new MaxAggregateFunction
 
-  override def complete(): Column = {
+  override def aggregate(): Column = {
     maxAgg(col(ColumnNames.PROPERTIES).getField(key)).as(name)
   }
 
-  override def begin(): Column = {
-    maxAgg(col(ColumnNames.PROPERTIES).getField(key)).as(name)
-  }
-
-  override def finish(): Column = {
-    maxAgg(col(name)).as(name)
-  }
 }
 
 object Max {

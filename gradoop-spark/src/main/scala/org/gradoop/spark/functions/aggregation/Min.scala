@@ -8,17 +8,10 @@ import org.gradoop.spark.functions.aggregation.udaf.MinAggregateFunction
 class Min(key: String, val name: String) extends AggregationFunction {
   private val minAgg = new MinAggregateFunction
 
-  override def complete(): Column = {
+  override def aggregate(): Column = {
     minAgg(col(ColumnNames.PROPERTIES).getField(key)).as(name)
   }
 
-  override def begin(): Column = {
-    minAgg(col(ColumnNames.PROPERTIES).getField(key)).as(name)
-  }
-
-  override def finish(): Column = {
-    minAgg(col(name)).as(name)
-  }
 }
 
 object Min {

@@ -8,17 +8,10 @@ import org.gradoop.common.properties.PropertyValue
 class Count(val name: String) extends AggregationFunction {
   private val toProp = udf((v: Any) => PropertyValue(v))
 
-  override def complete(): Column = {
+  override def aggregate(): Column = {
     toProp(count("*")).as(name)
   }
 
-  override def begin(): Column = {
-    count("*").as(name)
-  }
-
-  override def finish(): Column = {
-    toProp(sum(col(name))).as(name)
-  }
 }
 
 object Count {
