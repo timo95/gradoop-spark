@@ -32,11 +32,21 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
 
     // Union over labels and group and aggregate
     val vertexAggFinish = if(vertexAggFunctions.isEmpty) Seq(DEFAULT_AGG.aggregate()) else vertexAggFunctions.map(_.aggregate())
-    var superVerticesDF = Map(GradoopConstants.DEFAULT_GRAPH_LABEL ->
-      reduceUnion(verticesWithKeys.values).groupBy(KEYS).agg(vertexAggFinish.head, vertexAggFinish.drop(1): _*))
+    val groupedVertices = reduceUnion(verticesWithKeys.values)
+      .groupBy(KEYS)
+      .agg(vertexAggFinish.head, vertexAggFinish.drop(1): _*)
+      .withColumn(ColumnNames.ID, longToId(monotonically_increasing_id())).cache()
 
-    // Add default ID, Label and GraphIds
-    superVerticesDF = addDefaultColumns(superVerticesDF)
+    // Extract vertex id -> superId mapping (needed for edges)
+    // The join uses joinWith and alias to enable selfjoin without the optimizer failing
+    val unionSuperVertexIds = groupedVertices
+      .select(col(KEYS).as("superKeys"), col(ColumnNames.ID).as(SUPER_ID))
+    val vertexIdMap = reduceUnion(verticesWithKeys.values.map(
+      _.joinWith(unionSuperVertexIds, unionSuperVertexIds("superKeys") === col(KEYS))
+        .select(col("_1." + ColumnNames.ID).as(VERTEX_ID), col("_2." + SUPER_ID)))).cache()
+
+    // Add default Label and GraphIds and make Map
+    var superVerticesDF = addDefaultColumns(groupedVertices)
 
     // Add aggregation result to properties
     superVerticesDF = columnsToProperties(superVerticesDF, vertexAggFunctions.map(_.name))
@@ -58,14 +68,6 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     // Transform result to vertex and property maps
     val (superVertices, superVertexProperties) = splitVertexMap(superVerticesDF.mapValues(_.drop(KEYS)))
 
-    // Extract vertex id -> superId mapping (needed for edges)
-    // The join uses joinWith and alias to enable selfjoin without the optimizer failing
-    val unionSuperVertexIds = reduceUnion(superVerticesDF.values)
-      .select(col(KEYS).as("superKeys"), col(ColumnNames.ID).as(SUPER_ID))
-    val vertexIdMap = reduceUnion(verticesWithKeys.values.map(
-      _.joinWith(unionSuperVertexIds, unionSuperVertexIds("superKeys") === col(KEYS))
-        .select(col("_1." + ColumnNames.ID).as(VERTEX_ID), col("_2." + SUPER_ID)))).cache()
-
     // ----- Edges -----
 
     // Compute edge grouping keys
@@ -85,12 +87,12 @@ class TflGrouping[L <: Tfl[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
 
     // Union over labels and group and aggregate edges
     val edgeAggFinish = if(edgeAggFunctions.isEmpty) Seq(DEFAULT_AGG.aggregate()) else edgeAggFunctions.map(_.aggregate())
-    var superEdgesDF = Map(GradoopConstants.DEFAULT_GRAPH_LABEL -> reduceUnion(updatedEdges.values)
+    val groupedEdges = reduceUnion(updatedEdges.values)
       .groupBy(KEYS, ColumnNames.SOURCE_ID, ColumnNames.TARGET_ID)
-      .agg(edgeAggFinish.head, edgeAggFinish.drop(1): _*))
+      .agg(edgeAggFinish.head, edgeAggFinish.drop(1): _*).withColumn(ColumnNames.ID, longToId(monotonically_increasing_id()))
 
     // Add default ID, Label and GraphIds
-    superEdgesDF = addDefaultColumns(superEdgesDF)
+    var superEdgesDF = addDefaultColumns(groupedEdges)
 
     // Add aggregation result to properties
     superEdgesDF = columnsToProperties(superEdgesDF, edgeAggFunctions.map(_.name))

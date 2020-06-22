@@ -45,11 +45,17 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
 
     // Group and aggregate vertices
     val vertexAgg = if(vertexAggFunctions.isEmpty) Seq(DEFAULT_AGG.aggregate()) else vertexAggFunctions.map(_.aggregate())
-    var superVerticesDF = verticesWithKeys.groupBy(KEYS)
+    val groupedVertices = verticesWithKeys.groupBy(KEYS)
       .agg(vertexAgg.head, vertexAgg.drop(1): _*)
+      .withColumn(ColumnNames.ID, longToId(monotonically_increasing_id())).cache()
 
-    // Add default ID, Label and GraphIds
-    superVerticesDF = addDefaultColumns(superVerticesDF)
+    // Extract vertex id -> superId mapping (needed for edges)
+    val vertexIdMap = verticesWithKeys.select(KEYS, ColumnNames.ID)
+      .join(groupedVertices.select(col(KEYS), col(ColumnNames.ID).as(SUPER_ID)), KEYS)
+      .select(col(ColumnNames.ID).as(VERTEX_ID), col(SUPER_ID)).cache()
+
+    // Add default Label and GraphIds
+    var superVerticesDF = addDefaultColumns(groupedVertices)
 
     // Add aggregation result to properties
     superVerticesDF = columnsToProperties(superVerticesDF, vertexAggFunctions.map(_.name))
@@ -66,11 +72,6 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
     val superVertices = superVerticesDF
       .drop(KEYS)
       .as[L#V]
-
-    // Extract vertex id -> superId mapping (needed for edges)
-    val vertexIdMap = verticesWithKeys.select(KEYS, ColumnNames.ID)
-      .join(superVerticesDF.select(col(KEYS), col(ColumnNames.ID).as(SUPER_ID)), KEYS)
-      .select(col(ColumnNames.ID).as(VERTEX_ID), col(SUPER_ID)).cache()
 
     // ----- Edges -----
 
@@ -90,12 +91,13 @@ class GveGrouping[L <: Gve[L]](vertexGroupingKeys: Seq[KeyFunction], vertexAggFu
 
     // Group and aggregate edges
     val edgeAgg = if(edgeAggFunctions.isEmpty) Seq(DEFAULT_AGG.aggregate()) else edgeAggFunctions.map(_.aggregate())
-    var superEdgesDF = updatedEdges
+    val groupedEdges = updatedEdges
       .groupBy(KEYS, ColumnNames.SOURCE_ID, ColumnNames.TARGET_ID)
       .agg(edgeAgg.head, edgeAgg.drop(1): _*)
+      .withColumn(ColumnNames.ID, longToId(monotonically_increasing_id()))
 
     // Add default ID, Label and GraphIds
-    superEdgesDF = addDefaultColumns(superEdgesDF)
+    var superEdgesDF = addDefaultColumns(groupedEdges)
 
     // Add aggregation result to properties
     superEdgesDF = columnsToProperties(superEdgesDF, edgeAggFunctions.map(_.name))

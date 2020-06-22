@@ -4,7 +4,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.gradoop.common.id.GradoopId
 import org.gradoop.common.properties.PropertyValue
-import org.gradoop.common.util.ColumnNames
+import org.gradoop.common.util.{ColumnNames, GradoopConstants}
 import org.gradoop.spark.model.impl.operators.grouping.Functions.{DEFAULT_AGG, longToId}
 
 private[tfl] object Functions {
@@ -30,16 +30,15 @@ private[tfl] object Functions {
     }
   }
 
-  /** Adds default id, label and graphIds to dataframe.
+  /** Adds default label and graphIds to dataframe.
    *
-   * @param dataMap dataframe
+   * @param dataFrame dataframe
    * @return dataframe with new id, default label and empty graph ids
    */
-  def addDefaultColumns(dataMap: Map[String, DataFrame]): Map[String, DataFrame] = {
-    dataMap.transform((l, df) => df.select(df("*"),
-      longToId(monotonically_increasing_id()).as(ColumnNames.ID),
-      lit(l).as(ColumnNames.LABEL),
-      typedLit[Array[GradoopId]](Array.empty).as(ColumnNames.GRAPH_IDS)
+  def addDefaultColumns(dataFrame: DataFrame): Map[String, DataFrame] = {
+    Map(GradoopConstants.DEFAULT_GRAPH_LABEL -> dataFrame.transform(
+      _.withColumn(ColumnNames.LABEL, lit(GradoopConstants.DEFAULT_GRAPH_LABEL))
+      .withColumn(ColumnNames.GRAPH_IDS, typedLit[Array[GradoopId]](Array.empty))
     ))
   }
 }

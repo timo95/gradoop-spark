@@ -30,15 +30,14 @@ private[gve] object Functions {
     }
   }
 
-  /** Adds default id, label and graphIds to dataframe.
+  /** Adds default label and graphIds to dataframe.
    *
    * @param dataFrame dataframe
    * @return dataframe with new id, default label and empty graph ids
    */
   def addDefaultColumns(dataFrame: DataFrame): DataFrame = {
-    dataFrame.select(dataFrame("*"),
-      longToId(monotonically_increasing_id()).as(ColumnNames.ID),
-      lit(GradoopConstants.DEFAULT_GRAPH_LABEL).as(ColumnNames.LABEL),
-      typedLit[Array[GradoopId]](Array.empty).as(ColumnNames.GRAPH_IDS))
+    dataFrame
+      .withColumn(ColumnNames.LABEL, lit(GradoopConstants.DEFAULT_GRAPH_LABEL))
+      .withColumn(ColumnNames.GRAPH_IDS, typedLit[Array[GradoopId]](Array.empty))
   }
 }
