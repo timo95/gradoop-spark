@@ -14,13 +14,12 @@ class TflExclusion[L <: Tfl[L]] extends BinaryLogicalGraphToLogicalGraphOperator
 
     val vertices = TflFunctions.mergeMapsLeft(left.vertices, right.vertices,
       (l: Dataset[L#V], r: Dataset[L#V]) => l.join(r, l(ColumnNames.ID) === r(ColumnNames.ID), "leftanti").as[L#V])
-
     val edges = TflFunctions.mergeMapsLeft(left.edges, right.edges,
       (l: Dataset[L#E], r: Dataset[L#E]) => l.join(r, l(ColumnNames.ID) === r(ColumnNames.ID), "leftanti").as[L#E])
-
-    // Properties
-    val vertexProps = TflFunctions.inducePropMap(vertices, left.vertexProperties)
-    val edgeProps = TflFunctions.inducePropMap(edges, left.edgeProperties)
+    val vertexProps = TflFunctions.mergeMapsLeft(left.vertexProperties, right.vertexProperties,
+      (l: Dataset[L#P], r: Dataset[L#P]) => l.join(r, l(ColumnNames.ID) === r(ColumnNames.ID), "leftanti").as[L#P])
+    val edgeProps = TflFunctions.mergeMapsLeft(left.edgeProperties, right.edgeProperties,
+      (l: Dataset[L#P], r: Dataset[L#P]) => l.join(r, l(ColumnNames.ID) === r(ColumnNames.ID), "leftanti").as[L#P])
 
     factory.init(left.graphHeads, vertices, edges, left.graphHeadProperties, vertexProps, edgeProps).removeDanglingEdges
   }
