@@ -6,10 +6,10 @@ import org.gradoop.common.util.ColumnNames
 
 private[tfl] object Functions {
 
-  def removeUncontainedElements[EL <: GraphElement](elements: Map[String, Dataset[EL]], graphIds: DataFrame)
+  def selectContainedElements[EL <: GraphElement](elements: Map[String, Dataset[EL]], graphs: DataFrame)
     (implicit sparkSession: SparkSession, encoder: Encoder[EL]): Map[String, Dataset[EL]] = {
 
-    graphIds.createOrReplaceTempView("graphs")
+    graphs.createOrReplaceTempView("graphs")
     elements.mapValues(df => {
       df.createOrReplaceTempView("elements")
       sparkSession

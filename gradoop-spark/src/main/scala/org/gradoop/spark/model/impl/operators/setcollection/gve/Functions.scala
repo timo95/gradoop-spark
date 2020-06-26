@@ -6,11 +6,11 @@ import org.gradoop.common.util.ColumnNames
 
 private[gve] object Functions {
 
-  def selectContainedElements[EL <: GraphElement](elements: Dataset[EL], graphIds: DataFrame)
+  def selectContainedElements[EL <: GraphElement](elements: Dataset[EL], graphs: DataFrame)
     (implicit sparkSession: SparkSession, encoder: Encoder[EL]): Dataset[EL] = {
 
     elements.createOrReplaceTempView("elements")
-    graphIds.createOrReplaceTempView("graphs")
+    graphs.createOrReplaceTempView("graphs")
     sparkSession
       .sql(s"SELECT * FROM elements LEFT SEMI JOIN graphs ON array_contains(elements.${ColumnNames.GRAPH_IDS}, graphs.${ColumnNames.ID})")
       .as[EL]
