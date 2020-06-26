@@ -15,9 +15,9 @@ class TflDifference[L <: Tfl[L]] extends BinaryGraphCollectionToGraphCollectionO
     implicit val sparkSession = factory.sparkSession
 
     val resGraphHeads = TflFunctions.mergeMapsLeft(left.graphHeads, right.graphHeads,
-      (l: Dataset[L#G], r: Dataset[L#G]) => l.join(r, l(ColumnNames.ID) === r(ColumnNames.ID), "leftanti").as[L#G])
+      (l: Dataset[L#G], r: Dataset[L#G]) => l.join(r, l(ColumnNames.ID) === r(ColumnNames.ID), "leftanti").as[L#G].cache())
 
-    val graphIds = TflFunctions.reduceUnion(resGraphHeads.values.map(_.select(ColumnNames.ID)))
+    val graphIds = TflFunctions.reduceUnion(resGraphHeads.values.map(_.toDF))
 
     val resVertices = removeUncontainedElements(left.vertices, graphIds)
     val resEdges = removeUncontainedElements(left.edges, graphIds)

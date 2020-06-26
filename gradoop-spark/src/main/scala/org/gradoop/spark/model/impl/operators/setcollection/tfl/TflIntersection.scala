@@ -15,9 +15,9 @@ class TflIntersection[L <: Tfl[L]] extends BinaryGraphCollectionToGraphCollectio
     implicit val sparkSession = factory.sparkSession
 
     val resGraphHeads = TflFunctions.mergeMapsInner(left.graphHeads, right.graphHeads,
-      (l: Dataset[L#G], r: Dataset[L#G]) => l.join(r, l(ColumnNames.ID) === r(ColumnNames.ID), "leftsemi").as[L#G])
+      (l: Dataset[L#G], r: Dataset[L#G]) => l.join(r, l(ColumnNames.ID) === r(ColumnNames.ID), "leftsemi").as[L#G].cache())
 
-    val graphIds = TflFunctions.reduceUnion(resGraphHeads.values.map(_.select(ColumnNames.ID)))
+    val graphIds = TflFunctions.reduceUnion(resGraphHeads.values.map(_.toDF))
 
     val resVertices = removeUncontainedElements(left.vertices, graphIds)
     val resEdges = removeUncontainedElements(left.edges, graphIds)
