@@ -11,8 +11,8 @@ private[gve] object Functions {
 
     elements.createOrReplaceTempView("elements")
     graphIds.createOrReplaceTempView("graphs")
-    sparkSession.sqlContext
-      .sql(s"SELECT elements.* FROM elements, graphs WHERE array_contains(elements.${ColumnNames.GRAPH_IDS}, graphs.${ColumnNames.ID})")
+    sparkSession
+      .sql(s"SELECT * FROM elements LEFT SEMI JOIN graphs ON array_contains(elements.${ColumnNames.GRAPH_IDS}, graphs.${ColumnNames.ID})")
       .as[EL]
   }
 }

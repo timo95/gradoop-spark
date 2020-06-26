@@ -12,8 +12,8 @@ private[tfl] object Functions {
     graphIds.createOrReplaceTempView("graphs")
     elements.mapValues(df => {
       df.createOrReplaceTempView("elements")
-      sparkSession.sqlContext
-        .sql(s"SELECT elements.* FROM elements, graphs WHERE array_contains(elements.${ColumnNames.GRAPH_IDS}, graphs.${ColumnNames.ID})")
+      sparkSession
+        .sql(s"SELECT * FROM elements LEFT SEMI JOIN graphs ON array_contains(elements.${ColumnNames.GRAPH_IDS}, graphs.${ColumnNames.ID})")
         .as[EL]
     })
   }
