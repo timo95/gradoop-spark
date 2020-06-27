@@ -15,7 +15,7 @@ private[tfl] object Functions {
     elements.mapValues(_
       .withColumn(EXPLODED_GRAPH_ID, explode(col(ColumnNames.GRAPH_IDS)))
       .join(graphs, col(EXPLODED_GRAPH_ID) === graphs(ColumnNames.ID), "leftsemi")
-      .drop(EXPLODED_GRAPH_ID).as[EL])
+      .drop(EXPLODED_GRAPH_ID).dropDuplicates(ColumnNames.ID).as[EL])
 
     /*
     graphs.createOrReplaceTempView("graphs")

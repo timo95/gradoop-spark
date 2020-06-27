@@ -15,7 +15,7 @@ private[gve] object Functions {
     elements
       .withColumn(EXPLODED_GRAPH_ID, explode(col(ColumnNames.GRAPH_IDS)))
       .join(graphs, col(EXPLODED_GRAPH_ID) === graphs(ColumnNames.ID), "leftsemi")
-      .drop(EXPLODED_GRAPH_ID).as[EL]
+      .drop(EXPLODED_GRAPH_ID).dropDuplicates(ColumnNames.ID).as[EL]
 
     /*
     elements.createOrReplaceTempView("elements")
