@@ -17,8 +17,4 @@ class Tfl[T <: Tfl[T]] extends LayoutType[T] {
 
   type LGF <: TflBaseLayoutFactory[T, LG]
   type GCF <: TflBaseLayoutFactory[T, GC]
-
-  type LabeledGraphHead = G
-  type LabeledVertex = V
-  type LabeledEdge = E
 }
