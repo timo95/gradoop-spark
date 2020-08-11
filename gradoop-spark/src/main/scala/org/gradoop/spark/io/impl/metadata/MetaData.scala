@@ -39,6 +39,10 @@ class MetaData(val graphHeadMetaData: Dataset[ElementMetaData],
   def edgeLabels(implicit encoder: Encoder[String]): Dataset[String] = {
     edgeMetaData.select(col(ElementMetaData.label).as[String])
   }
+
+  def cache(): MetaData = {
+    new MetaData(graphHeadMetaData.cache(), vertexMetaData.cache(), edgeMetaData.cache())
+  }
 }
 
 object MetaData {
@@ -58,11 +62,11 @@ object MetaData {
     layout match {
       case gve: GveLayout[L] => new MetaData(fromElements(gve.graphHead),
         fromElements(gve.vertices),
-        fromElements(gve.edges))
+        fromElements(gve.edges)).cache()
       case tfl: TflLayout[L] => new MetaData(
         TflFunctions.reduceUnion(tfl.graphHeadProperties.values.map(p => fromElements(p))),
         TflFunctions.reduceUnion(tfl.vertexProperties.values.map(p => fromElements(p))),
-        TflFunctions.reduceUnion(tfl.edgeProperties.values.map(p => fromElements(p))))
+        TflFunctions.reduceUnion(tfl.edgeProperties.values.map(p => fromElements(p)))).cache()
       case other: Any => throw new IllegalArgumentException("Layout %s is not supported by MetaData."
         .format(other.getClass.getSimpleName))
     }
