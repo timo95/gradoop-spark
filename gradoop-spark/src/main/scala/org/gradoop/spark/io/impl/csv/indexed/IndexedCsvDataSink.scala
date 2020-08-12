@@ -19,13 +19,20 @@ class IndexedCsvDataSink[L <: Tfl[L]] private (csvPath: String, config: GradoopS
 
   override def write(logicalGraph: L#LG, saveMode: SaveMode): Unit = {
     if(handleSavemode(saveMode)) {
-      val metaData = metaDataOpt.getOrElse(MetaData(logicalGraph))
 
-      metaData.graphHeadMetaData.collect.foreach(m => logicalGraph.graphHeadsWithProperties.get(m.label).foreach(ds =>
+      // get metadata and cache graph if it has to be created
+      val (graph, metaData) = metaDataOpt match {
+        case Some(m) => (logicalGraph, m)
+        case None =>
+          val graph = logicalGraph.cache
+          (graph, MetaData(graph))
+      }
+
+      metaData.graphHeadMetaData.collect.foreach(m => graph.graphHeadsWithProperties.get(m.label).foreach(ds =>
         writeGraphHeads(indexedCsvPath(GRAPH_HEAD_PATH, m.label), propertiesToStr(ds, m), SaveMode.Append)))
-      metaData.vertexMetaData.collect.foreach(m => logicalGraph.verticesWithProperties.get(m.label).foreach(ds =>
+      metaData.vertexMetaData.collect.foreach(m => graph.verticesWithProperties.get(m.label).foreach(ds =>
         writeVertices(indexedCsvPath(VERTEX_PATH, m.label), propertiesToStr(ds, m), SaveMode.Append)))
-      metaData.edgeMetaData.collect.foreach(m => logicalGraph.edgesWithProperties.get(m.label).foreach(ds =>
+      metaData.edgeMetaData.collect.foreach(m => graph.edgesWithProperties.get(m.label).foreach(ds =>
         writeEdges(indexedCsvPath(EDGE_PATH, m.label), propertiesToStr(ds, m), SaveMode.Append)))
 
       CsvMetaDataSink(csvPath).write(metaData, saveMode)
@@ -34,13 +41,20 @@ class IndexedCsvDataSink[L <: Tfl[L]] private (csvPath: String, config: GradoopS
 
   override def write(graphCollection: L#GC, saveMode: SaveMode): Unit = {
     if(handleSavemode(saveMode)) {
-      val metaData = metaDataOpt.getOrElse(MetaData(graphCollection))
 
-      metaData.graphHeadMetaData.collect.foreach(m => graphCollection.graphHeadsWithProperties.get(m.label).foreach(ds =>
+      // get metadata and cache collection if it has to be created
+      val (collection, metaData) = metaDataOpt match {
+        case Some(m) => (graphCollection, m)
+        case None =>
+          val collection = graphCollection.cache
+          (collection, MetaData(collection))
+      }
+
+      metaData.graphHeadMetaData.collect.foreach(m => collection.graphHeadsWithProperties.get(m.label).foreach(ds =>
         writeGraphHeads(indexedCsvPath(GRAPH_HEAD_PATH, m.label), propertiesToStr(ds, m), SaveMode.Append)))
-      metaData.vertexMetaData.collect.foreach(m => graphCollection.verticesWithProperties.get(m.label).foreach(ds =>
+      metaData.vertexMetaData.collect.foreach(m => collection.verticesWithProperties.get(m.label).foreach(ds =>
         writeVertices(indexedCsvPath(VERTEX_PATH, m.label), propertiesToStr(ds, m), SaveMode.Append)))
-      metaData.edgeMetaData.collect.foreach(m => graphCollection.edgesWithProperties.get(m.label).foreach(ds =>
+      metaData.edgeMetaData.collect.foreach(m => collection.edgesWithProperties.get(m.label).foreach(ds =>
         writeEdges(indexedCsvPath(EDGE_PATH, m.label), propertiesToStr(ds, m), SaveMode.Append)))
 
       CsvMetaDataSink(csvPath).write(metaData, saveMode)

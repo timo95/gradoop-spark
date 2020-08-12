@@ -14,18 +14,34 @@ class CsvDataSink[L <: Gve[L]] private (csvPath: String, config: GradoopSparkCon
   import config.Implicits._
 
   override def write(logicalGraph: L#LG, saveMode: SaveMode): Unit = {
-    val metaData = metaDataOpt.getOrElse(MetaData(logicalGraph))
-    writeGraphHeads(CsvConstants.GRAPH_HEAD_FILE, propertiesToStr(logicalGraph.graphHeads, metaData.graphHeadMetaData), saveMode)
-    writeVertices(CsvConstants.VERTEX_FILE, propertiesToStr(logicalGraph.vertices, metaData.vertexMetaData), saveMode)
-    writeEdges(CsvConstants.EDGE_FILE, propertiesToStr(logicalGraph.edges, metaData.edgeMetaData), saveMode)
+
+    // get metadata and cache graph if it has to be created
+    val (graph, metaData) = metaDataOpt match {
+      case Some(m) => (logicalGraph, m)
+      case None =>
+        val graph = logicalGraph.cache
+        (graph, MetaData(graph))
+    }
+
+    writeGraphHeads(CsvConstants.GRAPH_HEAD_FILE, propertiesToStr(graph.graphHeads, metaData.graphHeadMetaData), saveMode)
+    writeVertices(CsvConstants.VERTEX_FILE, propertiesToStr(graph.vertices, metaData.vertexMetaData), saveMode)
+    writeEdges(CsvConstants.EDGE_FILE, propertiesToStr(graph.edges, metaData.edgeMetaData), saveMode)
     CsvMetaDataSink(csvPath).write(metaData, saveMode)
   }
 
   override def write(graphCollection: L#GC, saveMode: SaveMode): Unit = {
-    val metaData = metaDataOpt.getOrElse(MetaData(graphCollection))
-    writeGraphHeads(CsvConstants.GRAPH_HEAD_FILE, propertiesToStr(graphCollection.graphHeads, metaData.graphHeadMetaData), saveMode)
-    writeVertices(CsvConstants.VERTEX_FILE, propertiesToStr(graphCollection.vertices, metaData.vertexMetaData), saveMode)
-    writeEdges(CsvConstants.EDGE_FILE, propertiesToStr(graphCollection.edges, metaData.edgeMetaData), saveMode)
+
+    // get metadata and cache collection if it has to be created
+    val (collection, metaData) = metaDataOpt match {
+      case Some(m) => (graphCollection, m)
+      case None =>
+        val collection = graphCollection.cache
+        (collection, MetaData(collection))
+    }
+
+    writeGraphHeads(CsvConstants.GRAPH_HEAD_FILE, propertiesToStr(collection.graphHeads, metaData.graphHeadMetaData), saveMode)
+    writeVertices(CsvConstants.VERTEX_FILE, propertiesToStr(collection.vertices, metaData.vertexMetaData), saveMode)
+    writeEdges(CsvConstants.EDGE_FILE, propertiesToStr(collection.edges, metaData.edgeMetaData), saveMode)
     CsvMetaDataSink(csvPath).write(metaData, saveMode)
   }
 

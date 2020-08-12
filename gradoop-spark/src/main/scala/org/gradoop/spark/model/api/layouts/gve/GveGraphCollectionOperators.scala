@@ -64,6 +64,10 @@ trait GveGraphCollectionOperators[L <: Gve[L]] extends GraphCollectionOperators[
     transform(TransformationFunctions.identity, TransformationFunctions.identity, edgeTransformationFunction)
   }
 
+  override def cache: L#GC = {
+    factory.init(layout.graphHeads.cache, layout.vertices.cache, layout.edges.cache)
+  }
+
   // Change layout
 
   def asGve[L2 <: Gve[L2]](config: GradoopSparkConfig[L2]): L2#GC = {

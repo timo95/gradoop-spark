@@ -38,6 +38,12 @@ trait TflGraphCollectionOperators[L <: Tfl[L]] extends GraphCollectionOperators[
     throw new RuntimeException("Not implemented")
   }
 
+  override def cache: L#GC = {
+    factory.init(layout.graphHeads.mapValues(_.cache), layout.vertices.mapValues(_.cache),
+      layout.edges.mapValues(_.cache), layout.graphHeadProperties.mapValues(_.cache),
+      layout.vertexProperties.mapValues(_.cache), layout.edgeProperties.mapValues(_.cache))
+  }
+
   // Tfl only operators
 
   /** Verifies, if each dataset only contains the correct label.

@@ -21,6 +21,8 @@ trait GraphCollectionOperators[L <: LayoutType[L]] {
 
   def equalsByGraphData(other: L#GC): Boolean
 
+  def cache: L#GC
+
   // Change layout
 
   def asGve[L2 <: Gve[L2]](config: GradoopSparkConfig[L2]): L2#GC
