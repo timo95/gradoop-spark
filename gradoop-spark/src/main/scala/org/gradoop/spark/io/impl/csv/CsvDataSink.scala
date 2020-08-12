@@ -1,6 +1,6 @@
 package org.gradoop.spark.io.impl.csv
 
-import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions.{broadcast, col}
 import org.apache.spark.sql.{DataFrame, Dataset, SaveMode}
 import org.gradoop.common.model.api.components.Attributed
 import org.gradoop.common.util.ColumnNames
@@ -46,7 +46,7 @@ class CsvDataSink[L <: Gve[L]] private (csvPath: String, config: GradoopSparkCon
   }
 
   private def propertiesToStr[T <: Attributed](dataset: Dataset[T], metaData: Dataset[ElementMetaData]): DataFrame = {
-    dataset.join(metaData, ColumnNames.LABEL)
+    dataset.join(broadcast(metaData), ColumnNames.LABEL)
       .withColumn(ColumnNames.PROPERTIES,
         propertiesToStrUdf(col(ColumnNames.PROPERTIES), col(ElementMetaData.metaData)))
   }
