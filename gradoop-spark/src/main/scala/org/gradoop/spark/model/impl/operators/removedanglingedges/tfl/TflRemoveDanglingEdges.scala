@@ -13,7 +13,8 @@ class TflRemoveDanglingEdges[L <: Tfl[L]] extends UnaryLogicalGraphToLogicalGrap
     implicit val sparkSession = graph.config.sparkSession
     import sparkSession.implicits._
 
-    val vertexIdUnion = TflFunctions.reduceUnion(graph.vertices.values
+    val vertices = graph.vertices.mapValues(_.cache)
+    val vertexIdUnion = TflFunctions.reduceUnion(vertices.values
       .map(_.select(ColumnNames.ID).cache))
 
     val filteredEdgesSource = graph.edges.mapValues(e =>
@@ -21,7 +22,7 @@ class TflRemoveDanglingEdges[L <: Tfl[L]] extends UnaryLogicalGraphToLogicalGrap
     val filteredEdges = filteredEdgesSource.mapValues(e =>
       e.join(vertexIdUnion, e.targetId === vertexIdUnion(ColumnNames.ID), "leftsemi").as[L#E])
 
-    graph.factory.init(graph.graphHead, graph.vertices, filteredEdges, graph.graphHeadProperties,
+    graph.factory.init(graph.graphHead, vertices, filteredEdges, graph.graphHeadProperties,
       graph.vertexProperties, TflFunctions.inducePropMap(filteredEdges, graph.edgeProperties))
   }
 }

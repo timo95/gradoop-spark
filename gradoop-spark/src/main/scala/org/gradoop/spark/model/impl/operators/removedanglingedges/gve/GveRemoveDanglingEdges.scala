@@ -11,10 +11,12 @@ class GveRemoveDanglingEdges[L <: Gve[L]] extends UnaryLogicalGraphToLogicalGrap
     val factory = graph.factory
     import factory.Implicits._
 
+    val vertices = graph.vertices.cache
+
     val filteredEdgesSource = graph.edges
-      .join(graph.vertices, graph.edges.sourceId === graph.vertices(ColumnNames.ID), "leftsemi").as[L#E]
+      .join(vertices, graph.edges.sourceId === vertices(ColumnNames.ID), "leftsemi").as[L#E]
     val filteredEdges = filteredEdgesSource
-      .join(graph.vertices, filteredEdgesSource.targetId === graph.vertices(ColumnNames.ID), "leftsemi").as[L#E]
-    graph.factory.init(graph.graphHead, graph.vertices, filteredEdges)
+      .join(vertices, filteredEdgesSource.targetId === vertices(ColumnNames.ID), "leftsemi").as[L#E]
+    graph.factory.init(graph.graphHead, vertices, filteredEdges)
   }
 }
