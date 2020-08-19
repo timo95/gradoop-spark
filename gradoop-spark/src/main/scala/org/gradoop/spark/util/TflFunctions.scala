@@ -94,11 +94,12 @@ object TflFunctions {
   /** Split map in element map and property map. */
   def splitGraphHeadMap[L <: Tfl[L]](graphHeadMap: Map[String, DataFrame])(implicit pEncoder: Encoder[L#P],
     gEncoder: Encoder[L#G]): (Map[String, Dataset[L#G]], Map[String, Dataset[L#P]]) = {
+    val graphHeads = graphHeadMap.mapValues(_.cache())
     // Split map in main element and property maps. Use constant as label.
-    val resGrap = graphHeadMap
+    val resGrap = graphHeads
       .transform((k, v) => v.select(col(ColumnNames.ID),
         lit(k).as(ColumnNames.LABEL)).as[L#G])
-    val resGrapProp = graphHeadMap
+    val resGrapProp = graphHeads
       .transform((k, v) => v.select(col(ColumnNames.ID),
         lit(k).as(ColumnNames.LABEL),
         col(ColumnNames.PROPERTIES)).as[L#P])
@@ -108,12 +109,13 @@ object TflFunctions {
   /** Split map in element map and property map. */
   def splitVertexMap[L <: Tfl[L]](vertexMap: Map[String, DataFrame])(implicit pEncoder: Encoder[L#P],
     vEncoder: Encoder[L#V]): (Map[String, Dataset[L#V]], Map[String, Dataset[L#P]]) = {
+    val vertices = vertexMap.mapValues(_.cache())
     // Split map in main element and property maps. Use constant as label.
-    val resVert = vertexMap
+    val resVert = vertices
       .transform((k, v) => v.select(col(ColumnNames.ID),
         lit(k).as(ColumnNames.LABEL),
         col(ColumnNames.GRAPH_IDS)).as[L#V])
-    val resVertProp = vertexMap
+    val resVertProp = vertices
       .transform((k, v) => v.select(col(ColumnNames.ID),
         lit(k).as(ColumnNames.LABEL),
         col(ColumnNames.PROPERTIES)).as[L#P])
@@ -123,14 +125,15 @@ object TflFunctions {
   /** Split map in element map and property map. */
   def splitEdgeMap[L <: Tfl[L]](edgeMap: Map[String, DataFrame])(implicit pEncoder: Encoder[L#P],
     eEncoder: Encoder[L#E]): (Map[String, Dataset[L#E]], Map[String, Dataset[L#P]]) = {
+    val edges = edgeMap.mapValues(_.cache())
     // Split map in main element and property maps. Use constant as label.
-    val resEdge = edgeMap
+    val resEdge = edges
       .transform((k, v) => v.select(col(ColumnNames.ID),
         lit(k).as(ColumnNames.LABEL),
         col(ColumnNames.SOURCE_ID),
         col(ColumnNames.TARGET_ID),
         col(ColumnNames.GRAPH_IDS)).as[L#E])
-    val resEdgeProp = edgeMap
+    val resEdgeProp = edges
       .transform((k, v) => v.select(col(ColumnNames.ID),
         lit(k).as(ColumnNames.LABEL),
         col(ColumnNames.PROPERTIES)).as[L#P])

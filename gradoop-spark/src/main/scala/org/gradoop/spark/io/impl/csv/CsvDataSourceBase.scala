@@ -24,7 +24,7 @@ class CsvDataSourceBase(csvPath: String) {
   private var metaData: Option[MetaData] = None
 
   protected def getMetaData(implicit sparkSession: SparkSession): MetaData = {
-    if(metaData.isEmpty) metaData = Some(new CsvMetaDataSource(csvPath).read)
+    if(metaData.isEmpty) metaData = Some(new CsvMetaDataSource(csvPath).read.cache())
     metaData.get
   }
 
