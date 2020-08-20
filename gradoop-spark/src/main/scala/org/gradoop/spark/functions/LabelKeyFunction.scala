@@ -21,7 +21,7 @@ class LabelKeyFunction extends KeyFunction {
     (implicit sparkSession: SparkSession): Map[String, DataFrame] = {
     import sparkSession.implicits._
     dataMap.flatMap(e => {
-      val df = if(labelOpt.isDefined) e._2 else e._2.cache.toDF
+      val df = e._2.toDF.cache
       val labels = labelOpt.getOrElse(df.select(column).distinct.as[String].collect)
       labels.map(l => (l, df.filter(column === lit(l)).withColumn(ColumnNames.LABEL, lit(l)).toDF))
     })
